@@ -49,7 +49,7 @@ function ConfigureContent() {
                 className="w-full px-4 py-2 bg-gray-800/50 border border-gray-700 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-blue-500"
               />
               <p className="mt-2 text-xs text-gray-500">
-                We'll send events to this URL when data is processed
+                We&apos;ll send events to this URL when data is processed
               </p>
             </div>
 
@@ -86,12 +86,12 @@ function ConfigureContent() {
             >
               {isSaving ? 'Saving...' : 'Save Configuration'}
             </button>
-            <a
-              href="/"
+            <button
+              onClick={() => window.location.href = '/'}
               className="px-6 py-3 border border-gray-700 text-white font-medium rounded-lg hover:border-gray-600 hover:bg-gray-900/50 transition-colors"
             >
               Cancel
-            </a>
+            </button>
           </div>
         </div>
       </div>

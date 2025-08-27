@@ -38,12 +38,12 @@ function ErrorContent() {
           </div>
 
           <div className="flex flex-col gap-3">
-            <a
-              href="/"
+            <button
+              onClick={() => window.location.href = '/'}
               className="px-6 py-3 bg-white text-black font-medium rounded-lg hover:bg-gray-100 transition-colors"
             >
               Try Again
-            </a>
+            </button>
             <a
               href="https://vercel.com/docs/integrations"
               target="_blank"

@@ -54,12 +54,12 @@ function SuccessContent() {
             >
               View in Dashboard
             </a>
-            <a
-              href="/"
+            <button
+              onClick={() => window.location.href = '/'}
               className="px-6 py-3 border border-gray-700 text-white font-medium rounded-lg hover:border-gray-600 hover:bg-gray-900/50 transition-colors"
             >
               Back to Home
-            </a>
+            </button>
           </div>
         </div>
       </div>

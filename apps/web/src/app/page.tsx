@@ -28,11 +28,11 @@ export default function Index() {
               </li>
               <li className="flex items-start">
                 <span className="text-blue-500 font-bold mr-3">2.</span>
-                <span>Search for "Stream Consumer"</span>
+                <span>Search for &quot;Stream Consumer&quot;</span>
               </li>
               <li className="flex items-start">
                 <span className="text-blue-500 font-bold mr-3">3.</span>
-                <span>Click "Add Integration" and authorize</span>
+                <span>Click &quot;Add Integration&quot; and authorize</span>
               </li>
               <li className="flex items-start">
                 <span className="text-blue-500 font-bold mr-3">4.</span>

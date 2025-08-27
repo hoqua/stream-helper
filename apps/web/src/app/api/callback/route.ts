@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const CLIENT_ID = process.env.CLIENT_ID!;
-const CLIENT_SECRET = process.env.CLIENT_SECRET!;
+const CLIENT_ID = process.env.CLIENT_ID || '';
+const CLIENT_SECRET = process.env.CLIENT_SECRET || '';
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
