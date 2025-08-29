@@ -11,12 +11,12 @@
     "test": "nx test web",
     "typecheck": "nx typecheck web",
     "-------DATABASE-------": "-------DATABASE-------",
-    "db:generate": "drizzle-kit generate",
-    "db:migrate": "drizzle-kit migrate",
-    "db:push": "drizzle-kit push",
-    "db:studio": "drizzle-kit studio",
+    "db:generate": "env-cmd -f apps/web/.env.local drizzle-kit generate",
+    "db:migrate": "env-cmd -f apps/web/.env.local drizzle-kit migrate",
+    "db:push": "env-cmd -f apps/web/.env.local drizzle-kit push",
+    "db:studio": "env-cmd -f apps/web/.env.local drizzle-kit studio",
     "-----DEPLOY-------": "-----DEPLOY-------",
-    "build:prod": "npm run db:generate && npm run db:migrate && npm run build"
+    "build:prod": "drizzle-kit generate && drizzle-kit migrate && nx build web"
   },
   "private": true,
   "devDependencies": {
@@ -47,6 +47,7 @@
     "autoprefixer": "10.4.13",
     "babel-jest": "^30.0.2",
     "drizzle-kit": "^0.31.4",
+    "env-cmd": "^11.0.0",
     "eslint": "^9.8.0",
     "eslint-config-next": "^15.2.4",
     "eslint-config-prettier": "^10.0.0",
