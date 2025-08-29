@@ -47,3 +47,8 @@ Thumbs.db
 .next
 out
 test-output
+
+apps/web/.env.local
+apps/api/.env.local
+.vercel
+.env*.local
