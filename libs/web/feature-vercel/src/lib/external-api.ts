@@ -36,7 +36,7 @@ export async function exchangeExternalCodeForToken(
       console.log('Error response from Vercel:', errorData);
       return {
         success: false,
-        error: 'Failed to exchange code',
+        error: 'Failed to exchange code' + JSON.stringify(errorData, null, 2),
       };
     }
 
