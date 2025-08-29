@@ -40,8 +40,9 @@ export async function GET(request: NextRequest) {
 
   // If there's a next URL from Vercel, redirect there
   if (next) {
-    const nextUrl = new URL(next);
-    nextUrl.searchParams.set('installationId', data.installation_id);
+    const nextUrl = new URL('/configure', request.url);
+    nextUrl.searchParams.set('redirectUrl', next);
+    nextUrl.searchParams.set('configurationId', configurationId);
     return NextResponse.redirect(nextUrl);
   }
 

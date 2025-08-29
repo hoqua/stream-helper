@@ -16,7 +16,7 @@ import { updateConfiguration } from './action';
 function ConfigureContent() {
   const searchParams = useSearchParams();
   const configurationId = searchParams.get('configurationId');
-  const installationId = searchParams.get('installationId');
+  const redirectUrl = searchParams.get('redirectUrl') || '/';
   const { register, handleSubmit, control } = useForm<ConfigurationType>({
     values: {
       processingMode: 'realtime',
@@ -30,11 +30,11 @@ function ConfigureContent() {
   const handleSave = async (data: ConfigurationType) => {
     setIsSaving(true);
 
-    if (!configurationId || !installationId) {
+    if (!configurationId) {
       return;
     }
 
-    await updateConfiguration(configurationId, installationId, data);
+    await updateConfiguration(configurationId, redirectUrl, data);
   };
 
   return (

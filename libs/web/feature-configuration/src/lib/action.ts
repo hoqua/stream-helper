@@ -5,12 +5,10 @@ import { redirect } from 'next/navigation';
 
 export async function updateConfiguration(
   configurationId: string,
-  installationId: string,
+  redirectUrl: string,
   data: ConfigurationType
 ) {
   await configureUser(configurationId, data);
 
-  redirect(
-    `https://vercel.com/integrations/complete?installationId=${installationId}&configurationId=${configurationId}`
-  );
+  redirect(redirectUrl);
 }
