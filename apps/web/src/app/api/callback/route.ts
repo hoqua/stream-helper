@@ -21,7 +21,10 @@ export async function GET(request: NextRequest) {
 
   if (!response.success || !response.data) {
     return NextResponse.redirect(
-      new URL(`/error?message=${response.error}`, request.url)
+      new URL(
+        `/error?message=${response.error} + ${process.env.NEXT_PUBLIC_VERCEL_URL}`,
+        request.url
+      )
     );
   }
 
