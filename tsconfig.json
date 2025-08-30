@@ -5,6 +5,18 @@
   "references": [
     {
       "path": "./apps/web"
+    },
+    {
+      "path": "./libs/web/feature-vercel"
+    },
+    {
+      "path": "./libs/shared/data-access-db"
+    },
+    {
+      "path": "./libs/web/feature-configuration"
+    },
+    {
+      "path": "./libs/shared/utils-schemas"
     }
   ]
 }

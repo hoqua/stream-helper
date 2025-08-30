@@ -28,7 +28,12 @@
           "buildDepsName": "build-deps",
           "watchDepsName": "watch-deps"
         }
-      }
+      },
+      "exclude": [
+        "libs/web/feature-vercel/*",
+        "libs/shared/data-access-db/*",
+        "libs/shared/utils-schemas/*"
+      ]
     },
     {
       "plugin": "@nx/next/plugin",
@@ -58,6 +63,30 @@
       "options": {
         "targetName": "test"
       }
+    },
+    {
+      "plugin": "@nx/js/typescript",
+      "include": [
+        "libs/web/feature-vercel/*",
+        "libs/shared/data-access-db/*",
+        "libs/shared/utils-schemas/*"
+      ],
+      "options": {
+        "typecheck": {
+          "targetName": "typecheck"
+        }
+      }
+    },
+    {
+      "plugin": "@nx/react/router-plugin",
+      "options": {
+        "buildTargetName": "build",
+        "devTargetName": "dev",
+        "startTargetName": "start",
+        "watchDepsTargetName": "watch-deps",
+        "buildDepsTargetName": "build-deps",
+        "typecheckTargetName": "typecheck"
+      }
     }
   ],
   "targetDefaults": {
@@ -70,6 +99,11 @@
       "application": {
         "style": "tailwind",
         "linter": "eslint"
+      }
+    },
+    "@nx/react": {
+      "library": {
+        "unitTestRunner": "jest"
       }
     }
   }
