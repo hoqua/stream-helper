@@ -13,6 +13,8 @@ permissions:
 jobs:
   main:
     runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -33,9 +35,17 @@ jobs:
 
       - run: npm ci --legacy-peer-deps
 
+      # Run lint check first for fast feedback
+      - name: Lint code
+        run: npm run lint
+
       # Prepend any command with "nx-cloud record --" to record its logs to Nx Cloud
       # - run: npx nx-cloud record -- echo Hello World
-      - run: npx nx run-many -t lint test build typecheck
+      - name: Run tests and typecheck
+        run: npx nx run-many -t test typecheck
+
+      - name: Build all projects
+        run: npx nx run-many --target=build --all
       # Nx Cloud recommends fixes for failures to help you get CI green faster. Learn more: https://nx.dev/ci/features/self-healing-ci
       - run: npx nx fix-ci
         if: always()

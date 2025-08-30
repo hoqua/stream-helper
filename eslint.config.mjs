@@ -1,11 +1,21 @@
 import nx from '@nx/eslint-plugin';
+import unicorn from 'eslint-plugin-unicorn';
+import prettierConfig from 'eslint-config-prettier';
+import prettierPlugin from 'eslint-plugin-prettier';
 
 export default [
   ...nx.configs['flat/base'],
   ...nx.configs['flat/typescript'],
   ...nx.configs['flat/javascript'],
+  unicorn.configs['flat/recommended'],
+  prettierConfig,
   {
-    ignores: ['**/dist'],
+    ignores: ['**/dist', '**/*.config.js', '**/*.config.ts', '**/*.config.mjs'],
+  },
+  {
+    plugins: {
+      prettier: prettierPlugin,
+    },
   },
   {
     files: ['**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx'],
@@ -37,6 +47,11 @@ export default [
       '**/*.mjs',
     ],
     // Override or add rules here
-    rules: {},
+    rules: {
+      'prettier/prettier': 'error',
+      'unicorn/prevent-abbreviations': 'off',
+      'unicorn/no-abusive-eslint-disable': 'off',
+      'unicorn/no-null': 'off',
+    },
   },
 ];

@@ -41,6 +41,7 @@ Simple Vercel Marketplace integration with OAuth support.
 ## Webhook Events
 
 The `/api/webhook` endpoint handles:
+
 - `integration.configuration-created` - New installation
 - `integration.configuration-removed` - Uninstalled
 - `deployment.created` - New deployment
