@@ -6,7 +6,7 @@ import { redirect } from 'next/navigation';
 export async function updateConfiguration(
   configurationId: string,
   redirectUrl: string,
-  data: ConfigurationType
+  data: ConfigurationType,
 ) {
   await configureUser(configurationId, data);
 

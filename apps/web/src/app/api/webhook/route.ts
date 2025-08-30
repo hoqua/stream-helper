@@ -17,23 +17,27 @@ export async function POST(request: NextRequest) {
 
     // Handle different event types
     switch (body.type) {
-      case 'integration.configuration-created':
+      case 'integration.configuration-created': {
         // New integration installed
         console.log('Integration installed for:', body.payload?.userId);
         break;
+      }
 
-      case 'integration.configuration-removed':
+      case 'integration.configuration-removed': {
         // Integration uninstalled
         console.log('Integration removed for:', body.payload?.userId);
         break;
+      }
 
-      case 'deployment.created':
+      case 'deployment.created': {
         // Deployment created
         console.log('Deployment created:', body.payload?.deployment?.url);
         break;
+      }
 
-      default:
+      default: {
         console.log('Unknown event type:', body.type);
+      }
     }
 
     return NextResponse.json({ received: true });

@@ -9,22 +9,20 @@ export async function GET(request: NextRequest) {
   const configurationId = searchParams.get('configurationId') || '';
 
   if (!code) {
-    return NextResponse.redirect(
-      new URL('/error?message=No%20code%20provided', request.url)
-    );
+    return NextResponse.redirect(new URL('/error?message=No%20code%20provided', request.url));
   }
 
   const response = await exchangeExternalCodeForToken(
     code,
-    `https://${process.env.NEXT_PUBLIC_VERCEL_URL}/api/callback`
+    `https://${process.env.NEXT_PUBLIC_VERCEL_URL}/api/callback`,
   );
 
   if (!response.success || !response.data) {
     return NextResponse.redirect(
       new URL(
         `/error?message=${response.error} + ${process.env.NEXT_PUBLIC_VERCEL_URL}`,
-        request.url
-      )
+        request.url,
+      ),
     );
   }
 

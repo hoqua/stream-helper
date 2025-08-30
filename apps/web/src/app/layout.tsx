@@ -5,11 +5,7 @@ export const metadata = {
   description: 'Real-time data streaming integration for Vercel projects',
 };
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
       <body>{children}</body>

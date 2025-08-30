@@ -8,6 +8,4 @@ export const IntegrationExternalTokenResponse = z.object({
   team_id: z.string().nullable(),
 });
 
-export type IntegrationExternalTokenResponseType = z.infer<
-  typeof IntegrationExternalTokenResponse
->;
+export type IntegrationExternalTokenResponseType = z.infer<typeof IntegrationExternalTokenResponse>;

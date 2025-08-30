@@ -14,9 +14,9 @@ import { ModeOptions } from './constants';
 import { updateConfiguration } from './action';
 
 function ConfigureContent() {
-  const searchParams = useSearchParams();
-  const configurationId = searchParams.get('configurationId');
-  const redirectUrl = searchParams.get('redirectUrl') || '/';
+  const searchParameters = useSearchParams();
+  const configurationId = searchParameters.get('configurationId');
+  const redirectUrl = searchParameters.get('redirectUrl') || '/';
   const { register, handleSubmit, control } = useForm<ConfigurationType>({
     values: {
       processingMode: 'realtime',
@@ -43,18 +43,12 @@ function ConfigureContent() {
 
       <div className="max-w-2xl mx-auto px-4 py-16">
         <div className="bg-gray-900/50 backdrop-blur border border-gray-800 rounded-2xl p-8">
-          <h1 className="text-2xl font-bold text-white mb-2">
-            Configure Stream Consumer
-          </h1>
-          <p className="text-gray-400 mb-8">
-            Set up your integration preferences
-          </p>
+          <h1 className="text-2xl font-bold text-white mb-2">Configure Stream Consumer</h1>
+          <p className="text-gray-400 mb-8">Set up your integration preferences</p>
 
           {configurationId && (
             <div className="bg-gray-800/50 rounded-lg p-3 mb-6">
-              <p className="text-xs text-gray-500">
-                Configuration ID: {configurationId}
-              </p>
+              <p className="text-xs text-gray-500">Configuration ID: {configurationId}</p>
             </div>
           )}
 
@@ -114,9 +108,7 @@ function ConfigureContent() {
                     )}
                   />
 
-                  <span className="text-sm text-gray-300">
-                    Enable automatic processing
-                  </span>
+                  <span className="text-sm text-gray-300">Enable automatic processing</span>
                 </label>
               </div>
             </div>
