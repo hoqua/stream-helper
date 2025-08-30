@@ -1,6 +1,7 @@
 {
   "name": "@stream-consumer/api",
   "version": "0.0.1",
+  "type": "module",
   "private": true,
   "nx": {
     "targets": {
@@ -14,7 +15,7 @@
           "platform": "node",
           "outputPath": "apps/api/dist",
           "format": [
-            "cjs"
+            "esm"
           ],
           "bundle": false,
           "main": "apps/api/src/main.ts",
