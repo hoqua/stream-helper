@@ -17,6 +17,9 @@
     },
     {
       "path": "./libs/shared/utils-schemas"
+    },
+    {
+      "path": "./apps/api"
     }
   ]
 }
