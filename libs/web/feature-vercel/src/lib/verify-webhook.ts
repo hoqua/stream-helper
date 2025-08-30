@@ -1,7 +1,7 @@
 import { NextRequest } from 'next/server';
 import * as crypto from 'node:crypto';
 
-const CLIENT_SECRET = process.env.CLIENT_SECRET || '';
+const CLIENT_SECRET = process.env.VERCEL_CLIENT_SECRET || '';
 
 export async function verifyWebhook(request: NextRequest) {
   const rawBody = await request.text();
