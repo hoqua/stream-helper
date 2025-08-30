@@ -15,6 +15,11 @@
   },
   "nx": {
     "name": "shared-utils-schemas",
+    "targets": {
+      "test": {
+        "executor": "nx:noop"
+      }
+    },
     "tags": [
       "scope:shared"
     ]
