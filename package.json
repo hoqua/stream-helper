@@ -12,6 +12,7 @@
     "db:push": "env-cmd -f apps/web/.env.local drizzle-kit push",
     "db:studio": "env-cmd -f apps/web/.env.local drizzle-kit studio",
     "-----DEPLOY-------": "-----DEPLOY-------",
+    "build": "nx build web",
     "build:prod": "drizzle-kit generate && drizzle-kit migrate && nx build web"
   },
   "private": true,
