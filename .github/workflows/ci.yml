@@ -44,8 +44,8 @@ jobs:
       - name: Run tests and typecheck
         run: npx nx run-many -t test typecheck
       
-      - name: Build
-        run: npm run build
+      - name: Build all projects
+        run: nx run-many --target=build --all
       # Nx Cloud recommends fixes for failures to help you get CI green faster. Learn more: https://nx.dev/ci/features/self-healing-ci
       - run: npx nx fix-ci
         if: always()
