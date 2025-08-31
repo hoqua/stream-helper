@@ -39,7 +39,7 @@ jobs:
         run: npm run db:migrate:prod
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          
+
       # Run lint check first for fast feedback
       - name: Lint code
         run: npm run lint
