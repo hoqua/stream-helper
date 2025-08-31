@@ -35,6 +35,11 @@ jobs:
 
       - run: npm ci
 
+      - name: Run Database Migrations
+        run: npm run db:migrate:prod
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+          
       # Run lint check first for fast feedback
       - name: Lint code
         run: npm run lint
@@ -47,7 +52,3 @@ jobs:
       - name: Build all projects
         run: npx nx run-many --target=build --all
 
-      - name: Run Database Migrations
-        run: npm run db:migrate:prod
-        env:
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
