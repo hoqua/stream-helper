@@ -8,7 +8,7 @@ export default function PrivacyPolicy() {
       <div className="max-w-4xl mx-auto px-4 py-24">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-white mb-6">Privacy Policy</h1>
-          <p className="text-gray-400">StreamHelper SaaS Integration for Vercel</p>
+          <p className="text-gray-400">Durablr SaaS Integration for Vercel</p>
         </div>
 
         <div className="bg-gray-900/50 backdrop-blur border border-gray-800 rounded-xl p-8 space-y-8">
@@ -17,7 +17,7 @@ export default function PrivacyPolicy() {
             <div className="text-gray-300 space-y-4">
               <div>
                 <h3 className="text-lg font-medium text-white mb-2">Integration Data</h3>
-                <p>When you install the StreamHelper integration, we collect:</p>
+                <p>When you install the Durablr integration, we collect:</p>
                 <ul className="list-disc list-inside space-y-1 ml-4 mt-2">
                   <li>Your Vercel account information (name, email, team details)</li>
                   <li>Project names and deployment URLs where the integration is installed</li>

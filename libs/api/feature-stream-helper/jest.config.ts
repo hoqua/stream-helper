@@ -10,7 +10,7 @@ const swcJestConfig = JSON.parse(
 swcJestConfig.swcrc = false;
 
 export default {
-  displayName: '@stream-consumer/feature-stream-helper',
+  displayName: '@durablr/feature-stream-helper',
   preset: '../../../jest.preset.js',
   testEnvironment: 'node',
   transform: {

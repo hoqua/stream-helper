@@ -40,7 +40,7 @@ function SuccessContent() {
           </h2>
 
           <p className="text-gray-400 mb-6">
-            Stream Consumer has been successfully added to your Vercel account.
+            Durablr has been successfully added to your Vercel account.
           </p>
 
           {installationId && (

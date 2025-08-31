@@ -1,5 +1,5 @@
 {
-  "name": "@stream-consumer/api",
+  "name": "@durablr/api",
   "version": "0.0.1",
   "type": "module",
   "private": true,
@@ -83,15 +83,15 @@
           "build"
         ],
         "options": {
-          "buildTarget": "@stream-consumer/api:build",
+          "buildTarget": "@durablr/api:build",
           "runBuildTargetDependencies": true
         },
         "configurations": {
           "development": {
-            "buildTarget": "@stream-consumer/api:build:development"
+            "buildTarget": "@durablr/api:build:development"
           },
           "production": {
-            "buildTarget": "@stream-consumer/api:build:production"
+            "buildTarget": "@durablr/api:build:production"
           }
         }
       }

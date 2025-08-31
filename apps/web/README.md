@@ -1,4 +1,4 @@
-# Stream Consumer - Vercel Integration
+# Durablr - Vercel Integration
 
 Simple Vercel Marketplace integration with OAuth support.
 

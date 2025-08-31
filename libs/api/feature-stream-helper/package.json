@@ -1,5 +1,5 @@
 {
-  "name": "@stream-consumer/feature-stream-helper",
+  "name": "@durablr/feature-stream-helper",
   "version": "0.0.1",
   "private": true,
   "type": "module",

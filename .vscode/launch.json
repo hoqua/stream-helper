@@ -4,9 +4,9 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "Debug @stream-consumer/api with Nx",
+      "name": "Debug @durablr/api with Nx",
       "runtimeExecutable": "npx",
-      "runtimeArgs": ["nx", "serve", "@stream-consumer/api"],
+      "runtimeArgs": ["nx", "serve", "@durablr/api"],
       "env": {
         "NODE_OPTIONS": "--inspect=9229"
       },

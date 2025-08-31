@@ -7,9 +7,9 @@ export default function Examples() {
 
       <div className="max-w-6xl mx-auto px-4 py-24">
         <div className="text-center mb-12">
-          <h1 className="text-5xl font-bold text-white mb-6">StreamHelper API Examples</h1>
+          <h1 className="text-5xl font-bold text-white mb-6">Durablr API Examples</h1>
           <p className="text-xl text-gray-400 max-w-3xl mx-auto">
-            Real-world examples of using StreamHelper to handle Server-Sent Events streams without
+            Real-world examples of using Durablr to handle Server-Sent Events streams without
             serverless timeouts
           </p>
         </div>
@@ -19,7 +19,7 @@ export default function Examples() {
           <h2 className="text-2xl font-semibold text-white mb-4">🚀 Getting Started</h2>
           <div className="bg-black/50 rounded-lg p-4 mb-4">
             <code className="text-green-400 text-sm">
-              # StreamHelper API is hosted at:
+              # Durablr API is hosted at:
               <br />
               https://www.durablr.run
             </code>
@@ -126,7 +126,7 @@ export default function Examples() {
         {/* Webhook Response Format */}
         <div className="bg-gray-900/50 backdrop-blur border border-gray-800 rounded-xl p-8 mb-8">
           <h2 className="text-2xl font-semibold text-white mb-4">📨 Webhook Response Format</h2>
-          <p className="text-gray-400 mb-4">StreamHelper forwards streaming chunks in real-time:</p>
+          <p className="text-gray-400 mb-4">Durablr forwards streaming chunks in real-time:</p>
 
           <div className="space-y-4">
             <div>
