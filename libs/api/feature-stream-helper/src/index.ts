@@ -1,1 +1,1 @@
-export * from './lib/feature-stream-helper.js';
+export * from './lib/stream-helper.route';

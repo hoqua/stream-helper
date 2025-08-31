@@ -1,6 +1,7 @@
 import Fastify from 'fastify';
 import sensiblePlugin from './app/plugins/sensible';
 import rootRoute from './app/routes/root';
+import { registerStreamHelperRoute } from '@stream-consumer/feature-stream-helper';
 
 const host = process.env.HOST ?? 'localhost';
 const port = process.env.PORT ? Number(process.env.PORT) : 3001;
@@ -15,6 +16,9 @@ server.register(sensiblePlugin);
 
 // Register routes
 server.register(rootRoute);
+server.register(fastify => {
+  registerStreamHelperRoute(fastify);
+});
 
 // Start listening.
 server.listen({ port, host }, (error) => {

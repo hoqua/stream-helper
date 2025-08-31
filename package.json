@@ -3,9 +3,10 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "dev": "nx run @stream-consumer/web:dev & nx run @stream-consumer/api:serve",
+    "dev": "nx run @stream-consumer/web:dev & nx run @stream-consumer/api:serve --watch",
     "dev:web": "nx dev web",
-    "dev:api": "nx serve @stream-consumer/api",
+    "dev:api": "nx serve @stream-consumer/api --watch",
+    "-----QUALITY-------": "-----QUALITY-------",
     "lint": "nx run-many --target=lint --all",
     "lint:fix": "nx run-many --target=lint --all -- --fix",
     "-------DATABASE-------": "-------DATABASE-------",
@@ -14,8 +15,8 @@
     "db:push": "env-cmd -f apps/web/.env.local drizzle-kit push",
     "db:studio": "env-cmd -f apps/web/.env.local drizzle-kit studio",
     "-----DEPLOY-------": "-----DEPLOY-------",
-    "build": "nx build web",
-    "build:prod": "drizzle-kit generate && drizzle-kit migrate && nx build web"
+    "build:web:prod": "drizzle-kit generate && drizzle-kit migrate && nx build web",
+    "build:api:prod": "nx build @stream-consumer/api --configuration=production"
   },
   "private": true,
   "devDependencies": {
@@ -94,6 +95,7 @@
     "fastify": "~5.2.1",
     "fastify-plugin": "~5.0.1",
     "next": "~15.2.4",
+    "openai": "^5.16.0",
     "react": "19.0.0",
     "react-dom": "19.0.0",
     "react-hook-form": "^7.62.0",
