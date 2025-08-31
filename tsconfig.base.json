@@ -17,5 +17,8 @@
     "strict": true,
     "target": "es2022",
     "customConditions": ["development"],
+    "paths": {
+      "@durablr/feature-stream-helper": ["./libs/api/feature-stream-helper/dist/index.d.ts"]
+    }
   }
 }
