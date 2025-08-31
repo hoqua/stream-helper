@@ -30,7 +30,9 @@ export const streams = pgTable('streams', {
 });
 
 export const streamLogs = pgTable('stream_logs', {
-  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+  id: text('id')
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
   streamId: text('stream_id')
     .notNull()
     .references(() => streams.id, { onDelete: 'cascade' }),

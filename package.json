@@ -14,8 +14,6 @@
     "db:migrate": "env-cmd -f apps/web/.env.local drizzle-kit migrate",
     "db:push": "env-cmd -f apps/web/.env.local drizzle-kit push",
     "db:studio": "env-cmd -f apps/web/.env.local drizzle-kit studio",
-    "db:reset": "env-cmd -f apps/web/.env.local node scripts/reset-database.js",
-    "db:reset-and-migrate": "npm run db:reset && npm run db:migrate",
     "-----DEPLOY-------": "-----DEPLOY-------",
     "build:web:prod": "drizzle-kit generate && drizzle-kit migrate && nx build web",
     "build:api:prod": "nx build @durablr/api --configuration=production"
