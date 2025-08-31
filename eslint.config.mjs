@@ -54,4 +54,10 @@ export default [
       'unicorn/no-null': 'off',
     },
   },
+  {
+    files: ['**/*.json'],
+    rules: {
+      'unicorn/prevent-abbreviations': 'off',
+    },
+  },
 ];

@@ -1,3 +1,3 @@
 export function featureStreamHelper(): string {
-    return 'feature-stream-helper';
+  return 'feature-stream-helper';
 }
