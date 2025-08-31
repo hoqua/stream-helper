@@ -3,6 +3,9 @@
   "include": [],
   "references": [
     {
+      "path": "../../shared/utils-schemas"
+    },
+    {
       "path": "../../shared/data-access-db"
     },
     {

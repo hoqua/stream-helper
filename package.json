@@ -3,7 +3,10 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "dev": "nx dev web",
+    "dev": "nx run @stream-consumer/web:dev & nx run @stream-consumer/api:serve --watch",
+    "dev:web": "nx dev web",
+    "dev:api": "nx serve @stream-consumer/api --watch",
+    "-----QUALITY-------": "-----QUALITY-------",
     "lint": "nx run-many --target=lint --all",
     "lint:fix": "nx run-many --target=lint --all -- --fix",
     "-------DATABASE-------": "-------DATABASE-------",
@@ -12,8 +15,8 @@
     "db:push": "env-cmd -f apps/web/.env.local drizzle-kit push",
     "db:studio": "env-cmd -f apps/web/.env.local drizzle-kit studio",
     "-----DEPLOY-------": "-----DEPLOY-------",
-    "build": "nx build web",
-    "build:prod": "drizzle-kit generate && drizzle-kit migrate && nx build web"
+    "build:web:prod": "drizzle-kit generate && drizzle-kit migrate && nx build web",
+    "build:api:prod": "nx build @stream-consumer/api --configuration=production"
   },
   "private": true,
   "devDependencies": {
@@ -62,6 +65,7 @@
     "jest-environment-jsdom": "^30.0.2",
     "jest-environment-node": "^30.0.2",
     "jest-util": "^30.0.2",
+    "jsonc-eslint-parser": "^2.1.0",
     "nx": "21.4.1",
     "postcss": "8.4.38",
     "prettier": "^3.6.2",
@@ -76,7 +80,9 @@
     "web",
     "apps/*",
     "libs/web/*",
-    "libs/shared/*"
+    "libs/shared/*",
+    "libs/api",
+    "libs/api/feature-stream-helper"
   ],
   "dependencies": {
     "@fastify/autoload": "~6.0.3",

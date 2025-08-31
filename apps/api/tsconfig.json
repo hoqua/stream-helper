@@ -4,6 +4,12 @@
   "include": [],
   "references": [
     {
+      "path": "../../libs/api/feature-stream-helper"
+    },
+    {
+      "path": "../../libs/shared/data-access-db"
+    },
+    {
       "path": "./tsconfig.app.json"
     }
   ]
