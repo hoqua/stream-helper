@@ -33,7 +33,7 @@ jobs:
           node-version: 20
           cache: 'npm'
 
-      - run: npm ci --legacy-peer-deps
+      - run: npm ci
 
       # Run lint check first for fast feedback
       - name: Lint code
