@@ -17,42 +17,48 @@ export class StreamHelperService {
 
   async subscribeToStream(config: StreamConfig): Promise<string> {
     const streamId = crypto.randomUUID();
-    
+
     const abortController = new AbortController();
     const processor: StreamProcessor = {
       config,
       streamId,
-      abortController
+      abortController,
     };
 
     this.processors.set(streamId, processor);
-    
+
     // Start processing in background
-    this.processStream(processor).catch(error => {
-      console.error(`Stream ${streamId} failed:`, error.message);
-    }).finally(() => {
-      this.processors.delete(streamId);
-    });
+    this.processStream(processor)
+      .catch((error) => {
+        console.error(`Stream ${streamId} failed:`, error.message);
+      })
+      .finally(() => {
+        this.processors.delete(streamId);
+      });
 
     return streamId;
   }
 
   private async processStream(processor: StreamProcessor): Promise<void> {
     const { config, streamId, abortController } = processor;
-    
+
     const headers = {
-      'Accept': 'text/event-stream',
-      ...config.headers
+      Accept: 'text/event-stream',
+      ...config.headers,
     };
 
     const fetchOptions: RequestInit = {
       method: config.method || 'GET',
       headers,
-      signal: abortController.signal
+      signal: abortController.signal,
     };
 
-    if (config.body && (config.method === 'POST' || config.method === 'PUT' || config.method === 'PATCH')) {
-      fetchOptions.body = typeof config.body === 'string' ? config.body : JSON.stringify(config.body);
+    if (
+      config.body &&
+      (config.method === 'POST' || config.method === 'PUT' || config.method === 'PATCH')
+    ) {
+      fetchOptions.body =
+        typeof config.body === 'string' ? config.body : JSON.stringify(config.body);
     }
 
     const response = await fetch(config.streamUrl, fetchOptions);
@@ -72,13 +78,13 @@ export class StreamHelperService {
         if (done) break;
 
         const chunk = decoder.decode(value);
-        
+
         // Just send whatever we got - no parsing, no trimming
         await this.sendWebhook(config.webhookUrl, {
           streamId,
           type: 'chunk',
           data: chunk,
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
         });
       }
 
@@ -86,9 +92,8 @@ export class StreamHelperService {
       await this.sendWebhook(config.webhookUrl, {
         streamId,
         type: 'completed',
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
-
     } finally {
       reader.releaseLock();
     }
@@ -99,7 +104,7 @@ export class StreamHelperService {
       await fetch(webhookUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
+        body: JSON.stringify(data),
       });
     } catch (error) {
       console.error('Webhook failed:', error);
@@ -110,14 +115,14 @@ export class StreamHelperService {
   stopStream(streamId: string): boolean {
     const processor = this.processors.get(streamId);
     if (!processor) return false;
-    
+
     processor.abortController.abort();
     this.processors.delete(streamId);
     return true;
   }
 
   getActiveStreams(): string[] {
-    return Array.from(this.processors.keys());
+    return [...this.processors.keys()];
   }
 }
 

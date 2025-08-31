@@ -16,7 +16,7 @@ server.register(sensiblePlugin);
 
 // Register routes
 server.register(rootRoute);
-server.register(fastify => {
+server.register((fastify) => {
   registerStreamHelperRoute(fastify);
 });
 

@@ -21,10 +21,11 @@ export default function Index() {
             </svg>
           </div>
 
-          <h1 className="text-5xl font-bold text-white mb-6">Stream Consumer</h1>
+          <h1 className="text-5xl font-bold text-white mb-6">StreamHelper SaaS</h1>
 
           <p className="text-xl text-gray-400 mb-12 max-w-2xl mx-auto">
-            Simple integration for Vercel Marketplace. Process and manage data streams with ease.
+            Generic SaaS that handles any Server-Sent Events (SSE) stream without serverless timeout issues. 
+            Perfect for Vercel, Netlify, and other serverless platforms.
           </p>
 
           <div className="bg-gray-900/50 backdrop-blur border border-gray-800 rounded-xl p-8 mb-8">
@@ -121,18 +122,18 @@ export default function Index() {
 
           <div className="flex gap-4 justify-center">
             <a
-              href="https://vercel.com/integrations"
-              target="_blank"
-              rel="noopener noreferrer"
+              href="/examples"
               className="px-8 py-3 bg-white text-black font-medium rounded-lg hover:bg-gray-100 transition-colors"
             >
-              View on Marketplace
+              View Examples
             </a>
             <a
-              href="/api/hello"
+              href="https://github.com/anthropics/stream-consumer"
+              target="_blank"
+              rel="noopener noreferrer" 
               className="px-8 py-3 border border-gray-700 text-white font-medium rounded-lg hover:border-gray-600 hover:bg-gray-900/50 transition-colors"
             >
-              Test API
+              View on GitHub
             </a>
           </div>
         </div>

@@ -23,11 +23,11 @@ export async function registerStreamHelperRoute(fastify: FastifyInstance) {
         webhookUrl,
         headers,
         body,
-        method
+        method,
       };
 
       const streamId = await streamService.subscribeToStream(streamConfig);
-      
+
       return { streamId };
     } catch (error) {
       reply.code(500);
@@ -39,14 +39,14 @@ export async function registerStreamHelperRoute(fastify: FastifyInstance) {
   fastify.delete('/stream/subscribe/:streamId', async (request, reply) => {
     try {
       const { streamId } = request.params as { streamId: string };
-      
+
       const success = streamService.stopStream(streamId);
-      
+
       if (!success) {
         reply.code(404);
         return { error: 'Stream not found' };
       }
-      
+
       return { message: 'Stream stopped', streamId };
     } catch (error) {
       reply.code(500);
