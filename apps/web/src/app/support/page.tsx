@@ -8,9 +8,7 @@ export default function Support() {
       <div className="max-w-4xl mx-auto px-4 py-24">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-white mb-6">Support</h1>
-          <p className="text-gray-400">
-            Get help with StreamHelper SaaS Integration
-          </p>
+          <p className="text-gray-400">Get help with StreamHelper SaaS Integration</p>
         </div>
 
         <div className="bg-gray-900/50 backdrop-blur border border-gray-800 rounded-xl p-8 space-y-8">
@@ -18,8 +16,18 @@ export default function Support() {
             <h2 className="text-2xl font-semibold text-white mb-4">📧 Contact Support</h2>
             <div className="bg-blue-900/20 border border-blue-800 rounded-lg p-6">
               <div className="flex items-center mb-4">
-                <svg className="w-8 h-8 text-blue-400 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                <svg
+                  className="w-8 h-8 text-blue-400 mr-3"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+                  />
                 </svg>
                 <div>
                   <h3 className="text-xl font-semibold text-blue-400">Email Support</h3>
@@ -32,8 +40,8 @@ export default function Support() {
                 </a>
               </p>
               <p className="text-gray-300">
-                Send us detailed information about your issue, including error messages, 
-                stream URLs, and webhook configurations for faster resolution.
+                Send us detailed information about your issue, including error messages, stream
+                URLs, and webhook configurations for faster resolution.
               </p>
             </div>
           </section>
@@ -46,10 +54,7 @@ export default function Support() {
                 <p className="text-gray-300 mb-3">
                   Check our examples page for implementation guides and API documentation.
                 </p>
-                <Link
-                  href="/examples"
-                  className="text-blue-400 hover:underline"
-                >
+                <Link href="/examples" className="text-blue-400 hover:underline">
                   View Examples →
                 </Link>
               </div>
@@ -92,8 +97,17 @@ export default function Support() {
               <div className="border border-gray-700 rounded-lg p-4">
                 <h3 className="text-lg font-medium text-white mb-2">OpenAI Streaming Issues</h3>
                 <ul className="text-gray-300 space-y-1 text-sm">
-                  <li>• Set <code className="bg-gray-600 px-1 rounded">"stream": true</code> in your request body</li>
-                  <li>• Use <code className="bg-gray-600 px-1 rounded">"method": "POST"</code> for chat completions</li>
+                  <li>
+                    • Set <code className="bg-gray-600 px-1 rounded">&quot;stream&quot;: true</code>{' '}
+                    in your request body
+                  </li>
+                  <li>
+                    • Use{' '}
+                    <code className="bg-gray-600 px-1 rounded">
+                      &quot;method&quot;: &quot;POST&quot;
+                    </code>{' '}
+                    for chat completions
+                  </li>
                   <li>• Include proper Authorization header with your API key</li>
                 </ul>
               </div>
@@ -120,9 +134,9 @@ export default function Support() {
             <h2 className="text-2xl font-semibold text-white mb-4">⏰ Response Times</h2>
             <div className="bg-yellow-900/20 border border-yellow-800 rounded-lg p-4">
               <p className="text-yellow-200">
-                <strong>Standard Support:</strong> We aim to respond to all support requests within 24-48 hours 
-                during business days. For urgent issues affecting production systems, please mention "URGENT" 
-                in your email subject line.
+                <strong>Standard Support:</strong> We aim to respond to all support requests within
+                24-48 hours during business days. For urgent issues affecting production systems,
+                please mention &quot;URGENT&quot; in your email subject line.
               </p>
             </div>
           </section>
@@ -130,9 +144,9 @@ export default function Support() {
           <section>
             <h2 className="text-2xl font-semibold text-white mb-4">🔒 Security & Privacy</h2>
             <p className="text-gray-300 leading-relaxed">
-              When reporting issues, please do not include sensitive information such as API keys, 
-              authentication tokens, or personal data in your support requests. We may ask for 
-              this information through secure channels if necessary for troubleshooting.
+              When reporting issues, please do not include sensitive information such as API keys,
+              authentication tokens, or personal data in your support requests. We may ask for this
+              information through secure channels if necessary for troubleshooting.
             </p>
           </section>
         </div>

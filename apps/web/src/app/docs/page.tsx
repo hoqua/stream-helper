@@ -25,8 +25,7 @@ export default function Examples() {
             </code>
           </div>
           <p className="text-gray-400">
-            The API is available at{' '}
-            <span className="text-blue-400">https://www.durablr.run</span>
+            The API is available at <span className="text-blue-400">https://www.durablr.run</span>
           </p>
         </div>
 

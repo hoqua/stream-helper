@@ -8,9 +8,7 @@ export default function PrivacyPolicy() {
       <div className="max-w-4xl mx-auto px-4 py-24">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-white mb-6">Privacy Policy</h1>
-          <p className="text-gray-400">
-            StreamHelper SaaS Integration for Vercel
-          </p>
+          <p className="text-gray-400">StreamHelper SaaS Integration for Vercel</p>
         </div>
 
         <div className="bg-gray-900/50 backdrop-blur border border-gray-800 rounded-xl p-8 space-y-8">
@@ -39,7 +37,9 @@ export default function PrivacyPolicy() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold text-white mb-4">2. Information We Do NOT Collect</h2>
+            <h2 className="text-2xl font-semibold text-white mb-4">
+              2. Information We Do NOT Collect
+            </h2>
             <div className="bg-green-900/20 border border-green-800 rounded-lg p-4">
               <p className="text-green-300 font-medium mb-2">Stream Content Protection</p>
               <ul className="list-disc list-inside space-y-1 text-green-200">
@@ -52,28 +52,61 @@ export default function PrivacyPolicy() {
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold text-white mb-4">3. How We Use Your Information</h2>
+            <h2 className="text-2xl font-semibold text-white mb-4">
+              3. How We Use Your Information
+            </h2>
             <div className="text-gray-300 space-y-3">
               <p>We use collected information to:</p>
               <ul className="list-disc list-inside space-y-2 ml-4">
-                <li><strong>Provide the Service:</strong> Process and forward your streams to designated webhooks</li>
-                <li><strong>Maintain Performance:</strong> Monitor service health and optimize delivery</li>
-                <li><strong>Improve Features:</strong> Analyze usage patterns to enhance the integration</li>
-                <li><strong>Customer Support:</strong> Troubleshoot issues and provide technical assistance</li>
-                <li><strong>Security:</strong> Detect and prevent abuse or unauthorized access</li>
+                <li>
+                  <strong>Provide the Service:</strong> Process and forward your streams to
+                  designated webhooks
+                </li>
+                <li>
+                  <strong>Maintain Performance:</strong> Monitor service health and optimize
+                  delivery
+                </li>
+                <li>
+                  <strong>Improve Features:</strong> Analyze usage patterns to enhance the
+                  integration
+                </li>
+                <li>
+                  <strong>Customer Support:</strong> Troubleshoot issues and provide technical
+                  assistance
+                </li>
+                <li>
+                  <strong>Security:</strong> Detect and prevent abuse or unauthorized access
+                </li>
               </ul>
             </div>
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold text-white mb-4">4. Data Sharing and Disclosure</h2>
+            <h2 className="text-2xl font-semibold text-white mb-4">
+              4. Data Sharing and Disclosure
+            </h2>
             <div className="text-gray-300 space-y-4">
-              <p>We do not sell, trade, or rent your personal information to third parties. We may share information only in these circumstances:</p>
+              <p>
+                We do not sell, trade, or rent your personal information to third parties. We may
+                share information only in these circumstances:
+              </p>
               <ul className="list-disc list-inside space-y-2 ml-4">
-                <li><strong>With Vercel:</strong> Integration data necessary for the Vercel platform functionality</li>
-                <li><strong>Legal Requirements:</strong> When required by law, court order, or government request</li>
-                <li><strong>Security Threats:</strong> To protect against fraud, abuse, or security vulnerabilities</li>
-                <li><strong>Business Transfer:</strong> In the event of a merger, acquisition, or sale of assets</li>
+                <li>
+                  <strong>With Vercel:</strong> Integration data necessary for the Vercel platform
+                  functionality
+                </li>
+                <li>
+                  <strong>Legal Requirements:</strong> When required by law, court order, or
+                  government request
+                </li>
+                <li>
+                  <strong>Security Threats:</strong> To protect against fraud, abuse, or security
+                  vulnerabilities
+                </li>
+                <li>
+                  <strong>Business Transfer:</strong> In the event of a merger, acquisition, or sale
+                  of assets
+                </li>
               </ul>
             </div>
           </section>
@@ -96,10 +129,18 @@ export default function PrivacyPolicy() {
             <div className="text-gray-300 space-y-3">
               <p>We retain different types of data for varying periods:</p>
               <ul className="list-disc list-inside space-y-2 ml-4">
-                <li><strong>Stream Content:</strong> Not retained - processed in real-time only</li>
-                <li><strong>Usage Logs:</strong> 90 days for performance monitoring</li>
-                <li><strong>Account Information:</strong> Until integration is uninstalled</li>
-                <li><strong>Error Logs:</strong> 30 days for troubleshooting</li>
+                <li>
+                  <strong>Stream Content:</strong> Not retained - processed in real-time only
+                </li>
+                <li>
+                  <strong>Usage Logs:</strong> 90 days for performance monitoring
+                </li>
+                <li>
+                  <strong>Account Information:</strong> Until integration is uninstalled
+                </li>
+                <li>
+                  <strong>Error Logs:</strong> 30 days for troubleshooting
+                </li>
               </ul>
             </div>
           </section>
@@ -109,47 +150,59 @@ export default function PrivacyPolicy() {
             <div className="text-gray-300 space-y-3">
               <p>You have the following rights regarding your data:</p>
               <ul className="list-disc list-inside space-y-2 ml-4">
-                <li><strong>Access:</strong> Request information about data we collect</li>
-                <li><strong>Deletion:</strong> Request removal of your data (subject to legal requirements)</li>
-                <li><strong>Correction:</strong> Update or correct inaccurate information</li>
-                <li><strong>Uninstall:</strong> Remove the integration to stop data collection</li>
+                <li>
+                  <strong>Access:</strong> Request information about data we collect
+                </li>
+                <li>
+                  <strong>Deletion:</strong> Request removal of your data (subject to legal
+                  requirements)
+                </li>
+                <li>
+                  <strong>Correction:</strong> Update or correct inaccurate information
+                </li>
+                <li>
+                  <strong>Uninstall:</strong> Remove the integration to stop data collection
+                </li>
               </ul>
             </div>
           </section>
 
           <section>
-            <h2 className="text-2xl font-semibold text-white mb-4">8. International Data Transfers</h2>
+            <h2 className="text-2xl font-semibold text-white mb-4">
+              8. International Data Transfers
+            </h2>
             <p className="text-gray-300 leading-relaxed">
-              Your data may be processed in countries other than your own. We ensure appropriate safeguards 
-              are in place to protect your data in accordance with applicable privacy laws, including GDPR 
-              and CCPA where relevant.
+              Your data may be processed in countries other than your own. We ensure appropriate
+              safeguards are in place to protect your data in accordance with applicable privacy
+              laws, including GDPR and CCPA where relevant.
             </p>
           </section>
 
           <section>
             <h2 className="text-2xl font-semibold text-white mb-4">9. Changes to This Policy</h2>
             <p className="text-gray-300 leading-relaxed">
-              We may update this Privacy Policy from time to time. We will notify you of material changes 
-              via email or through the Vercel integration interface. The &quot;Last updated&quot; date at the bottom 
-              indicates when this policy was last revised.
+              We may update this Privacy Policy from time to time. We will notify you of material
+              changes via email or through the Vercel integration interface. The &quot;Last
+              updated&quot; date at the bottom indicates when this policy was last revised.
             </p>
           </section>
 
           <section>
             <h2 className="text-2xl font-semibold text-white mb-4">10. Contact Us</h2>
             <p className="text-gray-300 leading-relaxed">
-              If you have questions about this Privacy Policy or how we handle your data, please contact 
-              us through the support channels provided in the Vercel integration interface or via the 
-              contact information in your integration settings.
+              If you have questions about this Privacy Policy or how we handle your data, please
+              contact us through the support channels provided in the Vercel integration interface
+              or via the contact information in your integration settings.
             </p>
           </section>
 
           <div className="border-t border-gray-700 pt-8 text-center">
             <p className="text-sm text-gray-500">
-              Last updated: {new Date().toLocaleDateString('en-US', { 
-                year: 'numeric', 
-                month: 'long', 
-                day: 'numeric' 
+              Last updated:{' '}
+              {new Date().toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
               })}
             </p>
           </div>
