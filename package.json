@@ -16,6 +16,7 @@
     "db:studio": "env-cmd -f apps/web/.env.local drizzle-kit studio",
     "-----DEPLOY-------": "-----DEPLOY-------",
     "build:web:prod": "drizzle-kit generate && drizzle-kit migrate && nx build web",
+    "build:web:prod:local": "env-cmd -f apps/web/.env.local drizzle-kit generate && env-cmd -f apps/web/.env.local drizzle-kit migrate && nx build web",
     "build:api:prod": "nx build @durablr/api --configuration=production"
   },
   "private": true,
