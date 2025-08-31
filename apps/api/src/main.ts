@@ -1,16 +1,20 @@
 import Fastify from 'fastify';
-import { app } from './app/app';
+import sensiblePlugin from './app/plugins/sensible';
+import rootRoute from './app/routes/root';
 
 const host = process.env.HOST ?? 'localhost';
-const port = process.env.PORT ? Number(process.env.PORT) : 3000;
+const port = process.env.PORT ? Number(process.env.PORT) : 3001;
 
 // Instantiate Fastify with some config
 const server = Fastify({
   logger: true,
 });
 
-// Register your application as a normal plugin.
-server.register(app);
+// Register plugins
+server.register(sensiblePlugin);
+
+// Register routes
+server.register(rootRoute);
 
 // Start listening.
 server.listen({ port, host }, (error) => {

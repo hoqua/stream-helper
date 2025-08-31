@@ -3,7 +3,9 @@
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "dev": "nx dev web",
+    "dev": "nx run @stream-consumer/web:dev & nx run @stream-consumer/api:serve",
+    "dev:web": "nx dev web",
+    "dev:api": "nx serve @stream-consumer/api",
     "lint": "nx run-many --target=lint --all",
     "lint:fix": "nx run-many --target=lint --all -- --fix",
     "-------DATABASE-------": "-------DATABASE-------",
@@ -62,6 +64,7 @@
     "jest-environment-jsdom": "^30.0.2",
     "jest-environment-node": "^30.0.2",
     "jest-util": "^30.0.2",
+    "jsonc-eslint-parser": "^2.1.0",
     "nx": "21.4.1",
     "postcss": "8.4.38",
     "prettier": "^3.6.2",
@@ -76,7 +79,8 @@
     "web",
     "apps/*",
     "libs/web/*",
-    "libs/shared/*"
+    "libs/shared/*",
+    "libs/api"
   ],
   "dependencies": {
     "@fastify/autoload": "~6.0.3",
