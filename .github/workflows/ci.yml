@@ -46,3 +46,8 @@ jobs:
 
       - name: Build all projects
         run: npx nx run-many --target=build --all
+
+      - name: Run Database Migrations
+        run: npm run db:migrate:prod
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
