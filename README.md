@@ -131,6 +131,53 @@ Subscribe to a streaming endpoint and forward events to a webhook.
 {"streamId": "stream_1234567890"}
 ```
 
+## 🧪 Testing Streams
+
+### Quick Stream Test
+
+Test stream creation and database logging:
+
+```bash
+# Start the API server
+npm run dev:api
+
+# Create a test stream (returns immediately with JSON response)
+curl -X POST http://localhost:3001/stream/subscribe \
+  -H "Content-Type: application/json" \
+  -d '{
+    "streamUrl": "https://httpbin.org/get",
+    "webhookUrl": "https://webhook.site/YOUR-UNIQUE-URL"
+  }'
+
+# Response: {"streamId": "53f9baab-92ac-4f43-afe6-6b8969e9ca00"}
+
+# Check active streams (should be empty - httpbin.org/get completes instantly)
+curl http://localhost:3001/stream/active
+# Response: {"activeStreams": [], "count": 0}
+```
+
+### Database Stream Logging
+
+Streams are automatically logged to the database with status tracking:
+
+- **streams** table: Contains stream metadata (URL, status, timestamps)
+- **stream_logs** table: Ready for optional stream content logging (not implemented yet)
+- Foreign key relationship: `stream_logs.stream_id` → `streams.id` (cascade delete)
+
+### Verify Database Structure
+
+```bash
+# Check database tables and structure
+node -e "
+const { neon } = require('@neondatabase/serverless');
+require('dotenv').config({ path: './apps/web/.env.local' });
+const sql = neon(process.env.DATABASE_URL);
+sql\`SELECT table_name FROM information_schema.tables WHERE table_schema='public'\`.then(tables => 
+  console.log('Tables:', tables.map(t => t.table_name))
+);
+"
+```
+
 ## 🌟 Use Cases
 
 - **🤖 OpenAI Deep Research** - Handle 30+ minute research without timeouts
