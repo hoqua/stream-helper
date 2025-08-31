@@ -80,7 +80,8 @@
     "apps/*",
     "libs/web/*",
     "libs/shared/*",
-    "libs/api"
+    "libs/api",
+    "libs/api/feature-stream-helper"
   ],
   "dependencies": {
     "@fastify/autoload": "~6.0.3",
