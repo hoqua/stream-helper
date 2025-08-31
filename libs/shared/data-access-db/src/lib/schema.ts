@@ -29,7 +29,19 @@ export const streams = pgTable('streams', {
   errorMessage: text('error_message'),
 });
 
+export const streamLogs = pgTable('stream_logs', {
+  id: text('id').primaryKey().$defaultFn(() => crypto.randomUUID()),
+  streamId: text('stream_id')
+    .notNull()
+    .references(() => streams.id, { onDelete: 'cascade' }),
+  content: text('content'),
+  metadata: text('metadata'), // JSON string for additional data
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+});
+
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
 export type Stream = typeof streams.$inferSelect;
 export type NewStream = typeof streams.$inferInsert;
+export type StreamLog = typeof streamLogs.$inferSelect;
+export type NewStreamLog = typeof streamLogs.$inferInsert;
