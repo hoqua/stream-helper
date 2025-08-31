@@ -4,8 +4,15 @@ export interface StreamConfig {
   streamUrl: string;
   webhookUrl: string;
   headers?: Record<string, string>;
-  body?: any;
+  body?: unknown;
   method?: string;
+}
+
+interface WebhookPayload {
+  streamId: string;
+  type: 'chunk' | 'completed';
+  data?: string;
+  timestamp: string;
 }
 
 interface StreamProcessor {
@@ -120,7 +127,7 @@ export class StreamHelperService {
     }
   }
 
-  private async sendWebhook(webhookUrl: string, data: any): Promise<void> {
+  private async sendWebhook(webhookUrl: string, data: WebhookPayload): Promise<void> {
     try {
       await fetch(webhookUrl, {
         method: 'POST',

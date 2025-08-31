@@ -9,7 +9,7 @@ export async function registerStreamHelperRoute(fastify: FastifyInstance) {
         streamUrl: string;
         webhookUrl: string;
         headers?: Record<string, string>;
-        body?: any;
+        body?: unknown;
         method?: string;
       };
 
