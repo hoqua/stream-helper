@@ -19,14 +19,13 @@ export default function Examples() {
           <h2 className="text-2xl font-semibold text-white mb-4">🚀 Getting Started</h2>
           <div className="bg-black/50 rounded-lg p-4 mb-4">
             <code className="text-green-400 text-sm">
-              # Start the API server
+              # StreamHelper API is hosted at:
               <br />
-              npm run dev:api
+              https://www.durablr.run
             </code>
           </div>
           <p className="text-gray-400">
-            The API will be available at{' '}
-            <span className="text-blue-400">http://localhost:3001</span>
+            The API is available at <span className="text-blue-400">https://www.durablr.run</span>
           </p>
         </div>
 
@@ -39,7 +38,7 @@ export default function Examples() {
 
           <div className="bg-black/50 rounded-lg p-4 mb-4 overflow-x-auto">
             <code className="text-green-400 text-xs whitespace-pre">
-              {`curl -X POST http://localhost:3001/stream/subscribe \\
+              {`curl -X POST https://www.durablr.run/stream/subscribe \\
   -H "Content-Type: application/json" \\
   -d '{
     "method": "POST",
@@ -74,7 +73,7 @@ export default function Examples() {
 
           <div className="bg-black/50 rounded-lg p-4 mb-4 overflow-x-auto">
             <code className="text-green-400 text-xs whitespace-pre">
-              {`curl -X POST http://localhost:3001/stream/subscribe \\
+              {`curl -X POST https://www.durablr.run/stream/subscribe \\
   -H "Content-Type: application/json" \\
   -d '{
     "streamUrl": "https://your-sse-endpoint.com/events",
@@ -180,7 +179,7 @@ export default function Examples() {
               <h3 className="text-white font-medium mb-2">Get Active Streams:</h3>
               <div className="bg-black/50 rounded-lg p-4">
                 <code className="text-green-400 text-sm">
-                  curl http://localhost:3001/stream/active
+                  curl https://www.durablr.run/stream/active
                 </code>
               </div>
               <div className="bg-blue-900/20 border border-blue-800 rounded-lg p-3 mt-2">
@@ -196,7 +195,7 @@ export default function Examples() {
               <div className="bg-black/50 rounded-lg p-4">
                 <code className="text-green-400 text-sm">
                   curl -X DELETE
-                  http://localhost:3001/stream/subscribe/7f8c9d2e-4b5a-1c3d-9e8f-2a1b3c4d5e6f
+                  https://www.durablr.run/stream/subscribe/7f8c9d2e-4b5a-1c3d-9e8f-2a1b3c4d5e6f
                 </code>
               </div>
               <div className="bg-blue-900/20 border border-blue-800 rounded-lg p-3 mt-2">
