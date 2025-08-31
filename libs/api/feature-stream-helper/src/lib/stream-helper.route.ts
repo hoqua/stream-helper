@@ -40,7 +40,7 @@ export async function registerStreamHelperRoute(fastify: FastifyInstance) {
     try {
       const { streamId } = request.params as { streamId: string };
 
-      const success = streamService.stopStream(streamId);
+      const success = await streamService.stopStream(streamId);
 
       if (!success) {
         reply.code(404);

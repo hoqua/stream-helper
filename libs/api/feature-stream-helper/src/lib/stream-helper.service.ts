@@ -1,3 +1,5 @@
+import { createStream, updateStreamStatus } from '@stream-helper/shared-data-access-db';
+
 export interface StreamConfig {
   streamUrl: string;
   webhookUrl: string;
@@ -18,6 +20,14 @@ export class StreamHelperService {
   async subscribeToStream(config: StreamConfig): Promise<string> {
     const streamId = crypto.randomUUID();
 
+    // Create stream record in database
+    await createStream({
+      id: streamId,
+      streamUrl: config.streamUrl,
+      webhookUrl: config.webhookUrl,
+      status: 'active',
+    });
+
     const abortController = new AbortController();
     const processor: StreamProcessor = {
       config,
@@ -29,8 +39,9 @@ export class StreamHelperService {
 
     // Start processing in background
     this.processStream(processor)
-      .catch((error) => {
+      .catch(async (error) => {
         console.error(`Stream ${streamId} failed:`, error.message);
+        await updateStreamStatus(streamId, 'error', error.message);
       })
       .finally(() => {
         this.processors.delete(streamId);
@@ -64,7 +75,9 @@ export class StreamHelperService {
     const response = await fetch(config.streamUrl, fetchOptions);
 
     if (!response.ok) {
-      throw new Error(`Stream failed: ${response.status}`);
+      const errorMessage = `Stream failed: ${response.status}`;
+      await updateStreamStatus(streamId, 'error', errorMessage);
+      throw new Error(errorMessage);
     }
 
     if (!response.body) return;
@@ -94,6 +107,14 @@ export class StreamHelperService {
         type: 'completed',
         timestamp: new Date().toISOString(),
       });
+
+      // Update database status to completed
+      await updateStreamStatus(streamId, 'completed');
+    } catch (error) {
+      // Handle reading errors
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      await updateStreamStatus(streamId, 'error', errorMessage);
+      throw error;
     } finally {
       reader.releaseLock();
     }
@@ -112,12 +133,15 @@ export class StreamHelperService {
     }
   }
 
-  stopStream(streamId: string): boolean {
+  async stopStream(streamId: string): Promise<boolean> {
     const processor = this.processors.get(streamId);
     if (!processor) return false;
 
     processor.abortController.abort();
     this.processors.delete(streamId);
+
+    // Update database status to stopped
+    await updateStreamStatus(streamId, 'stopped');
     return true;
   }
 
