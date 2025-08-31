@@ -1,7 +1,7 @@
 import './globals.css';
 
 export const metadata = {
-  title: 'Stream Consumer - Vercel Integration',
+  title: 'Durablr - Vercel Integration',
   description: 'Real-time data streaming integration for Vercel projects',
 };
 

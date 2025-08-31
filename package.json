@@ -1,11 +1,11 @@
 {
-  "name": "@stream-consumer/source",
+  "name": "@durablr/source",
   "version": "0.0.0",
   "license": "MIT",
   "scripts": {
-    "dev": "nx run @stream-consumer/web:dev & nx run @stream-consumer/api:serve --watch",
+    "dev": "nx run @durablr/web:dev & nx run @durablr/api:serve --watch",
     "dev:web": "nx dev web",
-    "dev:api": "nx serve @stream-consumer/api --watch",
+    "dev:api": "nx serve @durablr/api --watch",
     "-----QUALITY-------": "-----QUALITY-------",
     "lint": "nx run-many --target=lint --all",
     "lint:fix": "nx run-many --target=lint --all -- --fix",
@@ -16,7 +16,7 @@
     "db:studio": "env-cmd -f apps/web/.env.local drizzle-kit studio",
     "-----DEPLOY-------": "-----DEPLOY-------",
     "build:web:prod": "drizzle-kit generate && drizzle-kit migrate && nx build web",
-    "build:api:prod": "nx build @stream-consumer/api --configuration=production"
+    "build:api:prod": "nx build @durablr/api --configuration=production"
   },
   "private": true,
   "devDependencies": {

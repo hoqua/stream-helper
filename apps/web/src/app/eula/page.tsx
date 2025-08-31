@@ -8,7 +8,7 @@ export default function EULA() {
       <div className="max-w-4xl mx-auto px-4 py-24">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-white mb-6">End User License Agreement</h1>
-          <p className="text-gray-400">StreamHelper SaaS Integration for Vercel</p>
+          <p className="text-gray-400">Durablr SaaS Integration for Vercel</p>
         </div>
 
         <div className="bg-gray-900/50 backdrop-blur border border-gray-800 rounded-xl p-8 space-y-8">
@@ -16,7 +16,7 @@ export default function EULA() {
             <h2 className="text-2xl font-semibold text-white mb-4">1. License Grant</h2>
             <p className="text-gray-300 leading-relaxed">
               Subject to the terms of this Agreement, Anthropic grants you a non-exclusive,
-              non-transferable license to use the StreamHelper integration (&quot;Service&quot;) to
+              non-transferable license to use the Durablr integration (&quot;Service&quot;) to
               handle Server-Sent Events streams for your applications deployed on Vercel or
               compatible serverless platforms.
             </p>

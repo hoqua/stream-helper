@@ -1,16 +1,16 @@
-# StreamHelper SaaS
+# Durablr SaaS
 
-**StreamHelper** is a generic SaaS that handles any Server-Sent Events (SSE) stream without serverless timeout issues. Perfect for Vercel, Netlify, and other serverless platforms with execution time limits.
+**Durablr** is a generic SaaS that handles any Server-Sent Events (SSE) stream without serverless timeout issues. Perfect for Vercel, Netlify, and other serverless platforms with execution time limits.
 
 ## 🚀 Quick Start
 
-StreamHelper solves the problem where your serverless function times out waiting for long-running streams (OpenAI, analytics feeds, real-time APIs, etc). Instead of waiting, you subscribe to the stream URL via StreamHelper and receive real-time updates via webhooks.
+Durablr solves the problem where your serverless function times out waiting for long-running streams (OpenAI, analytics feeds, real-time APIs, etc). Instead of waiting, you subscribe to the stream URL via Durablr and receive real-time updates via webhooks.
 
 ## 📋 How It Works
 
 1. **Your app starts long-running request** → Gets streaming URL
-2. **Subscribe to stream via StreamHelper** → StreamHelper connects to SSE stream
-3. **StreamHelper forwards events** → Real-time updates to your webhook
+2. **Subscribe to stream via Durablr** → Durablr connects to SSE stream
+3. **Durablr forwards events** → Real-time updates to your webhook
 4. **Your app receives completion** → No timeouts, no waiting!
 
 ## 🔧 API Usage Examples
@@ -66,7 +66,7 @@ curl -X POST http://localhost:3001/stream/subscribe \
 
 ### What Your Webhook Receives
 
-StreamHelper forwards streaming chunks in real-time:
+Durablr forwards streaming chunks in real-time:
 
 **Stream Chunk (OpenAI example):**
 ```json
