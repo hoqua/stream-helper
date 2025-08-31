@@ -1,3 +1,5 @@
+import Link from 'next/link';
+
 export default function Index() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900">
@@ -24,8 +26,8 @@ export default function Index() {
           <h1 className="text-5xl font-bold text-white mb-6">StreamHelper SaaS</h1>
 
           <p className="text-xl text-gray-400 mb-12 max-w-2xl mx-auto">
-            Generic SaaS that handles any Server-Sent Events (SSE) stream without serverless timeout issues. 
-            Perfect for Vercel, Netlify, and other serverless platforms.
+            Generic SaaS that handles any Server-Sent Events (SSE) stream without serverless timeout
+            issues. Perfect for Vercel, Netlify, and other serverless platforms.
           </p>
 
           <div className="bg-gray-900/50 backdrop-blur border border-gray-800 rounded-xl p-8 mb-8">
@@ -121,16 +123,16 @@ export default function Index() {
           </div>
 
           <div className="flex gap-4 justify-center">
-            <a
+            <Link
               href="/examples"
               className="px-8 py-3 bg-white text-black font-medium rounded-lg hover:bg-gray-100 transition-colors"
             >
               View Examples
-            </a>
+            </Link>
             <a
               href="https://github.com/anthropics/stream-consumer"
               target="_blank"
-              rel="noopener noreferrer" 
+              rel="noopener noreferrer"
               className="px-8 py-3 border border-gray-700 text-white font-medium rounded-lg hover:border-gray-600 hover:bg-gray-900/50 transition-colors"
             >
               View on GitHub
