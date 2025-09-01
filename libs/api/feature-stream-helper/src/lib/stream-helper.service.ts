@@ -24,6 +24,13 @@ interface StreamProcessor {
 export class StreamHelperService {
   private processors = new Map<string, StreamProcessor>();
 
+  constructor() {
+    // Log active streams count every 5 seconds
+    setInterval(() => {
+      console.log(`[${new Date().toISOString()}] Active streams: ${this.processors.size}`);
+    }, 5000);
+  }
+
   async subscribeToStream(config: StreamConfig): Promise<string> {
     const streamId = crypto.randomUUID();
 
