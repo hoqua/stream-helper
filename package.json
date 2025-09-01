@@ -20,7 +20,7 @@
     "build:api:prod": "nx build @durablr/api --configuration=production"
   },
   "engines": {
-    "node": ">=20.0.0"
+    "node": ">=22.0.0"
   },
   "private": true,
   "devDependencies": {
