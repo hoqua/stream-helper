@@ -12,6 +12,9 @@ export async function getStreams(projectId: string) {
 export async function getProjects() {
   //!: GET USERID FROM SESSION
   const users = await getAllUsers();
+  if (users.length === 0) {
+    return [];
+  }
   const userId = users[0].id;
 
   return getUserProjects(userId);
