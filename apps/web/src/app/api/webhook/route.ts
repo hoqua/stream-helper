@@ -1,10 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { VercelService, verifyWebhook } from '@stream-helper/feature-vercel';
 import {
-  ConfigurationRemovedSchema,
-  PermisionUpgradedSchema,
-} from '@stream-helper/shared-utils-schemas';
-import {
   addMultipleProjects,
   deleteProjects,
   deleteUserByConfigurationId,
@@ -24,7 +20,7 @@ export async function POST(request: NextRequest) {
     // Handle different event types
     switch (body.type) {
       case 'integration-configuration.permission-upgraded': {
-        const data = PermisionUpgradedSchema.parse(body.payload);
+        const data = body.payload;
         const user = await getUserByConfigurationId(data.configuration.id);
         const vercelClient = new VercelService(user[0].accessToken);
         const projects = await vercelClient.getProjects(data.team.id);
@@ -47,8 +43,7 @@ export async function POST(request: NextRequest) {
         break;
       }
       case 'integration-configuration.removed': {
-        const data = ConfigurationRemovedSchema.parse(body.payload);
-        await deleteUserByConfigurationId(data.configuration.id);
+        await deleteUserByConfigurationId(body.payload.configuration.id);
         break;
       }
       case 'integration-resource.project-disconnected': {
