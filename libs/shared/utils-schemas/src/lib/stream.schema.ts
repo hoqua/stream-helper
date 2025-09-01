@@ -3,7 +3,7 @@ import z from 'zod';
 export const Status = z.enum(['active', 'completed', 'error', 'stopped']);
 
 export const OverviewMetricsSchema = z.object({
-  totalEvents: z.number(),
+  totalStreams: z.number(),
   successRate: z.number(),
   activeStreams: z.number(),
   errorRate: z.number(),

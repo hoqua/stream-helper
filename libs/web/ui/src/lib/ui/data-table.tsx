@@ -50,9 +50,9 @@ export function DataTable<T>({
   });
 
   return (
-    <div className="bg-gray-900/50 backdrop-blur border border-gray-800 rounded-xl p-6">
+    <div className="bg-gray-900/50 backdrop-blur border border-gray-800 rounded-xl p-6 flex flex-col gap-6">
       {(title || description || searchable) && (
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
             {title && <h2 className="text-lg font-semibold text-white mb-1">{title}</h2>}
             {description && <p className="text-gray-400 text-sm">{description}</p>}
@@ -60,9 +60,10 @@ export function DataTable<T>({
           {searchable && (
             <div className="flex items-center gap-2">
               <Input
+                type="text"
                 placeholder={searchPlaceholder}
                 value={globalFilter ?? ''}
-                onChange={(e) => setGlobalFilter(String(e.target.value))}
+                onChange={(e) => setGlobalFilter(e.target.value)}
                 className="px-3 py-2 bg-gray-800/50 border border-gray-700 rounded-lg text-white placeholder-gray-400 text-sm focus:outline-none focus:border-blue-500 w-64"
               />
             </div>

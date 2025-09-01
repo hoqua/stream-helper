@@ -1,4 +1,4 @@
-import { colorClasses, subtitleColors } from './constants';
+import { colorClasses } from './constants';
 import { OverviewMetrics } from '@stream-helper/shared-utils-schemas';
 import { cn } from '@stream-helper/web-ui/server';
 
@@ -12,33 +12,33 @@ interface Metric {
 export default function MetricsGrid({ metrics }: { metrics: OverviewMetrics }) {
   const metricsData: Metric[] = [
     {
-      title: 'Total Events',
-      value: metrics.totalEvents,
-      subtitle: '+12% from yesterday',
+      title: 'Total Streams',
+      value: metrics.totalStreams,
+      subtitle: 'Total number of streams',
       color: 'blue',
     },
     {
       title: 'Success Rate',
       value: `${metrics.successRate}%`,
-      subtitle: 'Excellent performance',
+      subtitle: 'Percentage of completed streams',
       color: 'green',
     },
     {
       title: 'Active Streams',
       value: metrics.activeStreams,
-      subtitle: 'Currently processing',
+      subtitle: 'Streams in progress',
       color: 'orange',
     },
     {
       title: 'Error Rate',
       value: `${metrics.errorRate}%`,
-      subtitle: 'Needs attention',
+      subtitle: 'Percentage of error streams',
       color: 'red',
     },
   ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
       {metricsData.map((metric) => (
         <MetricCard
           key={metric.title}
@@ -85,7 +85,7 @@ function MetricCard({
       <div className="text-2xl font-bold text-white mb-1">
         {typeof value === 'number' ? value.toLocaleString() : value}
       </div>
-      <div className={cn('text-xs', subtitleColors[color])}>{subtitle}</div>
+      <div className={cn('text-xs text-gray-400')}>{subtitle}</div>
     </div>
   );
 }

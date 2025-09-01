@@ -41,7 +41,7 @@ export const columns: ColumnDef<Stream>[] = [
     header: 'Created',
     cell: ({ row }) => {
       const date = new Date(row.getValue('createdAt'));
-      return <span className="text-sm text-gray-300">{format(date, 'dd.MM.yyyy')}</span>;
+      return <span className="text-sm text-gray-300">{format(date, 'dd.MM.yyyy HH:mm:ss')}</span>;
     },
   },
   {
@@ -49,7 +49,7 @@ export const columns: ColumnDef<Stream>[] = [
     header: 'Updated',
     cell: ({ row }) => {
       const date = new Date(row.getValue('updatedAt'));
-      return <span className="text-sm text-gray-300">{format(date, 'dd.MM.yyyy')}</span>;
+      return <span className="text-sm text-gray-300">{format(date, 'dd.MM.yyyy HH:mm:ss')}</span>;
     },
   },
 ];

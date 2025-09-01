@@ -7,7 +7,7 @@ export default [
   ...nx.configs['flat/base'],
   ...nx.configs['flat/typescript'],
   ...nx.configs['flat/javascript'],
-  unicorn.configs['flat/recommended'],
+  unicorn.configs.recommended,
   prettierConfig,
   {
     ignores: ['**/dist', '**/*.config.js', '**/*.config.ts', '**/*.config.mjs'],
