@@ -1,5 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { verifyWebhook } from '@stream-helper/feature-vercel';
+import { VercelService, verifyWebhook } from '@stream-helper/feature-vercel';
+import {
+  ConfigurationRemovedSchema,
+  PermisionUpgradedSchema,
+} from '@stream-helper/shared-utils-schemas';
+import {
+  addMultipleProjects,
+  deleteProjects,
+  deleteUserByConfigurationId,
+  getUserByConfigurationId,
+} from '@stream-helper/shared-data-access-db';
 
 export async function POST(request: NextRequest) {
   try {
@@ -13,14 +23,32 @@ export async function POST(request: NextRequest) {
 
     // Handle different event types
     switch (body.type) {
+      case 'integration-configuration.permission-upgraded': {
+        const data = PermisionUpgradedSchema.parse(body.payload);
+        const user = await getUserByConfigurationId(data.configuration.id);
+        const vercelClient = new VercelService(user[0].accessToken);
+        const projects = await vercelClient.getProjects(data.team.id);
+        const projectsToAdd = projects.filter((p) => data.projects.added.includes(p.id));
+        await Promise.all([
+          addMultipleProjects(
+            projectsToAdd.map((p) => ({
+              id: p.id,
+              name: p.name,
+              userId: user[0].id,
+            })),
+          ),
+          deleteProjects(data.projects.removed),
+        ]);
+        break;
+      }
       case 'integration-resource.project-connected': {
         // New integration installed
         console.log('Integration installed for:', body.payload);
         break;
       }
       case 'integration-configuration.removed': {
-        console.log('integrations', body.payload.integrations);
-        console.log('projects', body.payload.configuration.projects);
+        const data = ConfigurationRemovedSchema.parse(body.payload);
+        await deleteUserByConfigurationId(data.configuration.id);
         break;
       }
       case 'integration-resource.project-disconnected': {
