@@ -19,6 +19,9 @@
     "build:web:prod": "nx build web",
     "build:api:prod": "nx build @durablr/api --configuration=production"
   },
+  "engines": {
+    "node": ">=20.0.0"
+  },
   "private": true,
   "devDependencies": {
     "@eslint/compat": "^1.1.1",
