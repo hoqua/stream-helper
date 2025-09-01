@@ -3,7 +3,7 @@ import sensiblePlugin from './app/plugins/sensible';
 import rootRoute from './app/routes/root';
 import { registerStreamHelperRoute } from '@durablr/feature-stream-helper';
 
-const host = process.env.HOST ?? 'localhost';
+const host = '0.0.0.0'
 const port = process.env.PORT ? Number(process.env.PORT) : 3001;
 
 // Instantiate Fastify with some config
