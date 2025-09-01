@@ -1,4 +1,3 @@
-import { mockMetrics } from './components/constants';
 import MetricsGrid from './components/metric-cards';
 import { DataTable } from '@stream-helper/web-ui/server';
 import { Stream } from '@stream-helper/shared-utils-schemas';
