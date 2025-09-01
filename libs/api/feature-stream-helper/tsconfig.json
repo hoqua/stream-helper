@@ -4,7 +4,7 @@
   "include": [],
   "references": [
     {
-      "path": "../utils-schemas"
+      "path": "../../shared/data-access-db"
     },
     {
       "path": "./tsconfig.lib.json"

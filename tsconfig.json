@@ -26,6 +26,9 @@
     },
     {
       "path": "./libs/web/ui"
+    },
+    {
+      "path": "./libs/api/feature-stream-helper"
     }
   ]
 }

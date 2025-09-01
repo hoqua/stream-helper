@@ -43,7 +43,7 @@ function ConfigureContent() {
 
       <div className="max-w-2xl mx-auto px-4 py-16">
         <div className="bg-gray-900/50 backdrop-blur border border-gray-800 rounded-2xl p-8">
-          <h1 className="text-2xl font-bold text-white mb-2">Configure Stream Consumer</h1>
+          <h1 className="text-2xl font-bold text-white mb-2">Configure Durablr</h1>
           <p className="text-gray-400 mb-8">Set up your integration preferences</p>
 
           {configurationId && (

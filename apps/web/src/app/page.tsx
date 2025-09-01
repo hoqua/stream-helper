@@ -1,3 +1,5 @@
+import Link from 'next/link';
+
 export default function Index() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900">
@@ -21,10 +23,11 @@ export default function Index() {
             </svg>
           </div>
 
-          <h1 className="text-5xl font-bold text-white mb-6">Stream Consumer</h1>
+          <h1 className="text-5xl font-bold text-white mb-6">Durablr SaaS</h1>
 
           <p className="text-xl text-gray-400 mb-12 max-w-2xl mx-auto">
-            Simple integration for Vercel Marketplace. Process and manage data streams with ease.
+            Generic SaaS that handles any Server-Sent Events (SSE) stream without serverless timeout
+            issues. Perfect for Vercel, Netlify, and other serverless platforms.
           </p>
 
           <div className="bg-gray-900/50 backdrop-blur border border-gray-800 rounded-xl p-8 mb-8">
@@ -36,7 +39,7 @@ export default function Index() {
               </li>
               <li className="flex items-start">
                 <span className="text-blue-500 font-bold mr-3">2.</span>
-                <span>Search for &quot;Stream Consumer&quot;</span>
+                <span>Search for &quot;Durablr&quot;</span>
               </li>
               <li className="flex items-start">
                 <span className="text-blue-500 font-bold mr-3">3.</span>
@@ -104,36 +107,28 @@ export default function Index() {
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     strokeWidth={2}
-                    d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
-                  />
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
                   />
                 </svg>
               </div>
-              <h3 className="text-lg font-semibold text-white mb-2">Configurable</h3>
-              <p className="text-gray-400 text-sm">Customize processing modes and webhooks</p>
+              <h3 className="text-lg font-semibold text-white mb-2">Full Documentation</h3>
+              <p className="text-gray-400 text-sm">Complete API docs and examples</p>
             </div>
           </div>
 
           <div className="flex gap-4 justify-center">
-            <a
-              href="https://vercel.com/integrations"
-              target="_blank"
-              rel="noopener noreferrer"
+            <Link
+              href="/examples"
               className="px-8 py-3 bg-white text-black font-medium rounded-lg hover:bg-gray-100 transition-colors"
             >
-              View on Marketplace
-            </a>
-            <a
-              href="/api/hello"
+              📖 View Documentation
+            </Link>
+            <Link
+              href="/support"
               className="px-8 py-3 border border-gray-700 text-white font-medium rounded-lg hover:border-gray-600 hover:bg-gray-900/50 transition-colors"
             >
-              Test API
-            </a>
+              💬 Get Support
+            </Link>
           </div>
         </div>
       </div>
