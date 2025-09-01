@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createUser } from '@stream-helper/shared-data-access-db';
-import { exchangeExternalCodeForToken } from '@stream-helper/feature-vercel';
+import { exchangeExternalCodeForToken, VercelService } from '@stream-helper/feature-vercel';
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -28,8 +28,22 @@ export async function GET(request: NextRequest) {
 
   const { data } = response;
 
+  const vercelClient = new VercelService(data.access_token);
+
+  const userData = await vercelClient.getUser();
+
+  console.log('UserData', userData);
+
+  if (!userData) {
+    return NextResponse.redirect(new URL(`/error?message=Unauthorized`, request.url));
+  }
+
+  const { name, email } = userData.user;
+
   await createUser({
     id: data.user_id,
+    username: name,
+    email,
     accessToken: data.access_token,
     teamId: data.team_id,
     configurationId,

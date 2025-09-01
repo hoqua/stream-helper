@@ -7,6 +7,10 @@ export class VercelService {
     this.client = new Vercel({ bearerToken: token });
   }
 
+  async getUser() {
+    return await this.client?.user.getAuthUser();
+  }
+
   async addEnvs(projectId: string, envs: Record<string, string>) {
     await this.client?.projects.createProjectEnv({
       idOrName: projectId,

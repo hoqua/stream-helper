@@ -18,7 +18,11 @@ export async function POST(request: NextRequest) {
         console.log('Integration installed for:', body.payload);
         break;
       }
-
+      case 'integration-configuration.removed': {
+        console.log('integrations', body.payload.integrations);
+        console.log('projects', body.payload.configuration.projects);
+        break;
+      }
       case 'integration-resource.project-disconnected': {
         // Integration uninstalled
         console.log('Integration removed for:', body.payload);

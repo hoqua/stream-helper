@@ -10,6 +10,8 @@ export const streamStatusEnum = pgEnum('stream_status', [
 
 export const users = pgTable('users', {
   id: text('id').primaryKey(),
+  email: text('email').notNull(),
+  username: text('username'),
   teamId: text('team_id').unique(),
   accessToken: text('access_token').unique().notNull(),
   configurationId: text('configuration_id').unique().notNull(),
