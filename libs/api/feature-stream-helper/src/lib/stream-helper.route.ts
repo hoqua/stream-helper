@@ -9,7 +9,7 @@ export async function registerStreamHelperRoute(fastify: FastifyInstance) {
         streamUrl: string;
         webhookUrl: string;
         headers?: Record<string, string>;
-        body?: any;
+        body?: unknown;
         method?: string;
       };
 
@@ -40,7 +40,7 @@ export async function registerStreamHelperRoute(fastify: FastifyInstance) {
     try {
       const { streamId } = request.params as { streamId: string };
 
-      const success = streamService.stopStream(streamId);
+      const success = await streamService.stopStream(streamId);
 
       if (!success) {
         reply.code(404);

@@ -10,17 +10,13 @@
     "moduleResolution": "bundler",
     "target": "ES2022",
     "useDefineForClassFields": true,
-    "types": [
-      "node"
-    ]
+    "types": ["node"]
   },
-  "include": [
-    "src/**/*.ts"
+  "include": ["src/**/*.ts"],
+  "references": [
+    {
+      "path": "../../shared/data-access-db/tsconfig.lib.json"
+    }
   ],
-  "references": [],
-  "exclude": [
-    "jest.config.ts",
-    "src/**/*.spec.ts",
-    "src/**/*.test.ts"
-  ]
+  "exclude": ["jest.config.ts", "src/**/*.spec.ts", "src/**/*.test.ts"]
 }
