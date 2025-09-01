@@ -19,8 +19,19 @@ export const users = pgTable('users', {
   automaticProcessing: boolean('automatic_processing').notNull().default(false),
 });
 
+export const projects = pgTable('projects', {
+  id: text('id').primaryKey(),
+  userId: text('userId')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
+  name: text('name').notNull(),
+});
+
 export const streams = pgTable('streams', {
   id: text('id').primaryKey(),
+  projectId: text('project_id')
+    .notNull()
+    .references(() => projects.id, { onDelete: 'cascade' }),
   status: streamStatusEnum('status').notNull().default('active'),
   streamUrl: text('stream_url').notNull(),
   webhookUrl: text('webhook_url').notNull(),
@@ -42,6 +53,8 @@ export const streamLogs = pgTable('stream_logs', {
 
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
+export type Project = typeof projects.$inferSelect;
+export type NewProject = typeof projects.$inferInsert;
 export type Stream = typeof streams.$inferSelect;
 export type NewStream = typeof streams.$inferInsert;
 export type StreamLog = typeof streamLogs.$inferSelect;

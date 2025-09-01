@@ -1,11 +1,13 @@
 import { mockMetrics } from './components/constants';
 import MetricsGrid from './components/metric-cards';
 import { DataTable } from '@stream-helper/web-ui/server';
-import { Metric } from '@stream-helper/shared-utils-schemas';
-import { columns } from './components/metrics-columns';
-import { mockMetricData } from './components/constants';
+import { Stream } from '@stream-helper/shared-utils-schemas';
+import { columns } from './components/stream-columns';
+import { getStreams } from './loader';
 
-export function DashboardPage({ projectId }: { projectId: string }) {
+export async function DashboardPage({ projectId }: { projectId: string }) {
+  const streams = await getStreams(projectId);
+
   return (
     <div className="flex flex-col gap-8">
       <div className="flex flex-col gap-2">
@@ -13,13 +15,13 @@ export function DashboardPage({ projectId }: { projectId: string }) {
         <p className="text-gray-400">Monitor your stream processing metrics and activity</p>
       </div>
       <MetricsGrid metrics={mockMetrics} />
-      <DataTable<Metric>
+      <DataTable<Stream>
         columns={columns}
-        data={mockMetricData}
-        title="Event Processing Log"
-        description="Detailed view of stream processing events and their metrics"
+        data={streams}
+        title="Stream Processing Log"
+        description="Detailed view of streams"
         searchable
-        searchPlaceholder="Search events..."
+        searchPlaceholder="Search streams..."
       />
     </div>
   );

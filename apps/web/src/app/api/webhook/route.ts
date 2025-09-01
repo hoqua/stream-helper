@@ -5,10 +5,6 @@ export async function POST(request: NextRequest) {
   try {
     const body = await verifyWebhook(request);
 
-    if (!body || !body.valid) {
-      return NextResponse.json({ error: body?.error }, { status: 400 });
-    }
-
     console.log('Webhook received:', {
       type: body.type,
       createdAt: body.createdAt,
@@ -17,24 +13,17 @@ export async function POST(request: NextRequest) {
 
     // Handle different event types
     switch (body.type) {
-      case 'integration.configuration-created': {
+      case 'integration-resource.project-connected': {
         // New integration installed
-        console.log('Integration installed for:', body.payload?.userId);
+        console.log('Integration installed for:', body.payload);
         break;
       }
 
-      case 'integration.configuration-removed': {
+      case 'integration-resource.project-disconnected': {
         // Integration uninstalled
-        console.log('Integration removed for:', body.payload?.userId);
+        console.log('Integration removed for:', body.payload);
         break;
       }
-
-      case 'deployment.created': {
-        // Deployment created
-        console.log('Deployment created:', body.payload?.deployment?.url);
-        break;
-      }
-
       default: {
         console.log('Unknown event type:', body.type);
       }

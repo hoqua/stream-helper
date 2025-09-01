@@ -2,6 +2,7 @@ import { createStream, updateStreamStatus } from '@stream-helper/shared-data-acc
 
 export interface StreamConfig {
   streamUrl: string;
+  projectId: string;
   webhookUrl: string;
   headers?: Record<string, string>;
   body?: unknown;
@@ -30,6 +31,7 @@ export class StreamHelperService {
     // Create stream record in database
     await createStream({
       id: streamId,
+      projectId: config.projectId,
       streamUrl: config.streamUrl,
       webhookUrl: config.webhookUrl,
       status: 'active',

@@ -1,4 +1,4 @@
-import { eq } from 'drizzle-orm';
+import { and, eq } from 'drizzle-orm';
 import { db } from '../client';
 import { NewStream, Stream, streams, streamStatusEnum } from '../schema';
 
@@ -34,4 +34,15 @@ export async function getActiveStreams(): Promise<Stream[]> {
 
 export async function getAllStreams(): Promise<Stream[]> {
   return await db.select().from(streams);
+}
+
+export async function getActiveProjectStreams(projectId: string): Promise<Stream[]> {
+  return await db
+    .select()
+    .from(streams)
+    .where(and(eq(streams.projectId, projectId), eq(streams.status, 'active')));
+}
+
+export async function getAllProjectStreams(projectId: string): Promise<Stream[]> {
+  return await db.select().from(streams).where(eq(streams.projectId, projectId));
 }

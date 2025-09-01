@@ -7,10 +7,10 @@ import {
   DropdownMenuTrigger,
 } from '@stream-helper/web-ui/server';
 import { ChevronDownIcon } from 'lucide-react';
-import { mockProjects } from './constants';
+import { getProjects } from '../loader';
 
 export async function WelcomePage() {
-  //TODO: GET USER PROJECTS
+  const projects = await getProjects();
   return (
     <div className="min-h-screen bg-black text-white">
       <div className="bg-grid-white/[0.02] relative">
@@ -42,7 +42,7 @@ export async function WelcomePage() {
                     </Button>
                   </DropdownMenuTrigger>
                   <DropdownMenuContent className="w-[300px] bg-gray-900 border-gray-800">
-                    {mockProjects.map((project) => (
+                    {projects.map((project) => (
                       <DropdownMenuItem
                         className="outline-none cursor-pointer hover:bg-gray-800"
                         key={project.id}
@@ -53,15 +53,6 @@ export async function WelcomePage() {
                           className="flex items-center justify-between w-full"
                         >
                           <span>{project.name}</span>
-                          <span
-                            className={`text-xs px-2 py-1 rounded-full ${
-                              project.status === 'active'
-                                ? 'bg-green-500/20 text-green-400'
-                                : 'bg-yellow-500/20 text-yellow-400'
-                            }`}
-                          >
-                            {project.status}
-                          </span>
                         </Link>
                       </DropdownMenuItem>
                     ))}

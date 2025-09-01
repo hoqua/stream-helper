@@ -3,6 +3,9 @@
   "include": [],
   "references": [
     {
+      "path": "../../shared/data-access-db"
+    },
+    {
       "path": "../ui"
     },
     {

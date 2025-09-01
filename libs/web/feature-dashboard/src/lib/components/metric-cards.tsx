@@ -24,12 +24,6 @@ export default function MetricsGrid({ metrics }: { metrics: OverviewMetrics }) {
       color: 'green',
     },
     {
-      title: 'Avg Latency',
-      value: `${metrics.avgLatency}ms`,
-      subtitle: 'Within normal range',
-      color: 'purple',
-    },
-    {
       title: 'Active Streams',
       value: metrics.activeStreams,
       subtitle: 'Currently processing',
@@ -40,12 +34,6 @@ export default function MetricsGrid({ metrics }: { metrics: OverviewMetrics }) {
       value: `${metrics.errorRate}%`,
       subtitle: 'Needs attention',
       color: 'red',
-    },
-    {
-      title: 'Throughput',
-      value: `${metrics.throughput}/min`,
-      subtitle: 'Events per minute',
-      color: 'cyan',
     },
   ];
 
