@@ -3,10 +3,10 @@
   "include": [],
   "references": [
     {
-      "path": "../../shared/utils-schemas"
+      "path": "../ui"
     },
     {
-      "path": "../../shared/data-access-db"
+      "path": "../../shared/utils-schemas"
     },
     {
       "path": "./tsconfig.lib.json"
