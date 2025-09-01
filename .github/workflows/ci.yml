@@ -37,7 +37,7 @@ jobs:
 
       # Run lint check first for fast feedback
       - name: Lint code
-        run: npm run lint
+        run: npm run lint:fix
 
       # Prepend any command with "nx-cloud record --" to record its logs to Nx Cloud
       # - run: npx nx-cloud record -- echo Hello World
@@ -51,4 +51,3 @@ jobs:
         run: npm run db:migrate:prod
         env:
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
-
