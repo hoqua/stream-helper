@@ -1,6 +1,5 @@
 import Fastify from 'fastify';
 import sensiblePlugin from './app/plugins/sensible';
-import rootRoute from './app/routes/root';
 import { registerStreamHelperRoute } from '@durablr/feature-stream-helper';
 import { env } from './env';
 
@@ -18,7 +17,6 @@ const server = Fastify({
 server.register(sensiblePlugin);
 
 // Register routes
-server.register(rootRoute);
 server.register((fastify) => {
   registerStreamHelperRoute(fastify);
 });

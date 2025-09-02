@@ -1,7 +1,7 @@
 import { FastifyInstance } from 'fastify';
 import { streamService, StreamConfig } from './stream-helper.service';
 
-export async function registerStreamHelperRoute(fastify: FastifyInstance) {
+export function registerStreamHelperRoute(fastify: FastifyInstance) {
   // Generic stream subscription - works with any SSE endpoint
   fastify.post('/stream/subscribe', async (request, reply) => {
     try {
