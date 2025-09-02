@@ -11,6 +11,16 @@
       "import": "./src/index.ts",
       "default": "./src/index.ts"
     },
+    "./lib/env-web": {
+      "types": "./src/lib/env-web.ts",
+      "import": "./src/lib/env-web.ts",
+      "default": "./src/lib/env-web.ts"
+    },
+    "./lib/env-api": {
+      "types": "./src/lib/env-api.ts",
+      "import": "./src/lib/env-api.ts",
+      "default": "./src/lib/env-api.ts"
+    },
     "./package.json": "./package.json"
   },
   "nx": {
