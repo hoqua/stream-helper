@@ -1,11 +1,11 @@
 'use client';
-import { Project } from '@stream-helper/shared-utils-schemas';
+import { Project } from '@durablr/shared-utils-schemas';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@stream-helper/web-ui/server';
+} from '@durablr/web-ui/server';
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';

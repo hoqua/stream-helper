@@ -1,6 +1,6 @@
 import MetricsGrid from './components/metric-cards';
-import { DataTable } from '@stream-helper/web-ui/server';
-import { Stream } from '@stream-helper/shared-utils-schemas';
+import { DataTable } from '@durablr/web-ui/server';
+import { Stream } from '@durablr/shared-utils-schemas';
 import { columns } from './components/stream-columns';
 import { getStreams } from './loader';
 

@@ -16,6 +16,9 @@
     },
     {
       "path": "../../libs/shared/data-access-db/tsconfig.lib.json"
+    },
+    {
+      "path": "../../libs/shared/utils-schemas/tsconfig.lib.json"
     }
   ]
 }

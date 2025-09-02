@@ -1,9 +1,5 @@
 'use server';
-import {
-  getAllProjectStreams,
-  getAllUsers,
-  getUserProjects,
-} from '@stream-helper/shared-data-access-db';
+import { getAllProjectStreams, getAllUsers, getUserProjects } from '@durablr/shared-data-access-db';
 
 export async function getStreams(projectId: string) {
   return await getAllProjectStreams(projectId);

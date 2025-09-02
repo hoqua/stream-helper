@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { VercelService, verifyWebhook } from '@stream-helper/feature-vercel';
+import { VercelService, verifyWebhook } from '@durablr/feature-vercel';
 import {
   addMultipleProjects,
   deleteProjects,
   deleteUserByConfigurationId,
   getUserByConfigurationId,
-} from '@stream-helper/shared-data-access-db';
+} from '@durablr/shared-data-access-db';
 
 export async function POST(request: NextRequest) {
   try {

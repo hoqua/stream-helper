@@ -1,5 +1,5 @@
 {
-  "name": "@stream-helper/shared-utils-schemas",
+  "name": "@durablr/shared-utils-schemas",
   "version": "0.0.1",
   "private": true,
   "type": "module",

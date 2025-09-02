@@ -2,13 +2,16 @@ import Fastify from 'fastify';
 import sensiblePlugin from './app/plugins/sensible';
 import rootRoute from './app/routes/root';
 import { registerStreamHelperRoute } from '@durablr/feature-stream-helper';
+import { env } from './env';
 
-const host = '0.0.0.0'
-const port = process.env.PORT ? Number(process.env.PORT) : 3001;
+const host = env.HOST;
+const port = env.PORT;
 
 // Instantiate Fastify with some config
 const server = Fastify({
-  logger: true,
+  logger: {
+    level: env.LOG_LEVEL,
+  },
 });
 
 // Register plugins
@@ -25,12 +28,28 @@ server.get('/health', async () => {
   return { status: 'ok', timestamp: new Date().toISOString() };
 });
 
+// Graceful shutdown
+const signals = ['SIGINT', 'SIGTERM'];
+for (const signal of signals) {
+  process.on(signal, async () => {
+    server.log.info(`Received ${signal}, shutting down gracefully...`);
+    try {
+      await server.close();
+      process.exit(0);
+    } catch (error) {
+      server.log.error(`Error during shutdown: ${error}`);
+      process.exit(1);
+    }
+  });
+}
+
 // Start listening.
 server.listen({ port, host }, (error) => {
   if (error) {
     server.log.error(error);
     throw error;
   } else {
-    console.log(`[ ready ] http://${host}:${port}`);
+    server.log.info(`Server running in ${env.NODE_ENV} mode`);
+    server.log.info(`[ ready ] http://${host}:${port}`);
   }
 });

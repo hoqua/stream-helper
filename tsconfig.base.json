@@ -1,8 +1,5 @@
 {
   "compilerOptions": {
-    "composite": true,
-    "declarationMap": true,
-    "emitDeclarationOnly": true,
     "importHelpers": true,
     "isolatedModules": true,
     "lib": [
@@ -24,7 +21,28 @@
     ],
     "paths": {
       "@durablr/feature-stream-helper": [
-        "./libs/api/feature-stream-helper/dist/index.d.ts"
+        "./libs/api/feature-stream-helper/src/index.ts"
+      ],
+      "@durablr/shared-utils-schemas": [
+        "./libs/shared/utils-schemas/src/index.ts"
+      ],
+      "@durablr/shared-data-access-db": [
+        "./libs/shared/data-access-db/src/index.ts"
+      ],
+      "@durablr/feature-vercel": [
+        "./libs/web/feature-vercel/src/index.ts"
+      ],
+      "@durablr/web-feature-configuration": [
+        "./libs/web/feature-configuration/src/index.ts"
+      ],
+      "@durablr/web-feature-configuration/server": [
+        "./libs/web/feature-configuration/src/server.ts"
+      ],
+      "@durablr/web-feature-dashboard": [
+        "./libs/web/feature-dashboard/src/index.ts"
+      ],
+      "@durablr/web-ui": [
+        "./libs/web/ui/src/index.ts"
       ]
     }
   }

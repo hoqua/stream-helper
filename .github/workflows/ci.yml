@@ -45,7 +45,7 @@ jobs:
         run: npx nx run-many -t test typecheck
 
       - name: Build all projects
-        run: npx nx run-many --target=build --all
+        run: SKIP_ENV_VALIDATION=1 npx nx run-many --target=build --all
 
       - name: Run Database Migrations
         run: npm run db:migrate:prod

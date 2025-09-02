@@ -1,4 +1,4 @@
-import { DashboardLayout } from '@stream-helper/web-feature-dashboard/server';
+import { DashboardLayout } from '@durablr/web-feature-dashboard/server';
 import { ReactNode } from 'react';
 
 export default async function Layout({

@@ -1,6 +1,6 @@
 import { colorClasses } from './constants';
-import { OverviewMetrics } from '@stream-helper/shared-utils-schemas';
-import { cn } from '@stream-helper/web-ui/server';
+import { OverviewMetrics } from '@durablr/shared-utils-schemas';
+import { cn } from '@durablr/web-ui/server';
 
 interface Metric {
   title: string;

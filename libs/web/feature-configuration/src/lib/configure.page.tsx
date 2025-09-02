@@ -8,7 +8,7 @@ import {
   ConfigurationSchema,
   ModeEnum,
   type ConfigurationType,
-} from '@stream-helper/shared-utils-schemas';
+} from '@durablr/shared-utils-schemas';
 import Link from 'next/link';
 import { ModeOptions } from './constants';
 import { updateConfiguration } from './action';

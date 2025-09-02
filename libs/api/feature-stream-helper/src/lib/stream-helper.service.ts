@@ -1,4 +1,4 @@
-import { createStream, updateStreamStatus } from '@stream-helper/shared-data-access-db';
+import { createStream, updateStreamStatus } from '@durablr/shared-data-access-db';
 
 export interface StreamConfig {
   streamUrl: string;
