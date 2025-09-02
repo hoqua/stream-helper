@@ -1,11 +1,11 @@
 import Link from 'next/link';
-import { Button } from '@stream-helper/web-ui/server';
+import { Button } from '@durablr/web-ui/server';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from '@stream-helper/web-ui/server';
+} from '@durablr/web-ui/server';
 import { ChevronDownIcon } from 'lucide-react';
 import { getProjects } from '../loader';
 

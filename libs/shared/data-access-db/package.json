@@ -1,5 +1,5 @@
 {
-  "name": "@stream-helper/shared-data-access-db",
+  "name": "@durablr/shared-data-access-db",
   "version": "0.0.1",
   "private": true,
   "type": "module",

@@ -1,8 +1,8 @@
 'use client';
 import { ColumnDef } from '@tanstack/react-table';
-import { Badge, cn } from '@stream-helper/web-ui/server';
+import { Badge, cn } from '@durablr/web-ui/server';
 import { statusConfig } from './constants';
-import { Stream } from '@stream-helper/shared-utils-schemas';
+import { Stream } from '@durablr/shared-utils-schemas';
 import { format } from 'date-fns';
 
 export const columns: ColumnDef<Stream>[] = [

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createProject, createUser } from '@stream-helper/shared-data-access-db';
-import { exchangeExternalCodeForToken, VercelService } from '@stream-helper/feature-vercel';
+import { createProject, createUser } from '@durablr/shared-data-access-db';
+import { exchangeExternalCodeForToken, VercelService } from '@durablr/feature-vercel';
+import { env } from '../../../env';
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -15,16 +16,11 @@ export async function GET(request: NextRequest) {
 
   const response = await exchangeExternalCodeForToken(
     code,
-    `https://${process.env.NEXT_PUBLIC_VERCEL_URL}/api/callback`,
+    `https://${env.NEXT_PUBLIC_VERCEL_URL || 'localhost:3000'}/api/callback`,
   );
 
   if (!response.success || !response.data) {
-    return NextResponse.redirect(
-      new URL(
-        `/error?message=${response.error} + ${process.env.NEXT_PUBLIC_VERCEL_URL}`,
-        request.url,
-      ),
-    );
+    return NextResponse.redirect(new URL(`/error?message=${response.error}`, request.url));
   }
 
   const { data } = response;

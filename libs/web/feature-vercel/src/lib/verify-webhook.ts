@@ -1,7 +1,8 @@
 import { NextRequest } from 'next/server';
 import * as crypto from 'node:crypto';
+import { envWeb } from '@durablr/shared-utils-schemas';
 
-const CLIENT_SECRET = process.env.VERCEL_CLIENT_SECRET || '';
+const CLIENT_SECRET = envWeb.VERCEL_CLIENT_SECRET;
 
 export async function verifyWebhook(request: NextRequest) {
   const rawBody = await request.text();

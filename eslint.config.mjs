@@ -10,7 +10,7 @@ export default [
   unicorn.configs.recommended,
   prettierConfig,
   {
-    ignores: ['**/dist', '**/*.config.js', '**/*.config.ts', '**/*.config.mjs'],
+    ignores: ['**/dist', '**/*.config.js', '**/*.config.ts', '**/*.config.mjs', '**/out-tsc'],
   },
   {
     plugins: {

@@ -6,7 +6,12 @@
     "types": ["node"],
     "rootDir": "src",
     "moduleResolution": "bundler",
-    "tsBuildInfoFile": "dist/tsconfig.app.tsbuildinfo"
+    "tsBuildInfoFile": "dist/tsconfig.app.tsbuildinfo",
+    "composite": false,
+    "skipLibCheck": true,
+    "declaration": true,
+    "declarationMap": false,
+    "emitDeclarationOnly": true
   },
   "include": ["src/**/*.ts"],
   "exclude": ["eslint.config.js", "eslint.config.cjs", "eslint.config.mjs"],
@@ -16,6 +21,9 @@
     },
     {
       "path": "../../libs/shared/data-access-db/tsconfig.lib.json"
+    },
+    {
+      "path": "../../libs/shared/utils-schemas/tsconfig.lib.json"
     }
   ]
 }

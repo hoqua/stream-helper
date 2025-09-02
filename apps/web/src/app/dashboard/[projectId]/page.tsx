@@ -1,4 +1,4 @@
-import { DashboardPage } from '@stream-helper/web-feature-dashboard/server';
+import { DashboardPage } from '@durablr/web-feature-dashboard/server';
 
 export default async function Dashboard({ params }: { params: Promise<{ projectId: string }> }) {
   const { projectId } = await params;

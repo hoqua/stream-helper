@@ -1,7 +1,7 @@
 import { eq } from 'drizzle-orm';
 import { db } from '../client';
 import { NewUser, users } from '../schema';
-import { ConfigurationType } from '@stream-helper/shared-utils-schemas';
+import { ConfigurationType } from '@durablr/shared-utils-schemas';
 
 export async function createUser(data: NewUser) {
   return await db.insert(users).values(data).returning();
