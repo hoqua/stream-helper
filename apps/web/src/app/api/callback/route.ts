@@ -67,6 +67,7 @@ export async function GET(request: NextRequest) {
         DURABLR_TOKEN: token,
         DURABLR_URL: env.STREAM_URL,
       },
+      teamId,
     ),
   ]);
 
