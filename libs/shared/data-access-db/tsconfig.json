@@ -4,9 +4,6 @@
   "include": [],
   "references": [
     {
-      "path": "../utils-schemas"
-    },
-    {
       "path": "./tsconfig.lib.json"
     },
     {
