@@ -1,59 +1,39 @@
 import { FastifyInstance } from 'fastify';
 import { streamService, StreamConfig } from './stream-helper.service';
+import { StreamSubscribeRequestSchema, StreamIdParamSchema } from '@durablr/shared-utils-schemas';
 
 export function registerStreamHelperRoute(fastify: FastifyInstance) {
   // Generic stream subscription - works with any SSE endpoint
   fastify.post('/stream/subscribe', async (request, reply) => {
-    try {
-      const { streamUrl, projectId, webhookUrl, headers, body, method } = request.body as {
-        streamUrl: string;
-        projectId: string;
-        webhookUrl: string;
-        headers?: Record<string, string>;
-        body?: unknown;
-        method?: string;
-      };
+    // Validate request body using Zod
+    const validatedBody = StreamSubscribeRequestSchema.parse(request.body);
 
-      if (!streamUrl || !webhookUrl) {
-        reply.code(400);
-        return { error: 'streamUrl and webhookUrl are required' };
-      }
+    const streamConfig: StreamConfig = {
+      streamUrl: validatedBody.streamUrl,
+      projectId: validatedBody.projectId,
+      webhookUrl: validatedBody.webhookUrl,
+      headers: validatedBody.headers,
+      body: validatedBody.body,
+      method: validatedBody.method,
+    };
 
-      const streamConfig: StreamConfig = {
-        streamUrl,
-        projectId,
-        webhookUrl,
-        headers,
-        body,
-        method,
-      };
-
-      const streamId = await streamService.subscribeToStream(streamConfig);
-
-      return { streamId };
-    } catch (error) {
-      reply.code(500);
-      return { error: (error as Error).message };
-    }
+    const streamId = await streamService.subscribeToStream(streamConfig);
+    return { streamId };
   });
 
   // Stop stream subscription
   fastify.delete('/stream/subscribe/:streamId', async (request, reply) => {
-    try {
-      const { streamId } = request.params as { streamId: string };
+    // Validate streamId parameter using Zod
+    const validatedParams = StreamIdParamSchema.parse(request.params);
 
-      const success = await streamService.stopStream(streamId);
+    const success = await streamService.stopStream(validatedParams.streamId);
 
-      if (!success) {
-        reply.code(404);
-        return { error: 'Stream not found' };
-      }
-
-      return { message: 'Stream stopped', streamId };
-    } catch (error) {
-      reply.code(500);
-      return { error: (error as Error).message };
+    if (!success) {
+      reply.code(404);
+      return { error: 'Stream not found' };
     }
+
+    return { message: 'Stream stopped', streamId: validatedParams.streamId };
   });
 
   // Get active streams

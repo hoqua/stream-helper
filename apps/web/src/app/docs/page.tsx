@@ -36,9 +36,12 @@ export default function Examples() {
             Stream OpenAI chat completions through webhooks to avoid serverless timeouts:
           </p>
 
-          <div className="bg-black/50 rounded-lg p-4 mb-4 overflow-x-auto">
-            <code className="text-green-400 text-xs whitespace-pre">
-              {`curl -X POST https://www.durablr.run/stream/subscribe \\
+          <div className="space-y-4">
+            <div>
+              <h3 className="text-white font-medium mb-2">Production:</h3>
+              <div className="bg-black/50 rounded-lg p-4 overflow-x-auto">
+                <code className="text-green-400 text-xs whitespace-pre">
+                  {`curl -X POST https://www.durablr.run/stream/subscribe \\
   -H "Content-Type: application/json" \\
   -d '{
     "method": "POST",
@@ -55,7 +58,34 @@ export default function Examples() {
       "max_tokens": 500
     }
   }'`}
-            </code>
+                </code>
+              </div>
+            </div>
+
+            <div>
+              <h3 className="text-white font-medium mb-2">Local Development (NextJS Gateway):</h3>
+              <div className="bg-black/50 rounded-lg p-4 overflow-x-auto">
+                <code className="text-green-400 text-xs whitespace-pre">
+                  {`curl -X POST http://localhost:3000/api/stream/subscribe \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "method": "POST",
+    "streamUrl": "https://api.openai.com/v1/chat/completions",
+    "webhookUrl": "https://webhook.site/your-unique-url",
+    "headers": {
+      "Authorization": "Bearer YOUR_OPENAI_API_KEY",
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "model": "gpt-4",
+      "messages": [{"role": "user", "content": "Write a creative story about space exploration"}],
+      "stream": true,
+      "max_tokens": 500
+    }
+  }'`}
+                </code>
+              </div>
+            </div>
           </div>
 
           <div className="bg-blue-900/20 border border-blue-800 rounded-lg p-4">
@@ -71,9 +101,12 @@ export default function Examples() {
           <h2 className="text-2xl font-semibold text-white mb-4">📡 Simple GET Stream</h2>
           <p className="text-gray-400 mb-4">Subscribe to any Server-Sent Events endpoint:</p>
 
-          <div className="bg-black/50 rounded-lg p-4 mb-4 overflow-x-auto">
-            <code className="text-green-400 text-xs whitespace-pre">
-              {`curl -X POST https://www.durablr.run/stream/subscribe \\
+          <div className="space-y-4">
+            <div>
+              <h3 className="text-white font-medium mb-2">Production:</h3>
+              <div className="bg-black/50 rounded-lg p-4 overflow-x-auto">
+                <code className="text-green-400 text-xs whitespace-pre">
+                  {`curl -X POST https://www.durablr.run/stream/subscribe \\
   -H "Content-Type: application/json" \\
   -d '{
     "streamUrl": "https://your-sse-endpoint.com/events",
@@ -82,7 +115,26 @@ export default function Examples() {
       "Authorization": "Bearer YOUR_TOKEN"
     }
   }'`}
-            </code>
+                </code>
+              </div>
+            </div>
+
+            <div>
+              <h3 className="text-white font-medium mb-2">Local Development (NextJS Gateway):</h3>
+              <div className="bg-black/50 rounded-lg p-4 overflow-x-auto">
+                <code className="text-green-400 text-xs whitespace-pre">
+                  {`curl -X POST http://localhost:3000/api/stream/subscribe \\
+  -H "Content-Type: application/json" \\
+  -d '{
+    "streamUrl": "https://your-sse-endpoint.com/events",
+    "webhookUrl": "https://webhook.site/your-unique-url",
+    "headers": {
+      "Authorization": "Bearer YOUR_TOKEN"
+    }
+  }'`}
+                </code>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -174,15 +226,33 @@ export default function Examples() {
         <div className="bg-gray-900/50 backdrop-blur border border-gray-800 rounded-xl p-8 mb-8">
           <h2 className="text-2xl font-semibold text-white mb-4">⚙️ Management API</h2>
 
-          <div className="space-y-4">
+          <div className="space-y-6">
             <div>
-              <h3 className="text-white font-medium mb-2">Get Active Streams:</h3>
-              <div className="bg-black/50 rounded-lg p-4">
-                <code className="text-green-400 text-sm">
-                  curl https://www.durablr.run/stream/active
-                </code>
+              <h3 className="text-white font-medium mb-4">Get Active Streams:</h3>
+
+              <div className="space-y-3">
+                <div>
+                  <h4 className="text-gray-300 text-sm mb-2">Production:</h4>
+                  <div className="bg-black/50 rounded-lg p-4">
+                    <code className="text-green-400 text-sm">
+                      curl https://www.durablr.run/stream/active
+                    </code>
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="text-gray-300 text-sm mb-2">
+                    Local Development (NextJS Gateway):
+                  </h4>
+                  <div className="bg-black/50 rounded-lg p-4">
+                    <code className="text-green-400 text-sm">
+                      curl http://localhost:3000/api/stream/active
+                    </code>
+                  </div>
+                </div>
               </div>
-              <div className="bg-blue-900/20 border border-blue-800 rounded-lg p-3 mt-2">
+
+              <div className="bg-blue-900/20 border border-blue-800 rounded-lg p-3 mt-3">
                 <code className="text-blue-300 text-sm">
                   {'{'}&quot;activeStreams&quot;:
                   [&quot;7f8c9d2e-4b5a-1c3d-9e8f-2a1b3c4d5e6f&quot;], &quot;count&quot;: 1{'}'}
@@ -191,14 +261,33 @@ export default function Examples() {
             </div>
 
             <div>
-              <h3 className="text-white font-medium mb-2">Stop a Stream:</h3>
-              <div className="bg-black/50 rounded-lg p-4">
-                <code className="text-green-400 text-sm">
-                  curl -X DELETE
-                  https://www.durablr.run/stream/subscribe/7f8c9d2e-4b5a-1c3d-9e8f-2a1b3c4d5e6f
-                </code>
+              <h3 className="text-white font-medium mb-4">Stop a Stream:</h3>
+
+              <div className="space-y-3">
+                <div>
+                  <h4 className="text-gray-300 text-sm mb-2">Production:</h4>
+                  <div className="bg-black/50 rounded-lg p-4">
+                    <code className="text-green-400 text-sm">
+                      curl -X DELETE
+                      https://www.durablr.run/stream/subscribe/7f8c9d2e-4b5a-1c3d-9e8f-2a1b3c4d5e6f
+                    </code>
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="text-gray-300 text-sm mb-2">
+                    Local Development (NextJS Gateway):
+                  </h4>
+                  <div className="bg-black/50 rounded-lg p-4">
+                    <code className="text-green-400 text-sm">
+                      curl -X DELETE
+                      http://localhost:3000/api/stream/subscribe/7f8c9d2e-4b5a-1c3d-9e8f-2a1b3c4d5e6f
+                    </code>
+                  </div>
+                </div>
               </div>
-              <div className="bg-blue-900/20 border border-blue-800 rounded-lg p-3 mt-2">
+
+              <div className="bg-blue-900/20 border border-blue-800 rounded-lg p-3 mt-3">
                 <code className="text-blue-300 text-sm">
                   {'{'}&quot;message&quot;: &quot;Stream stopped&quot;, &quot;streamId&quot;:
                   &quot;7f8c9d2e-4b5a-1c3d-9e8f-2a1b3c4d5e6f&quot;{'}'}

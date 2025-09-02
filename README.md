@@ -18,11 +18,11 @@ Durablr solves the problem where your serverless function times out waiting for 
 ### Example 1: OpenAI Chat Streaming
 
 ```bash
-# Start API server
-npm run dev:api
+# Start the NextJS application
+npm run dev:web  # Starts on http://localhost:3000
 
 # Subscribe to OpenAI streaming chat
-curl -X POST http://localhost:3001/stream/subscribe \
+curl -X POST http://localhost:3000/api/stream/subscribe \
   -H "Content-Type: application/json" \
   -d '{
     "method": "POST",
@@ -46,7 +46,7 @@ curl -X POST http://localhost:3001/stream/subscribe \
 
 ```bash
 # Subscribe to any GET-based SSE endpoint
-curl -X POST http://localhost:3001/stream/subscribe \
+curl -X POST http://localhost:3000/api/stream/subscribe \
   -H "Content-Type: application/json" \
   -d '{
     "streamUrl": "https://your-sse-endpoint.com/events",
@@ -96,11 +96,11 @@ Durablr forwards streaming chunks in real-time:
 
 ```bash
 # Get active streams
-curl http://localhost:3001/stream/active
+curl http://localhost:3000/api/stream/active
 # Response: {"activeStreams": ["stream_123", "stream_456"], "count": 2}
 
 # Stop a stream (optional - streams auto-complete)
-curl -X DELETE http://localhost:3001/stream/subscribe/stream_1234
+curl -X DELETE http://localhost:3000/api/stream/subscribe/stream_1234
 # Response: {"message": "Stream stopped", "streamId": "stream_1234"}
 ```
 
@@ -138,11 +138,11 @@ Subscribe to a streaming endpoint and forward events to a webhook.
 Test stream creation and database logging:
 
 ```bash
-# Start the API server
-npm run dev:api
+# Start the NextJS application
+npm run dev:web  # NextJS gateway on :3000
 
 # Create a test stream using httpbin streaming endpoint
-curl -X POST http://localhost:3001/stream/subscribe \
+curl -X POST http://localhost:3000/api/stream/subscribe \
   -H "Content-Type: application/json" \
   -d '{
     "streamUrl": "https://httpbin.org/stream/10",
@@ -152,7 +152,7 @@ curl -X POST http://localhost:3001/stream/subscribe \
 # Response: {"streamId": "53f9baab-92ac-4f43-afe6-6b8969e9ca00"}
 
 # Check active streams
-curl http://localhost:3001/stream/active
+curl http://localhost:3000/api/stream/active
 # Response: {"activeStreams": ["53f9baab-92ac-4f43-afe6-6b8969e9ca00"], "count": 1}
 ```
 
@@ -179,14 +179,12 @@ Streams are automatically logged to the database with status tracking:
 ## 🛠️ Development
 
 ```bash
-# Start API server with auto-reload
-npm run dev:api
+# Start NextJS application (recommended)
+npm run dev:web  # Runs on http://localhost:3000
 
-# Start web app (if applicable)
-npm run dev:web
-
-# Start both API and web
-npm run dev
+# Or start both services separately (advanced)
+npm run dev:api  # API server on :3001 
+npm run dev:web  # NextJS gateway on :3000
 
 # Run linting
 npm run lint
