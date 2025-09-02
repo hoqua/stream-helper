@@ -3,6 +3,7 @@ import { z } from 'zod';
 
 export const envApi = createEnv({
   server: {
+    DATABASE_URL: z.url(),
     PORT: z.coerce.number().default(3001),
     HOST: z.string().default('0.0.0.0'),
     NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
