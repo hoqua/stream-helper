@@ -50,6 +50,9 @@
   ],
   "references": [
     {
+      "path": "../../libs/shared/utils-schemas"
+    },
+    {
       "path": "../../libs/web/feature-dashboard"
     },
     {

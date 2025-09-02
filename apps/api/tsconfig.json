@@ -7,6 +7,9 @@
       "path": "../../libs/api/feature-stream-helper"
     },
     {
+      "path": "../../libs/shared/utils-schemas"
+    },
+    {
       "path": "../../libs/shared/data-access-db"
     },
     {
