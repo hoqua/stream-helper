@@ -4,8 +4,8 @@ import { z } from 'zod';
 export const envWeb = createEnv({
   server: {
     DATABASE_URL: z.string().url(),
-    VERCEL_CLIENT_ID: z.string().min(1),
-    VERCEL_CLIENT_SECRET: z.string().min(1),
+    VERCEL_CLIENT_ID: z.string().min(2),
+    VERCEL_CLIENT_SECRET: z.string().min(2),
     NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
   },
 
