@@ -2,7 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createProject, createUser } from '@durablr/shared-data-access-db';
 import { exchangeExternalCodeForToken, VercelService } from '@durablr/feature-vercel';
 import { env } from '../../../env';
-import * as jwt from 'jsonwebtoken';
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -51,8 +50,6 @@ export async function GET(request: NextRequest) {
     installationId: data.installation_id,
   });
 
-  const token = jwt.sign(newUser[0].id, env.SECRET_JWT_KEY);
-
   await Promise.all([
     createProject(
       projects.map((p) => ({
@@ -64,7 +61,6 @@ export async function GET(request: NextRequest) {
     vercelClient.addEnvs(
       projects.map((p) => p.id),
       {
-        DURABLR_TOKEN: token,
         DURABLR_URL: env.STREAM_URL,
       },
       teamId,
