@@ -1,8 +1,8 @@
 import { IntegrationExternalTokenResponse, IntegrationExternalTokenResponseType } from './schema';
 import { envWeb } from '@durablr/shared-utils-schemas';
 
-const CLIENT_ID = envWeb.CLIENT_ID;
-const CLIENT_SECRET = envWeb.CLIENT_SECRET;
+const CLIENT_ID = envWeb.VERCEL_CLIENT_ID;
+const CLIENT_SECRET = envWeb.VERCEL_CLIENT_SECRET;
 
 export async function exchangeExternalCodeForToken(
   code: string,
