@@ -3,10 +3,11 @@ import { z } from 'zod';
 
 export const envWeb = createEnv({
   server: {
-    DATABASE_URL: z.string().url(),
+    DATABASE_URL: z.url(),
     VERCEL_CLIENT_ID: z.string().min(2),
     VERCEL_CLIENT_SECRET: z.string().min(2),
     NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
+    API_URL: z.url(),
   },
 
   client: {
@@ -19,6 +20,7 @@ export const envWeb = createEnv({
     VERCEL_CLIENT_SECRET: process.env.VERCEL_CLIENT_SECRET,
     NODE_ENV: process.env.NODE_ENV,
     NEXT_PUBLIC_VERCEL_URL: process.env.NEXT_PUBLIC_VERCEL_URL,
+    API_URL: process.env.API_URL,
   },
 
   skipValidation: !!process.env.SKIP_ENV_VALIDATION,
