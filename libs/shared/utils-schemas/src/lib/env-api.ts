@@ -7,6 +7,7 @@ export const envApi = createEnv({
     HOST: z.string().default('0.0.0.0'),
     NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
     LOG_LEVEL: z.enum(['trace', 'debug', 'info', 'warn', 'error', 'fatal']).default('info'),
+    SECRET_JWT_KEY: z.string().min(2),
   },
 
   runtimeEnv: process.env,

@@ -27,17 +27,21 @@ export class VercelService {
     return data.projects;
   }
 
-  async addEnvs(projectId: string, envs: Record<string, string>, teamId?: string) {
-    await this.client?.projects.createProjectEnv({
-      idOrName: projectId,
-      teamId,
-      upsert: 'true',
-      requestBody: Object.entries(envs).map(([key, value]) => ({
-        key,
-        value,
-        target: ['production', 'preview', 'development'],
-        type: 'encrypted',
-      })),
-    });
+  async addEnvs(projectIds: string[], envs: Record<string, string>, teamId?: string) {
+    await Promise.all(
+      projectIds.map((projectId) =>
+        this.client?.projects.createProjectEnv({
+          idOrName: projectId,
+          teamId,
+          upsert: 'true',
+          requestBody: Object.entries(envs).map(([key, value]) => ({
+            key,
+            value,
+            target: ['production', 'preview', 'development'],
+            type: 'encrypted',
+          })),
+        }),
+      ),
+    );
   }
 }
