@@ -1,6 +1,6 @@
-# Durablr SaaS
+# Durablr
 
-**Durablr** is a generic SaaS that handles any Server-Sent Events (SSE) stream without serverless timeout issues. Perfect for Vercel, Netlify, and other serverless platforms with execution time limits.
+**Durablr** handles any Server-Sent Events (SSE) stream without serverless timeout issues. Perfect for Vercel, Netlify, and other serverless platforms with execution time limits.
 
 ## 🚀 Quick Start
 

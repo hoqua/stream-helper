@@ -8,7 +8,7 @@ export default function EULA() {
       <div className="max-w-4xl mx-auto px-4 py-24">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-white mb-6">End User License Agreement</h1>
-          <p className="text-gray-400">Durablr SaaS Integration for Vercel</p>
+          <p className="text-gray-400">Durablr Stream Service</p>
         </div>
 
         <div className="bg-gray-900/50 backdrop-blur border border-gray-800 rounded-xl p-8 space-y-8">

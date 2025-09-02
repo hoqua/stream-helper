@@ -23,31 +23,37 @@ export default function Index() {
             </svg>
           </div>
 
-          <h1 className="text-5xl font-bold text-white mb-6">Durablr SaaS</h1>
+          <h1 className="text-5xl font-bold text-white mb-6">Durablr</h1>
 
           <p className="text-xl text-gray-400 mb-12 max-w-2xl mx-auto">
-            Generic SaaS that handles any Server-Sent Events (SSE) stream without serverless timeout
-            issues. Perfect for Vercel, Netlify, and other serverless platforms.
+            Never worry about serverless timeouts again. Handle long-running streams like OpenAI
+            chat, analytics feeds, or real-time APIs without hitting platform limits.
           </p>
 
           <div className="bg-gray-900/50 backdrop-blur border border-gray-800 rounded-xl p-8 mb-8">
-            <h2 className="text-lg font-semibold text-white mb-4">How to Install</h2>
-            <ol className="text-left text-gray-400 space-y-3 max-w-md mx-auto">
+            <h2 className="text-lg font-semibold text-white mb-4">The Problem</h2>
+            <p className="text-gray-400 mb-4">
+              Your serverless function times out waiting for long streams (OpenAI responses,
+              analytics data, etc). Vercel, Netlify and similar platforms have execution time
+              limits.
+            </p>
+            <h2 className="text-lg font-semibold text-white mb-4">The Solution</h2>
+            <ol className="text-left text-gray-400 space-y-2 max-w-2xl">
               <li className="flex items-start">
                 <span className="text-blue-500 font-bold mr-3">1.</span>
-                <span>Visit the Vercel Integrations Marketplace</span>
+                <span>Send your streaming URL to Durablr</span>
               </li>
               <li className="flex items-start">
                 <span className="text-blue-500 font-bold mr-3">2.</span>
-                <span>Search for &quot;Durablr&quot;</span>
+                <span>Durablr connects and receives the stream data</span>
               </li>
               <li className="flex items-start">
                 <span className="text-blue-500 font-bold mr-3">3.</span>
-                <span>Click &quot;Add Integration&quot; and authorize</span>
+                <span>Real-time updates are sent to your webhook</span>
               </li>
               <li className="flex items-start">
                 <span className="text-blue-500 font-bold mr-3">4.</span>
-                <span>Configure your settings</span>
+                <span>No timeouts, no waiting!</span>
               </li>
             </ol>
           </div>
@@ -65,13 +71,13 @@ export default function Index() {
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     strokeWidth={2}
-                    d="M5 12h14M12 5l7 7-7 7"
+                    d="M13 10V3L4 14h7v7l9-11h-7z"
                   />
                 </svg>
               </div>
-              <h3 className="text-lg font-semibold text-white mb-2">Easy Setup</h3>
+              <h3 className="text-lg font-semibold text-white mb-2">OpenAI Compatible</h3>
               <p className="text-gray-400 text-sm">
-                One-click installation through Vercel Marketplace
+                Handle 30+ minute OpenAI research tasks without timeouts
               </p>
             </div>
 
@@ -87,12 +93,14 @@ export default function Index() {
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     strokeWidth={2}
-                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
                   />
                 </svg>
               </div>
-              <h3 className="text-lg font-semibold text-white mb-2">Secure OAuth</h3>
-              <p className="text-gray-400 text-sm">Industry-standard OAuth 2.0 authentication</p>
+              <h3 className="text-lg font-semibold text-white mb-2">Real-time Webhooks</h3>
+              <p className="text-gray-400 text-sm">
+                Receive streaming data as it arrives via webhooks
+              </p>
             </div>
 
             <div className="bg-gray-900/50 backdrop-blur border border-gray-800 rounded-xl p-6">
@@ -107,27 +115,29 @@ export default function Index() {
                     strokeLinecap="round"
                     strokeLinejoin="round"
                     strokeWidth={2}
-                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
                   />
                 </svg>
               </div>
-              <h3 className="text-lg font-semibold text-white mb-2">Full Documentation</h3>
-              <p className="text-gray-400 text-sm">Complete API docs and examples</p>
+              <h3 className="text-lg font-semibold text-white mb-2">Simple REST API</h3>
+              <p className="text-gray-400 text-sm">
+                Just POST your stream URL and webhook endpoint
+              </p>
             </div>
           </div>
 
-          <div className="flex gap-4 justify-center">
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link
-              href="/examples"
-              className="px-8 py-3 bg-white text-black font-medium rounded-lg hover:bg-gray-100 transition-colors"
+              href="/docs"
+              className="px-8 py-4 bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors text-center"
             >
-              📖 View Documentation
+              🚀 Get Started - View API Docs
             </Link>
             <Link
               href="/support"
-              className="px-8 py-3 border border-gray-700 text-white font-medium rounded-lg hover:border-gray-600 hover:bg-gray-900/50 transition-colors"
+              className="px-8 py-4 border border-gray-700 text-white font-medium rounded-lg hover:border-gray-600 hover:bg-gray-900/50 transition-colors text-center"
             >
-              💬 Get Support
+              💬 Need Help?
             </Link>
           </div>
         </div>

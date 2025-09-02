@@ -8,7 +8,7 @@ export default function Support() {
       <div className="max-w-4xl mx-auto px-4 py-24">
         <div className="text-center mb-12">
           <h1 className="text-4xl font-bold text-white mb-6">Support</h1>
-          <p className="text-gray-400">Get help with Durablr SaaS Integration</p>
+          <p className="text-gray-400">Get help with Durablr</p>
         </div>
 
         <div className="bg-gray-900/50 backdrop-blur border border-gray-800 rounded-xl p-8 space-y-8">
