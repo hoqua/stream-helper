@@ -1,1 +1,1 @@
-export { envApi as env } from '@durablr/shared-utils-schemas';
+export { envApi as env } from '@durablr/shared-utils-schemas/lib/env-api';

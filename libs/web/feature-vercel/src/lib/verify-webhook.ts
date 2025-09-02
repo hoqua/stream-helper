@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 import * as crypto from 'node:crypto';
-import { envWeb } from '@durablr/shared-utils-schemas';
+import { envWeb } from '@durablr/shared-utils-schemas/lib/env-web';
 
 const CLIENT_SECRET = envWeb.VERCEL_CLIENT_SECRET;
 
