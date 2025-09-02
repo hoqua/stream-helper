@@ -5,8 +5,9 @@ export async function registerStreamHelperRoute(fastify: FastifyInstance) {
   // Generic stream subscription - works with any SSE endpoint
   fastify.post('/stream/subscribe', async (request, reply) => {
     try {
-      const { streamUrl, webhookUrl, headers, body, method } = request.body as {
+      const { streamUrl, projectId, webhookUrl, headers, body, method } = request.body as {
         streamUrl: string;
+        projectId: string;
         webhookUrl: string;
         headers?: Record<string, string>;
         body?: unknown;
@@ -20,6 +21,7 @@ export async function registerStreamHelperRoute(fastify: FastifyInstance) {
 
       const streamConfig: StreamConfig = {
         streamUrl,
+        projectId,
         webhookUrl,
         headers,
         body,

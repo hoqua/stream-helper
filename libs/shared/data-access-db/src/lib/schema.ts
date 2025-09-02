@@ -9,7 +9,12 @@ export const streamStatusEnum = pgEnum('stream_status', [
 ]);
 
 export const users = pgTable('users', {
-  id: text('id').primaryKey(),
+  id: text('id')
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  externalId: text('external_id').unique(),
+  email: text('email').notNull(),
+  username: text('username'),
   teamId: text('team_id').unique(),
   accessToken: text('access_token').unique().notNull(),
   configurationId: text('configuration_id').unique().notNull(),
@@ -19,8 +24,19 @@ export const users = pgTable('users', {
   automaticProcessing: boolean('automatic_processing').notNull().default(false),
 });
 
+export const projects = pgTable('projects', {
+  id: text('id').primaryKey(),
+  userId: text('userId')
+    .notNull()
+    .references(() => users.id, { onDelete: 'cascade' }),
+  name: text('name').notNull(),
+});
+
 export const streams = pgTable('streams', {
   id: text('id').primaryKey(),
+  projectId: text('project_id')
+    .notNull()
+    .references(() => projects.id, { onDelete: 'cascade' }),
   status: streamStatusEnum('status').notNull().default('active'),
   streamUrl: text('stream_url').notNull(),
   webhookUrl: text('webhook_url').notNull(),
@@ -42,6 +58,8 @@ export const streamLogs = pgTable('stream_logs', {
 
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
+export type Project = typeof projects.$inferSelect;
+export type NewProject = typeof projects.$inferInsert;
 export type Stream = typeof streams.$inferSelect;
 export type NewStream = typeof streams.$inferInsert;
 export type StreamLog = typeof streamLogs.$inferSelect;

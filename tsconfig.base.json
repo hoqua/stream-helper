@@ -5,7 +5,10 @@
     "emitDeclarationOnly": true,
     "importHelpers": true,
     "isolatedModules": true,
-    "lib": ["es2022"],
+    "lib": [
+      "es2022",
+      "dom"
+    ],
     "module": "esnext",
     "moduleResolution": "bundler",
     "noEmitOnError": true,
@@ -16,9 +19,13 @@
     "skipLibCheck": true,
     "strict": true,
     "target": "es2022",
-    "customConditions": ["development"],
+    "customConditions": [
+      "development"
+    ],
     "paths": {
-      "@durablr/feature-stream-helper": ["./libs/api/feature-stream-helper/dist/index.d.ts"]
+      "@durablr/feature-stream-helper": [
+        "./libs/api/feature-stream-helper/dist/index.d.ts"
+      ]
     }
   }
 }

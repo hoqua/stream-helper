@@ -1,13 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { verifyWebhook } from '@stream-helper/feature-vercel';
+import { VercelService, verifyWebhook } from '@stream-helper/feature-vercel';
+import {
+  addMultipleProjects,
+  deleteProjects,
+  deleteUserByConfigurationId,
+  getUserByConfigurationId,
+} from '@stream-helper/shared-data-access-db';
 
 export async function POST(request: NextRequest) {
   try {
     const body = await verifyWebhook(request);
-
-    if (!body || !body.valid) {
-      return NextResponse.json({ error: body?.error }, { status: 400 });
-    }
 
     console.log('Webhook received:', {
       type: body.type,
@@ -17,24 +19,38 @@ export async function POST(request: NextRequest) {
 
     // Handle different event types
     switch (body.type) {
-      case 'integration.configuration-created': {
+      case 'integration-configuration.permission-upgraded': {
+        const data = body.payload;
+        const user = await getUserByConfigurationId(data.configuration.id);
+        const vercelClient = new VercelService(user[0].accessToken);
+        const projects = await vercelClient.getProjects(data.team.id);
+        const projectsToAdd = projects.filter((p) => data.projects.added.includes(p.id));
+        await Promise.all([
+          addMultipleProjects(
+            projectsToAdd.map((p) => ({
+              id: p.id,
+              name: p.name,
+              userId: user[0].id,
+            })),
+          ),
+          deleteProjects(data.projects.removed),
+        ]);
+        break;
+      }
+      case 'integration-resource.project-connected': {
         // New integration installed
-        console.log('Integration installed for:', body.payload?.userId);
+        console.log('Integration installed for:', body.payload);
         break;
       }
-
-      case 'integration.configuration-removed': {
+      case 'integration-configuration.removed': {
+        await deleteUserByConfigurationId(body.payload.configuration.id);
+        break;
+      }
+      case 'integration-resource.project-disconnected': {
         // Integration uninstalled
-        console.log('Integration removed for:', body.payload?.userId);
+        console.log('Integration removed for:', body.payload);
         break;
       }
-
-      case 'deployment.created': {
-        // Deployment created
-        console.log('Deployment created:', body.payload?.deployment?.url);
-        break;
-      }
-
       default: {
         console.log('Unknown event type:', body.type);
       }

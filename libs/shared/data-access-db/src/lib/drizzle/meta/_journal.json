@@ -15,6 +15,27 @@
       "when": 1756663142673,
       "tag": "0001_tough_manta",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1756732320981,
+      "tag": "0002_exotic_greymalkin",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1756734791953,
+      "tag": "0003_short_spencer_smythe",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1756746471771,
+      "tag": "0004_closed_ravenous",
+      "breakpoints": true
     }
   ]
 }

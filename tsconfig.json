@@ -22,6 +22,12 @@
       "path": "./apps/api"
     },
     {
+      "path": "./libs/web/feature-dashboard"
+    },
+    {
+      "path": "./libs/web/ui"
+    },
+    {
       "path": "./libs/api/feature-stream-helper"
     }
   ]

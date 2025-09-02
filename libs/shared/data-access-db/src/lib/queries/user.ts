@@ -14,3 +14,11 @@ export async function configureUser(id: string, data: ConfigurationType) {
 export async function getAllUsers() {
   return await db.select().from(users);
 }
+
+export async function getUserByConfigurationId(id: string) {
+  return await db.select().from(users).where(eq(users.configurationId, id));
+}
+
+export async function deleteUserByConfigurationId(id: string) {
+  return await db.delete(users).where(eq(users.configurationId, id));
+}
