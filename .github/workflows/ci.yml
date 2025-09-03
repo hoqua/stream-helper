@@ -14,20 +14,21 @@ permissions:
   actions: read
   contents: read
   pull-requests: write
+  id-token: write
 
 jobs:
-  # 📦 Install Dependencies (Shared)
   setup:
     name: 📦 Setup & Install
     runs-on: ubuntu-latest
+    outputs:
+      cache-key: ${{ steps.cache-deps.outputs.cache-hit }}
     steps:
-      - name: 📥 Checkout code
+      - name: 📥 Checkout
         uses: actions/checkout@v4
         with:
-          filter: tree:0
           fetch-depth: 0
 
-      - name: 🟢 Setup Node.js
+      - name: 🟢 Setup Node.js & Cache
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
@@ -37,15 +38,12 @@ jobs:
         run: npm ci
 
       - name: 💾 Cache node_modules
-        uses: actions/cache@v4
+        uses: actions/cache/save@v4
         id: cache-deps
         with:
-          path: |
-            node_modules
-            ~/.npm
+          path: node_modules
           key: deps-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
 
-  # 🏗️ Build, Test & Deploy Setup
   build-test:
     name: 🏗️ Build & Test
     runs-on: ubuntu-latest
@@ -53,10 +51,9 @@ jobs:
     env:
       DATABASE_URL: ${{ github.event_name == 'pull_request' && secrets.DEV_DATABASE_URL || secrets.PROD_DATABASE_URL }}
     steps:
-      - name: 📥 Checkout code
+      - name: 📥 Checkout
         uses: actions/checkout@v4
         with:
-          filter: tree:0
           fetch-depth: 0
 
       - name: 🟢 Setup Node.js
@@ -65,32 +62,29 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
 
       - name: 🔄 Restore dependencies
-        uses: actions/cache@v4
+        uses: actions/cache/restore@v4
         with:
-          path: |
-            node_modules
-            ~/.npm
+          path: node_modules
           key: deps-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+          fail-on-cache-miss: true
 
-      - name: 🧪 Run tests & type check
+      - name: 🧪 Test & TypeCheck
         run: npx nx run-many -t test typecheck
 
-      - name: 🗄️ Run database migrations
+      - name: 🗄️ Database migrations
         run: npm run db:migrate:prod
 
-      - name: 🔨 Build projects
+      - name: 🔨 Build all projects
         run: SKIP_ENV_VALIDATION=1 npx nx run-many --target=build --all
 
-  # 🔍 Code Quality & Security
   quality-security:
     name: 🔍 Quality & Security
     runs-on: ubuntu-latest
     needs: setup
     steps:
-      - name: 📥 Checkout code
+      - name: 📥 Checkout
         uses: actions/checkout@v4
         with:
-          filter: tree:0
           fetch-depth: 0
 
       - name: 🟢 Setup Node.js
@@ -99,33 +93,31 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
 
       - name: 🔄 Restore dependencies
-        uses: actions/cache@v4
+        uses: actions/cache/restore@v4
         with:
-          path: |
-            node_modules
-            ~/.npm
+          path: node_modules
           key: deps-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+          fail-on-cache-miss: true
 
-      - name: 🧹 Lint & fix code
+      - name: 🧹 Lint & fix
         run: npm run lint:fix
 
       - name: 🛡️ Security audit
         run: npm audit --audit-level=high
-        continue-on-error: true
 
-  # 🤖 AI Code Review
   ai-review:
     name: 🤖 Claude Review
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request'
     steps:
-      - name: 📥 Checkout code
+      - name: 📥 Checkout
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
 
-      - name: 🤖 Run Claude code review
+      - name: 🤖 AI Code Review
         uses: anthropics/claude-code-action@beta
+        continue-on-error: true
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           direct_prompt: |
@@ -137,31 +129,59 @@ jobs:
             
             Be concise. Report only actual issues found.
             If clean, state: "No security issues or bugs detected."
+            
+            NOTE: This is an advisory review - suggestions only, not blocking.
 
-  # ✅ Final Status Check
   status:
     name: ✅ CI Status
     runs-on: ubuntu-latest
     needs: [setup, build-test, quality-security, ai-review]
     if: always()
     steps:
-      - name: 📊 Evaluate results
+      - name: 📊 Check Results
         run: |
+          # Required jobs that must pass
+          REQUIRED_JOBS=("setup" "build-test" "quality-security")
+          
           echo "📋 CI Results Summary:"
+          echo "Setup: ${{ needs.setup.result }}"
           echo "Build & Test: ${{ needs.build-test.result }}"
           echo "Quality & Security: ${{ needs.quality-security.result }}"
           echo "Claude Review: ${{ needs.ai-review.result || 'skipped' }}"
+          echo ""
           
-          # Check for failures
-          if [[ "${{ needs.build-test.result }}" != "success" ]]; then
-            echo "❌ Build/Test failed"; exit 1
-          fi
-          if [[ "${{ needs.quality-security.result }}" != "success" ]]; then
-            echo "❌ Quality/Security failed"; exit 1
-          fi
-          if [[ "${{ github.event_name }}" == "pull_request" ]] && [[ "${{ needs.ai-review.result }}" != "success" ]]; then
-            echo "❌ AI Review failed"; exit 1
+          # Check required jobs
+          for job in "${REQUIRED_JOBS[@]}"; do
+            case $job in
+              "setup")
+                if [[ "${{ needs.setup.result }}" != "success" ]]; then
+                  echo "❌ Setup failed - dependency installation issues"
+                  exit 1
+                fi
+                ;;
+              "build-test")
+                if [[ "${{ needs.build-test.result }}" != "success" ]]; then
+                  echo "❌ Build/Test failed - code doesn't compile or tests failing"
+                  exit 1
+                fi
+                ;;
+              "quality-security")
+                if [[ "${{ needs.quality-security.result }}" != "success" ]]; then
+                  echo "❌ Quality/Security failed - fix linting and security issues"
+                  exit 1
+                fi
+                ;;
+            esac
+          done
+          
+          # Claude review status (advisory only)
+          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
+            case "${{ needs.ai-review.result }}" in
+              "success") echo "✅ Claude Review completed successfully" ;;
+              "failure") echo "⚠️  Claude Review found issues (advisory only)" ;;
+              *) echo "ℹ️  Claude Review was skipped or had errors" ;;
+            esac
           fi
           
-          echo "🎉 All checks passed!"
+          echo "🎉 All quality gates passed! Ready to merge."
 
