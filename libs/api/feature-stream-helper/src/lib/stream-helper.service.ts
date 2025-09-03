@@ -1,4 +1,5 @@
 import { createStream, updateStreamStatus } from '@durablr/shared-data-access-db';
+import { retry } from 'radash';
 
 export interface StreamConfig {
   streamUrl: string;
@@ -23,19 +24,39 @@ interface StreamProcessor {
 }
 
 export class StreamHelperService {
-  private processors = new Map<string, StreamProcessor>();
+  private readonly processors = new Map<string, StreamProcessor>();
+  private readonly MAX_CONCURRENT_STREAMS = 10_000;
+  private readonly WEBHOOK_TIMEOUT = 10_000; // 10 seconds
+  private readonly WEBHOOK_RETRY_CONFIG = {
+    times: 3,
+    delay: 1000,
+    backoff: (attempts: number) => attempts * 1000, // 1s, 2s, 3s
+  };
+  private readonly logger = console;
 
   constructor() {
-    // Log active streams count every 5 seconds
+    // Log active streams every 30 seconds
     setInterval(() => {
-      console.log(`[${new Date().toISOString()}] Active streams: ${this.processors.size}`);
-    }, 5000);
+      if (this.processors.size > 0) {
+        const utilizationPercent = ((this.processors.size / this.MAX_CONCURRENT_STREAMS) * 100).toFixed(2);
+        this.logger.info({
+          activeStreams: this.processors.size,
+          maxStreams: this.MAX_CONCURRENT_STREAMS,
+          utilizationPercent,
+        }, 'Stream metrics');
+      }
+    }, 30_000);
   }
 
   async subscribeToStream(config: StreamConfig): Promise<string> {
+    // Check capacity limit
+    if (this.processors.size >= this.MAX_CONCURRENT_STREAMS) {
+      throw new Error(`Maximum concurrent streams limit reached (${this.MAX_CONCURRENT_STREAMS}). Please try again later.`);
+    }
+
     const streamId = crypto.randomUUID();
 
-    // Create stream record in database
+    // Create database record
     await createStream({
       id: streamId,
       projectId: config.projectId,
@@ -44,20 +65,20 @@ export class StreamHelperService {
       status: 'active',
     });
 
-    const abortController = new AbortController();
+    // Create processor
     const processor: StreamProcessor = {
       config,
       streamId,
-      abortController,
+      abortController: new AbortController(),
     };
-
     this.processors.set(streamId, processor);
 
     // Start processing in background
     this.processStream(processor)
       .catch(async (error) => {
-        console.error(`Stream ${streamId} failed:`, error.message);
-        await updateStreamStatus(streamId, 'error', error.message);
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        this.logger.error({ streamId, error: errorMessage }, 'Stream processing failed');
+        await updateStreamStatus(streamId, 'error', errorMessage);
       })
       .finally(() => {
         this.processors.delete(streamId);
@@ -69,65 +90,54 @@ export class StreamHelperService {
   private async processStream(processor: StreamProcessor): Promise<void> {
     const { config, streamId, abortController } = processor;
 
-    const headers = {
-      Accept: 'text/event-stream',
-      ...config.headers,
-    };
-
+    // Make HTTP request to stream URL
     const fetchOptions: RequestInit = {
-      method: config.method || 'GET',
-      headers,
+      method: config.method,
+      headers: {
+        Accept: 'text/event-stream',
+        ...config.headers,
+      },
       signal: abortController.signal,
+      body: config.body ? JSON.stringify(config.body) : undefined,
     };
-
-    if (
-      config.body &&
-      (config.method === 'POST' || config.method === 'PUT' || config.method === 'PATCH')
-    ) {
-      fetchOptions.body =
-        typeof config.body === 'string' ? config.body : JSON.stringify(config.body);
-    }
 
     const response = await fetch(config.streamUrl, fetchOptions);
 
     if (!response.ok) {
-      const errorMessage = `Stream failed: ${response.status}`;
+      const errorMessage = `Stream failed with status ${response.status}`;
       await updateStreamStatus(streamId, 'error', errorMessage);
       throw new Error(errorMessage);
     }
 
     if (!response.body) return;
 
+    // Process the stream
     const reader = response.body.getReader();
     const decoder = new TextDecoder();
 
     try {
+      // Read chunks and send to webhook
       while (!abortController.signal.aborted) {
         const { done, value } = await reader.read();
         if (done) break;
 
-        const chunk = decoder.decode(value);
-
-        // Just send whatever we got - no parsing, no trimming
-        await this.sendWebhook(config.webhookUrl, {
+        await this.sendWebhookWithRetry(config.webhookUrl, {
           streamId,
           type: 'chunk',
-          data: chunk,
+          data: decoder.decode(value),
           timestamp: new Date().toISOString(),
         });
       }
 
-      // Send completion when stream ends
-      await this.sendWebhook(config.webhookUrl, {
+      // Send completion notification
+      await this.sendWebhookWithRetry(config.webhookUrl, {
         streamId,
         type: 'completed',
         timestamp: new Date().toISOString(),
       });
 
-      // Update database status to completed
       await updateStreamStatus(streamId, 'completed');
     } catch (error) {
-      // Handle reading errors
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
       await updateStreamStatus(streamId, 'error', errorMessage);
       throw error;
@@ -136,16 +146,43 @@ export class StreamHelperService {
     }
   }
 
-  private async sendWebhook(webhookUrl: string, data: WebhookPayload): Promise<void> {
+
+  private async sendWebhookWithRetry(webhookUrl: string, data: WebhookPayload): Promise<void> {
     try {
-      await fetch(webhookUrl, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
-      });
+      await retry(
+        this.WEBHOOK_RETRY_CONFIG,
+        async () => {
+          const response = await fetch(webhookUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data),
+            signal: AbortSignal.timeout(this.WEBHOOK_TIMEOUT),
+          });
+
+          if (!response.ok) {
+            throw new Error(`Webhook failed with status ${response.status}`);
+          }
+        }
+      );
     } catch (error) {
-      console.error('Webhook failed:', error);
-      // Continue processing even if webhook fails
+      // Webhook failed after all retries - stop the stream
+      const baseError = error instanceof Error ? error.message : 'Unknown error';
+      const errorMessage = `Webhook delivery failed after ${this.WEBHOOK_RETRY_CONFIG.times} retries: ${baseError}`;
+      
+      this.logger.error(
+        { webhookUrl, streamId: data.streamId, error: errorMessage },
+        'Webhook delivery failed after all retries - stopping stream'
+      );
+      
+      // Update database and cleanup stream
+      await updateStreamStatus(data.streamId, 'error', errorMessage);
+      const processor = this.processors.get(data.streamId);
+      if (processor) {
+        processor.abortController.abort();
+        this.processors.delete(data.streamId);
+      }
+      
+      throw new Error(errorMessage);
     }
   }
 
@@ -155,14 +192,24 @@ export class StreamHelperService {
 
     processor.abortController.abort();
     this.processors.delete(streamId);
-
-    // Update database status to stopped
     await updateStreamStatus(streamId, 'stopped');
     return true;
   }
 
   getActiveStreams(): string[] {
     return [...this.processors.keys()];
+  }
+
+  public async destroy(): Promise<void> {
+    const streamIds = [...this.processors.keys()];
+    
+    await Promise.all(
+      streamIds.map(streamId => 
+        this.stopStream(streamId).catch(error => 
+          this.logger.error({ streamId, error }, 'Failed to stop stream during shutdown')
+        )
+      )
+    );
   }
 }
 
