@@ -25,7 +25,6 @@ export const envWeb = createEnv({
     // API URL priority:
     // 1. Use explicit API_URL if set (production/manual override)
     // 2. Fallback: Auto-generate Railway preview URL for Vercel previews
-    // 
     // KNOWN ISSUE: VERCEL_GIT_PULL_REQUEST_ID doesn't exist as a Vercel system variable
     // This will result in "undefined" in the URL. Use GitHub Action to set API_URL instead.
     API_URL: process.env.API_URL || 
