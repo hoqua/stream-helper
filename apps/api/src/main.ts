@@ -115,27 +115,8 @@ server.setErrorHandler((error, request, reply) => {
     'Request failed',
   );
 
-  // Don't expose internal errors in production
-  if (env.NODE_ENV === 'production') {
-    if (error.statusCode === 429) {
-      reply.status(429).send({
-        error: 'Too Many Requests',
-        message: 'Rate limit exceeded, please try again later',
-      });
-    } else if (error.statusCode && error.statusCode < 500) {
-      reply.status(error.statusCode).send({
-        error: error.message,
-      });
-    } else {
-      reply.status(500).send({
-        error: 'Internal Server Error',
-        message: 'An unexpected error occurred',
-      });
-    }
-  } else {
-    // In development, return full error details
-    reply.status(error.statusCode || 500).send(error);
-  }
+  // now expose!!
+
 });
 
 // Start listening.
