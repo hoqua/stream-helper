@@ -114,9 +114,6 @@ server.setErrorHandler((error, request, reply) => {
     },
     'Request failed',
   );
-
-  // now expose!!
-
 });
 
 // Start listening.

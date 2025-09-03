@@ -61,7 +61,7 @@ export async function GET(request: NextRequest) {
     vercelClient.addEnvs(
       projects.map((p) => p.id),
       {
-        DURABLR_URL: env.STREAM_URL,
+        DURABLR_URL: env.API_URL,
       },
       teamId,
     ),

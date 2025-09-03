@@ -3,6 +3,9 @@ import { streamService, StreamConfig } from './stream-helper.service';
 import { StreamSubscribeRequestSchema, StreamIdParamSchema } from '@durablr/shared-utils-schemas';
 
 export function registerStreamHelperRoute(fastify: FastifyInstance) {
+  // Pass Fastify logger to stream service
+  streamService.setLogger(fastify.log);
+
   // Generic stream subscription - works with any SSE endpoint
   fastify.post('/stream/subscribe', async (request, reply) => {
     // Validate request body using Zod
