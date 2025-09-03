@@ -54,20 +54,18 @@ export class StreamHelperService {
 
     // Log active streams every 30 seconds
     this.metricsInterval = setInterval(() => {
-      if (this.processors.size > 0) {
-        const utilizationPercent = (
-          (this.processors.size / this.MAX_CONCURRENT_STREAMS) *
-          100
-        ).toFixed(2);
-        this.logger.info(
-          {
-            activeStreams: this.processors.size,
-            maxStreams: this.MAX_CONCURRENT_STREAMS,
-            utilizationPercent,
-          },
-          'Stream metrics',
-        );
-      }
+      const utilizationPercent = (
+        (this.processors.size / this.MAX_CONCURRENT_STREAMS) *
+        100
+      ).toFixed(2);
+      this.logger.info(
+        {
+          activeStreams: this.processors.size,
+          maxStreams: this.MAX_CONCURRENT_STREAMS,
+          utilizationPercent,
+        },
+        'Stream metrics',
+      );
     }, 30_000);
   }
 
