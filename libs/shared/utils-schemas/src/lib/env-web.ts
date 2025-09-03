@@ -28,7 +28,7 @@ export const envWeb = createEnv({
     // re-created on the same branch. In such cases, Railway will increment
     // the PR number, leading to a mismatched URL.
     API_URL: process.env.API_URL || 
-      `https://durablr-api-stream-helper-${process.env.VERCEL_GIT_PULL_REQUEST_ID || 'undefined'}.up.railway.app`,
+      `https://durablr-api-stream-helper-${process.env.VERCEL_GIT_PULL_REQUEST_ID!}.up.railway.app`,
   },
 
   skipValidation: !!process.env.SKIP_ENV_VALIDATION,
