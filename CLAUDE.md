@@ -11,6 +11,10 @@ npm run dev:web
 
 # Build API for production
 npm run build:api:prod
+
+# Interactive stream management tool
+npm run stream                                # Uses NextJS gateway (port 3000) - DEFAULT
+API_URL=http://localhost:3001 npm run stream  # Use API directly (for testing)
 ```
 
 ## Working curl Examples

@@ -8,7 +8,6 @@ export const envWeb = createEnv({
     VERCEL_CLIENT_SECRET: z.string().min(2),
     NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
     SECRET_JWT_KEY: z.string().min(2),
-    STREAM_URL: z.string().min(2),
     API_URL: z.url(),
   },
 
