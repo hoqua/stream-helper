@@ -20,7 +20,6 @@ export const envWeb = createEnv({
     VERCEL_CLIENT_ID: process.env.VERCEL_CLIENT_ID,
     VERCEL_CLIENT_SECRET: process.env.VERCEL_CLIENT_SECRET,
     SECRET_JWT_KEY: process.env.SECRET_JWT_KEY,
-    STREAM_URL: process.env.STREAM_URL,
     NODE_ENV: process.env.NODE_ENV,
     NEXT_PUBLIC_VERCEL_URL: process.env.NEXT_PUBLIC_VERCEL_URL,
     API_URL: process.env.API_URL,
