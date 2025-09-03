@@ -4,6 +4,7 @@
 const { composePlugins, withNx } = require('@nx/next');
 
 // Log environment variables during build
+console.log(process.env)
 console.log('🔍 VERCEL BUILD ENV VARS:');
 console.log('API_URL:', process.env.API_URL);
 console.log('NEXT_PUBLIC_API_URL:', process.env.NEXT_PUBLIC_API_URL);
