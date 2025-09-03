@@ -106,9 +106,10 @@ jobs:
         run: npm audit --audit-level=high
 
   ai-review:
-    name: 🤖 Claude Review
+    name: 🤖 Claude Review (Advisory)
     runs-on: ubuntu-latest
     if: github.event_name == 'pull_request'
+    continue-on-error: true
     steps:
       - name: 📥 Checkout
         uses: actions/checkout@v4
@@ -117,9 +118,7 @@ jobs:
 
       - name: 🤖 AI Code Review
         uses: anthropics/claude-code-action@beta
-        continue-on-error: true
         with:
-          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           direct_prompt: |
             Review this PR for bugs and security issues. Focus on:
             • Security vulnerabilities
@@ -135,7 +134,7 @@ jobs:
   status:
     name: ✅ CI Status
     runs-on: ubuntu-latest
-    needs: [setup, build-test, quality-security, ai-review]
+    needs: [setup, build-test, quality-security]
     if: always()
     steps:
       - name: 📊 Check Results
@@ -147,7 +146,6 @@ jobs:
           echo "Setup: ${{ needs.setup.result }}"
           echo "Build & Test: ${{ needs.build-test.result }}"
           echo "Quality & Security: ${{ needs.quality-security.result }}"
-          echo "Claude Review: ${{ needs.ai-review.result || 'skipped' }}"
           echo ""
           
           # Check required jobs
@@ -173,15 +171,6 @@ jobs:
                 ;;
             esac
           done
-          
-          # Claude review status (advisory only)
-          if [[ "${{ github.event_name }}" == "pull_request" ]]; then
-            case "${{ needs.ai-review.result }}" in
-              "success") echo "✅ Claude Review completed successfully" ;;
-              "failure") echo "⚠️  Claude Review found issues (advisory only)" ;;
-              *) echo "ℹ️  Claude Review was skipped or had errors" ;;
-            esac
-          fi
           
           echo "🎉 All quality gates passed! Ready to merge."
 
