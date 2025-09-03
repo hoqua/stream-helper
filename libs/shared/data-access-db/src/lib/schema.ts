@@ -1,4 +1,4 @@
-import { boolean, pgEnum, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
+import { pgEnum, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
 
 export const modeEnum = pgEnum('mode', ['realtime', 'batch', 'daily']);
 export const streamStatusEnum = pgEnum('stream_status', [
@@ -19,9 +19,6 @@ export const users = pgTable('users', {
   accessToken: text('access_token').unique().notNull(),
   configurationId: text('configuration_id').unique().notNull(),
   installationId: text('installation_id').unique().notNull(),
-  webhookUrl: text('webhook_url'),
-  processingMode: modeEnum('processing_mode').notNull().default('realtime'),
-  automaticProcessing: boolean('automatic_processing').notNull().default(false),
 });
 
 export const projects = pgTable('projects', {

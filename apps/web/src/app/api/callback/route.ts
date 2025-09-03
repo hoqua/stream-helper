@@ -50,20 +50,26 @@ export async function GET(request: NextRequest) {
     installationId: data.installation_id,
   });
 
-  await createProject(
-    projects.map((p) => ({
-      id: p.id,
-      name: p.name,
-      userId: newUser[0].id,
-    })),
-  );
+  await Promise.all([
+    createProject(
+      projects.map((p) => ({
+        id: p.id,
+        name: p.name,
+        userId: newUser[0].id,
+      })),
+    ),
+    vercelClient.addEnvs(
+      projects.map((p) => p.id),
+      {
+        DURABLR_URL: env.STREAM_URL,
+      },
+      teamId,
+    ),
+  ]);
 
   // If there's a next URL from Vercel, redirect there
   if (next) {
-    const nextUrl = new URL('/configure', request.url);
-    nextUrl.searchParams.set('redirectUrl', next);
-    nextUrl.searchParams.set('configurationId', configurationId);
-    return NextResponse.redirect(nextUrl);
+    return NextResponse.redirect(next);
   }
 
   // Default redirect to success

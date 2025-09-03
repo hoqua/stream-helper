@@ -36,6 +36,13 @@
       "when": 1756746471771,
       "tag": "0004_closed_ravenous",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1756830078472,
+      "tag": "0005_minor_lady_deathstrike",
+      "breakpoints": true
     }
   ]
 }
