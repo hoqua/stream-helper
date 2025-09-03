@@ -38,12 +38,18 @@ export class StreamHelperService {
     // Log active streams every 30 seconds
     setInterval(() => {
       if (this.processors.size > 0) {
-        const utilizationPercent = ((this.processors.size / this.MAX_CONCURRENT_STREAMS) * 100).toFixed(2);
-        this.logger.info({
-          activeStreams: this.processors.size,
-          maxStreams: this.MAX_CONCURRENT_STREAMS,
-          utilizationPercent,
-        }, 'Stream metrics');
+        const utilizationPercent = (
+          (this.processors.size / this.MAX_CONCURRENT_STREAMS) *
+          100
+        ).toFixed(2);
+        this.logger.info(
+          {
+            activeStreams: this.processors.size,
+            maxStreams: this.MAX_CONCURRENT_STREAMS,
+            utilizationPercent,
+          },
+          'Stream metrics',
+        );
       }
     }, 30_000);
   }
@@ -51,7 +57,9 @@ export class StreamHelperService {
   async subscribeToStream(config: StreamConfig): Promise<string> {
     // Check capacity limit
     if (this.processors.size >= this.MAX_CONCURRENT_STREAMS) {
-      throw new Error(`Maximum concurrent streams limit reached (${this.MAX_CONCURRENT_STREAMS}). Please try again later.`);
+      throw new Error(
+        `Maximum concurrent streams limit reached (${this.MAX_CONCURRENT_STREAMS}). Please try again later.`,
+      );
     }
 
     const streamId = crypto.randomUUID();
@@ -146,34 +154,30 @@ export class StreamHelperService {
     }
   }
 
-
   private async sendWebhookWithRetry(webhookUrl: string, data: WebhookPayload): Promise<void> {
     try {
-      await retry(
-        this.WEBHOOK_RETRY_CONFIG,
-        async () => {
-          const response = await fetch(webhookUrl, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data),
-            signal: AbortSignal.timeout(this.WEBHOOK_TIMEOUT),
-          });
+      await retry(this.WEBHOOK_RETRY_CONFIG, async () => {
+        const response = await fetch(webhookUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data),
+          signal: AbortSignal.timeout(this.WEBHOOK_TIMEOUT),
+        });
 
-          if (!response.ok) {
-            throw new Error(`Webhook failed with status ${response.status}`);
-          }
+        if (!response.ok) {
+          throw new Error(`Webhook failed with status ${response.status}`);
         }
-      );
+      });
     } catch (error) {
       // Webhook failed after all retries - stop the stream
       const baseError = error instanceof Error ? error.message : 'Unknown error';
       const errorMessage = `Webhook delivery failed after ${this.WEBHOOK_RETRY_CONFIG.times} retries: ${baseError}`;
-      
+
       this.logger.error(
         { webhookUrl, streamId: data.streamId, error: errorMessage },
-        'Webhook delivery failed after all retries - stopping stream'
+        'Webhook delivery failed after all retries - stopping stream',
       );
-      
+
       // Update database and cleanup stream
       await updateStreamStatus(data.streamId, 'error', errorMessage);
       const processor = this.processors.get(data.streamId);
@@ -181,7 +185,7 @@ export class StreamHelperService {
         processor.abortController.abort();
         this.processors.delete(data.streamId);
       }
-      
+
       throw new Error(errorMessage);
     }
   }
@@ -202,13 +206,13 @@ export class StreamHelperService {
 
   public async destroy(): Promise<void> {
     const streamIds = [...this.processors.keys()];
-    
+
     await Promise.all(
-      streamIds.map(streamId => 
-        this.stopStream(streamId).catch(error => 
-          this.logger.error({ streamId, error }, 'Failed to stop stream during shutdown')
-        )
-      )
+      streamIds.map((streamId) =>
+        this.stopStream(streamId).catch((error) =>
+          this.logger.error({ streamId, error }, 'Failed to stop stream during shutdown'),
+        ),
+      ),
     );
   }
 }

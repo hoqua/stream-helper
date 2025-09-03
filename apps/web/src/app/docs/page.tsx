@@ -197,7 +197,8 @@ export default function Examples() {
 
               <div className="bg-black/50 rounded-lg p-4">
                 <code className="text-green-400 text-sm">
-                  curl -X DELETE https://www.durablr.run/stream/subscribe/7f8c9d2e-4b5a-1c3d-9e8f-2a1b3c4d5e6f
+                  curl -X DELETE
+                  https://www.durablr.run/stream/subscribe/7f8c9d2e-4b5a-1c3d-9e8f-2a1b3c4d5e6f
                 </code>
               </div>
 

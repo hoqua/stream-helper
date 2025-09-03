@@ -26,8 +26,8 @@ const server = Fastify({
     },
   },
 
-  bodyLimit: 10485760, // Request body size limit: 10MB
-  requestTimeout: 30000,
+  bodyLimit: 10_485_760, // Request body size limit: 10MB
+  requestTimeout: 30_000,
 });
 
 // Register security plugins
@@ -45,9 +45,7 @@ server.register(helmet, {
 
 // CORS configuration
 server.register(cors, {
-  origin: env.NODE_ENV === 'production' 
-    ? ['https://durablr.com']
-    : true,
+  origin: env.NODE_ENV === 'production' ? ['https://durablr.com'] : true,
   credentials: true,
 });
 
@@ -92,7 +90,7 @@ for (const signal of signals) {
     try {
       // Clean up active streams on shutdown
       await streamService.destroy();
-      
+
       await server.close();
       process.exit(0);
     } catch (error) {
@@ -105,14 +103,17 @@ for (const signal of signals) {
 // Global error handler
 server.setErrorHandler((error, request, reply) => {
   // Log error with context
-  server.log.error({
-    err: error,
-    request: {
-      method: request.method,
-      url: request.url,
-      id: request.id,
+  server.log.error(
+    {
+      err: error,
+      request: {
+        method: request.method,
+        url: request.url,
+        id: request.id,
+      },
     },
-  }, 'Request failed');
+    'Request failed',
+  );
 
   // Don't expose internal errors in production
   if (env.NODE_ENV === 'production') {
