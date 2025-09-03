@@ -22,7 +22,14 @@ export const envWeb = createEnv({
     SECRET_JWT_KEY: process.env.SECRET_JWT_KEY,
     NODE_ENV: process.env.NODE_ENV,
     NEXT_PUBLIC_VERCEL_URL: process.env.NEXT_PUBLIC_VERCEL_URL,
-    API_URL: process.env.API_URL,
+    // API URL priority:
+    // 1. Use explicit API_URL if set (production/manual override)
+    // 2. Fallback: Auto-generate Railway preview URL for Vercel previews
+    // 
+    // KNOWN ISSUE: VERCEL_GIT_PULL_REQUEST_ID doesn't exist as a Vercel system variable
+    // This will result in "undefined" in the URL. Use GitHub Action to set API_URL instead.
+    API_URL: process.env.API_URL || 
+      `https://durablr-api-stream-helper-${process.env.VERCEL_GIT_PULL_REQUEST_ID || 'undefined'}.up.railway.app`,
   },
 
   skipValidation: !!process.env.SKIP_ENV_VALIDATION,
