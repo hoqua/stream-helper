@@ -1,17 +1,19 @@
 'use server';
-import { getAllProjectStreams, getAllUsers, getUserProjects } from '@durablr/shared-data-access-db';
+import { getAllProjectStreams, getUserProjects } from '@durablr/shared-data-access-db';
+import { auth } from '@clerk/nextjs/server';
 
 export async function getStreams(projectId: string) {
-  return await getAllProjectStreams(projectId);
+  const { userId } = await auth();
+
+  if (!userId) throw new Error('Unauthorized: User not found');
+
+  return await getAllProjectStreams(projectId, userId);
 }
 
 export async function getProjects() {
-  //!: GET USERID FROM SESSION
-  const users = await getAllUsers();
-  if (users.length === 0) {
-    return [];
-  }
-  const userId = users[0].id;
+  const { userId } = await auth();
 
-  return getUserProjects(userId);
+  if (!userId) throw new Error('Unauthorized: User not found');
+
+  return await getUserProjects(userId);
 }

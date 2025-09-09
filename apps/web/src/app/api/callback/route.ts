@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createProject, createUser } from '@durablr/shared-data-access-db';
+import { createOrganization, createProject, createUser } from '@durablr/shared-data-access-db';
 import { exchangeExternalCodeForToken, VercelService } from '@durablr/feature-vercel';
 import { env } from '../../../env';
 
@@ -41,11 +41,15 @@ export async function GET(request: NextRequest) {
   const { username, email } = userData.user;
 
   const newUser = await createUser({
-    externalId: data.user_id,
     username,
     email,
+  });
+
+  const org = await createOrganization({
+    userId: newUser[0].id,
+    name: 'Vercel',
     accessToken: data.access_token,
-    teamId: data.team_id,
+    teamId: data.team_id || data.user_id,
     configurationId,
     installationId: data.installation_id,
   });
@@ -55,7 +59,7 @@ export async function GET(request: NextRequest) {
       projects.map((p) => ({
         id: p.id,
         name: p.name,
-        userId: newUser[0].id,
+        orgId: org[0].id,
       })),
     ),
     vercelClient.addEnvs(

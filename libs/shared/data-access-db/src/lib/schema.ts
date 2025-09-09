@@ -12,20 +12,32 @@ export const users = pgTable('users', {
   id: text('id')
     .primaryKey()
     .$defaultFn(() => crypto.randomUUID()),
-  externalId: text('external_id').unique(),
   email: text('email').notNull(),
   username: text('username'),
-  teamId: text('team_id').unique(),
-  accessToken: text('access_token').unique().notNull(),
-  configurationId: text('configuration_id').unique().notNull(),
-  installationId: text('installation_id').unique().notNull(),
 });
 
-export const projects = pgTable('projects', {
-  id: text('id').primaryKey(),
+export const organizations = pgTable('organizations', {
+  id: text('id')
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  name: text('name').notNull(),
   userId: text('userId')
     .notNull()
     .references(() => users.id, { onDelete: 'cascade' }),
+
+  teamId: text('teamId'),
+  accessToken: text('access_token').unique(),
+  configurationId: text('configuration_id').unique(),
+  installationId: text('installation_id').unique(),
+});
+
+export const projects = pgTable('projects', {
+  id: text('id')
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  orgId: text('orgId')
+    .notNull()
+    .references(() => organizations.id, { onDelete: 'cascade' }),
   name: text('name').notNull(),
 });
 
@@ -55,6 +67,8 @@ export const streamLogs = pgTable('stream_logs', {
 
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
+export type Organization = typeof organizations.$inferSelect;
+export type NewOrganization = typeof organizations.$inferInsert;
 export type Project = typeof projects.$inferSelect;
 export type NewProject = typeof projects.$inferInsert;
 export type Stream = typeof streams.$inferSelect;

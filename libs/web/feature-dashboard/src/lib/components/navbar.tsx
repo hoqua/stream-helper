@@ -9,6 +9,7 @@ import {
 import { ChevronDown, ChevronUp } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
+import { UserButton } from '@clerk/nextjs';
 
 export default function Navbar({
   projects,
@@ -18,7 +19,9 @@ export default function Navbar({
   selectedProjectId: string;
 }) {
   const [open, setIsOpen] = useState(false);
-  const selectedProject = projects.find((project) => project.id === selectedProjectId);
+
+  const selectedProject = projects.find((p) => p.id === selectedProjectId);
+
   return (
     <nav className="border-b border-gray-800 bg-gray-900/50 backdrop-blur">
       <div className="max-w-7xl mx-auto px-4">
@@ -66,6 +69,7 @@ export default function Navbar({
               </DropdownMenu>
             </div>
           </div>
+          <UserButton />
         </div>
       </div>
     </nav>

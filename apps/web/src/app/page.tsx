@@ -1,6 +1,9 @@
+'use client';
+import { useUser } from '@clerk/nextjs';
 import Link from 'next/link';
 
 export default function Index() {
+  const { isSignedIn } = useUser();
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 via-black to-gray-900">
       <div className="absolute inset-0 bg-grid-white/[0.02] -z-10" />
@@ -29,6 +32,26 @@ export default function Index() {
             Never worry about serverless timeouts again. Handle long-running streams like OpenAI
             chat, analytics feeds, or real-time APIs without hitting platform limits.
           </p>
+
+          {isSignedIn ? (
+            <div className="mb-8">
+              <Link
+                href="/dashboard"
+                className="px-8 py-4  bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors text-center"
+              >
+                Dashboard
+              </Link>
+            </div>
+          ) : (
+            <div className="mb-8">
+              <Link
+                href="/sign-in"
+                className="px-8 py-4  bg-blue-600 text-white font-semibold rounded-lg hover:bg-blue-700 transition-colors text-center"
+              >
+                Sign In
+              </Link>
+            </div>
+          )}
 
           <div className="bg-gray-900/50 backdrop-blur border border-gray-800 rounded-xl p-8 mb-8">
             <h2 className="text-lg font-semibold text-white mb-4">The Problem</h2>

@@ -1,6 +1,6 @@
 import { and, eq } from 'drizzle-orm';
 import { db } from '../client';
-import { NewStream, Stream, streams, streamStatusEnum } from '../schema';
+import { NewStream, organizations, projects, Stream, streams, streamStatusEnum } from '../schema';
 
 export async function createStream(data: NewStream): Promise<Stream[]> {
   return await db.insert(streams).values(data).returning();
@@ -43,6 +43,13 @@ export async function getActiveProjectStreams(projectId: string): Promise<Stream
     .where(and(eq(streams.projectId, projectId), eq(streams.status, 'active')));
 }
 
-export async function getAllProjectStreams(projectId: string): Promise<Stream[]> {
-  return await db.select().from(streams).where(eq(streams.projectId, projectId));
+export async function getAllProjectStreams(projectId: string, userId: string): Promise<Stream[]> {
+  const rows = await db
+    .select({ stream: streams })
+    .from(streams)
+    .innerJoin(projects, eq(streams.projectId, projects.id))
+    .innerJoin(organizations, eq(projects.orgId, organizations.id))
+    .where(and(eq(streams.projectId, projectId), eq(organizations.userId, userId)));
+
+  return rows.map((r) => r.stream);
 }

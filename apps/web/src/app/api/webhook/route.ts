@@ -3,8 +3,8 @@ import { VercelService, verifyWebhook } from '@durablr/feature-vercel';
 import {
   addMultipleProjects,
   deleteProjects,
-  deleteUserByConfigurationId,
-  getUserByConfigurationId,
+  deleteOrganizationByConfigurationId,
+  getOrganizationByConfigurationId,
 } from '@durablr/shared-data-access-db';
 
 export async function POST(request: NextRequest) {
@@ -21,8 +21,8 @@ export async function POST(request: NextRequest) {
     switch (body.type) {
       case 'integration-configuration.permission-upgraded': {
         const data = body.payload;
-        const user = await getUserByConfigurationId(data.configuration.id);
-        const vercelClient = new VercelService(user[0].accessToken);
+        const org = await getOrganizationByConfigurationId(data.configuration.id);
+        const vercelClient = new VercelService(org[0].accessToken || '');
         const projects = await vercelClient.getProjects(data.team.id);
         const projectsToAdd = projects.filter((p) => data.projects.added.includes(p.id));
         await Promise.all([
@@ -30,7 +30,7 @@ export async function POST(request: NextRequest) {
             projectsToAdd.map((p) => ({
               id: p.id,
               name: p.name,
-              userId: user[0].id,
+              orgId: org[0].id,
             })),
           ),
           deleteProjects(data.projects.removed),
@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
         break;
       }
       case 'integration-configuration.removed': {
-        await deleteUserByConfigurationId(body.payload.configuration.id);
+        await deleteOrganizationByConfigurationId(body.payload.configuration.id);
         break;
       }
       case 'integration-resource.project-disconnected': {
