@@ -32,25 +32,40 @@ export class StreamHelperService {
     delay: 1000,
     backoff: (attempts: number) => attempts * 1000, // 1s, 2s, 3s
   };
-  private readonly logger = console;
+  private logger: any = console; // Default to console, can be overridden with setLogger
+
+  private metricsInterval: NodeJS.Timeout | null = null;
 
   constructor() {
+    this.startMetricsLogging();
+  }
+
+  public setLogger(logger: any): void {
+    this.logger = logger;
+    // Restart metrics logging with new logger
+    this.startMetricsLogging();
+  }
+
+  private startMetricsLogging(): void {
+    // Clear existing interval if any
+    if (this.metricsInterval) {
+      clearInterval(this.metricsInterval);
+    }
+
     // Log active streams every 30 seconds
-    setInterval(() => {
-      if (this.processors.size > 0) {
-        const utilizationPercent = (
-          (this.processors.size / this.MAX_CONCURRENT_STREAMS) *
-          100
-        ).toFixed(2);
-        this.logger.info(
-          {
-            activeStreams: this.processors.size,
-            maxStreams: this.MAX_CONCURRENT_STREAMS,
-            utilizationPercent,
-          },
-          'Stream metrics',
-        );
-      }
+    this.metricsInterval = setInterval(() => {
+      const utilizationPercent = (
+        (this.processors.size / this.MAX_CONCURRENT_STREAMS) *
+        100
+      ).toFixed(2);
+      this.logger.info(
+        {
+          activeStreams: this.processors.size,
+          maxStreams: this.MAX_CONCURRENT_STREAMS,
+          utilizationPercent,
+        },
+        'Stream metrics',
+      );
     }, 30_000);
   }
 
@@ -205,6 +220,12 @@ export class StreamHelperService {
   }
 
   public async destroy(): Promise<void> {
+    // Clear metrics interval
+    if (this.metricsInterval) {
+      clearInterval(this.metricsInterval);
+      this.metricsInterval = null;
+    }
+
     const streamIds = [...this.processors.keys()];
 
     await Promise.all(

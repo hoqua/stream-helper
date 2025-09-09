@@ -9,7 +9,8 @@ import type {
   StreamStopResponse 
 } from '@durablr/shared-utils-schemas';
 
-const API_URL = 'http://localhost:3000';
+// Default to NextJS gateway (port 3000)
+const API_URL = process.env.API_URL || 'http://localhost:3000';
 const PROJECT_ID = 'prj_EnR6PgZtcDR9IWYc8Pf8T49spW6t';
 
 // Predefined test streams
@@ -197,6 +198,7 @@ async function main(): Promise<void> {
   if (!serverRunning) {
     console.log(chalk.red('❌ NextJS server not running on ') + chalk.yellow(API_URL));
     console.log(chalk.gray('💡 Start it with: ') + chalk.cyan('npm run dev:web'));
+    console.log(chalk.gray('   Or use API directly: ') + chalk.cyan('API_URL=http://localhost:3001 npm run stream'));
     process.exit(1);
   }
 
