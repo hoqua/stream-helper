@@ -50,6 +50,13 @@
       "when": 1757414234350,
       "tag": "0006_new_vapor",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1757428391167,
+      "tag": "0007_foamy_nextwave",
+      "breakpoints": true
     }
   ]
 }
