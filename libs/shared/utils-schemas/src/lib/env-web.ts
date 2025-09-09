@@ -8,7 +8,6 @@ export const envWeb = createEnv({
     VERCEL_CLIENT_SECRET: z.string().min(2),
     NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
     SECRET_JWT_KEY: z.string().min(2),
-    STREAM_URL: z.string().min(2),
     API_URL: z.url(),
   },
 
@@ -21,10 +20,15 @@ export const envWeb = createEnv({
     VERCEL_CLIENT_ID: process.env.VERCEL_CLIENT_ID,
     VERCEL_CLIENT_SECRET: process.env.VERCEL_CLIENT_SECRET,
     SECRET_JWT_KEY: process.env.SECRET_JWT_KEY,
-    STREAM_URL: process.env.STREAM_URL,
     NODE_ENV: process.env.NODE_ENV,
     NEXT_PUBLIC_VERCEL_URL: process.env.NEXT_PUBLIC_VERCEL_URL,
-    API_URL: process.env.API_URL,
+    // 1. For production, always use the explicitly defined API_URL.
+    // 2. For Vercel preview deployments, build the Railway preview URL.
+    // Known issue: VERCEL_GIT_PULL_REQUEST_ID does not increment if a PR is
+    // re-created on the same branch. In such cases, Railway will increment
+    // the PR number, leading to a mismatched URL.
+    API_URL: process.env.API_URL || 
+      `https://durablr-api-stream-helper-${process.env.VERCEL_GIT_PULL_REQUEST_ID!}.up.railway.app`,
   },
 
   skipValidation: !!process.env.SKIP_ENV_VALIDATION,

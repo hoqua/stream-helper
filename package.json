@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "nx run @durablr/web:dev & nx run @durablr/api:serve --watch",
     "dev:web": "nx dev web",
-    "dev:api": "env-cmd -f apps/web/.env.local nx serve @durablr/api --watch",
+    "dev:api": "env-cmd -f apps/api/.env.local nx serve @durablr/api --watch",
     "-----TOOLS-------": "-----TOOLS-------",
     "stream": "tsx scripts/register-stream.ts",
     "-----QUALITY-------": "-----QUALITY-------",
