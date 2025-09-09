@@ -1,9 +1,14 @@
 import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
+import { NextResponse } from 'next/server';
 
 const isProtectedRoute = createRouteMatcher(['/dashboard(.*)']);
 
 export default clerkMiddleware(async (auth, req) => {
-  //TODO:CHECK HERE VERCEL SSO TOKEN
+  const path = req.nextUrl.pathname;
+  if (path.startsWith('/api/callback') || path.startsWith('api/webhook')) {
+    NextResponse.next();
+  }
+
   if (isProtectedRoute(req)) await auth.protect();
 });
 
