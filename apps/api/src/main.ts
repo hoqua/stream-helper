@@ -43,6 +43,7 @@ server.register(helmet, {
   crossOriginEmbedderPolicy: false,
 });
 
+// TODO: cors for preview?
 // CORS configuration
 server.register(cors, {
   origin: env.NODE_ENV === 'production' ? ['https://durablr.com'] : true,
