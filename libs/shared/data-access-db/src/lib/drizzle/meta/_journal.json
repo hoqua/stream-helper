@@ -15,6 +15,13 @@
       "when": 1757513155764,
       "tag": "0001_zippy_shinobi_shaw",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1757515582733,
+      "tag": "0002_cultured_steel_serpent",
+      "breakpoints": true
     }
   ]
 }
