@@ -22,7 +22,12 @@ export async function POST(request: NextRequest) {
       case 'integration-configuration.permission-upgraded': {
         const data = body.payload;
         const org = await getOrganizationByConfigurationId(data.configuration.id);
-        const vercelClient = new VercelService(org[0].accessToken || '');
+
+        if (!org.accessToken) {
+          throw new Error('AccessToken must be provided');
+        }
+
+        const vercelClient = new VercelService(org.accessToken);
         const projects = await vercelClient.getProjects(data.team.id);
         const projectsToAdd = projects.filter((p) => data.projects.added.includes(p.id));
         await Promise.all([
@@ -30,7 +35,7 @@ export async function POST(request: NextRequest) {
             projectsToAdd.map((p) => ({
               id: p.id,
               name: p.name,
-              orgId: org[0].id,
+              orgId: org.id,
             })),
           ),
           deleteProjects(data.projects.removed),

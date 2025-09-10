@@ -1,5 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createOrganization, createProject, createUser } from '@durablr/shared-data-access-db';
+import {
+  createOrganizationWithUser,
+  createProject,
+  createUser,
+  findUserById,
+} from '@durablr/shared-data-access-db';
 import { exchangeExternalCodeForToken, VercelService } from '@durablr/feature-vercel';
 import { env } from '../../../env';
 
@@ -7,10 +12,9 @@ export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const code = searchParams.get('code');
   const next = searchParams.get('next');
-  const configurationId = searchParams.get('configurationId') || '';
-  const teamId = searchParams.get('teamId') || '';
+  const configurationId = searchParams.get('configurationId');
 
-  if (!code) {
+  if (!code || !configurationId) {
     return NextResponse.redirect(new URL('/error?message=No%20code%20provided', request.url));
   }
 
@@ -27,9 +31,10 @@ export async function GET(request: NextRequest) {
 
   const vercelClient = new VercelService(data.access_token);
 
-  const [userData, projects] = await Promise.all([
+  const [existingUser, userData, projects] = await Promise.all([
+    findUserById(data.user_id),
     vercelClient.getUser(),
-    vercelClient.getProjects(teamId),
+    vercelClient.getProjects(data.team_id ?? undefined),
   ]);
 
   console.log('UserData', userData);
@@ -40,16 +45,19 @@ export async function GET(request: NextRequest) {
 
   const { username, email } = userData.user;
 
-  const newUser = await createUser({
-    username,
-    email,
-  });
+  if (!existingUser) {
+    await createUser({
+      id: data.user_id,
+      username,
+      email,
+      teamId: data.team_id,
+    });
+  }
 
-  const org = await createOrganization({
-    userId: newUser[0].id,
+  const org = await createOrganizationWithUser(data.user_id, {
     name: 'Vercel',
     accessToken: data.access_token,
-    teamId: data.team_id || data.user_id,
+    providerId: data.team_id || data.user_id,
     configurationId,
     installationId: data.installation_id,
   });
@@ -59,7 +67,7 @@ export async function GET(request: NextRequest) {
       projects.map((p) => ({
         id: p.id,
         name: p.name,
-        orgId: org[0].id,
+        orgId: org.id,
       })),
     ),
     vercelClient.addEnvs(
@@ -67,7 +75,7 @@ export async function GET(request: NextRequest) {
       {
         DURABLR_URL: env.API_URL,
       },
-      teamId,
+      data.team_id ?? undefined,
     ),
   ]);
 

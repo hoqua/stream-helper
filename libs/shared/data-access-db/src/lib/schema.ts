@@ -1,4 +1,4 @@
-import { pgEnum, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
+import { pgEnum, pgTable, primaryKey, text, timestamp } from 'drizzle-orm/pg-core';
 
 export const modeEnum = pgEnum('mode', ['realtime', 'batch', 'daily']);
 export const streamStatusEnum = pgEnum('stream_status', [
@@ -13,6 +13,7 @@ export const users = pgTable('users', {
     .primaryKey()
     .$defaultFn(() => crypto.randomUUID()),
   email: text('email').notNull(),
+  teamId: text('teamId'),
   username: text('username'),
 });
 
@@ -21,15 +22,24 @@ export const organizations = pgTable('organizations', {
     .primaryKey()
     .$defaultFn(() => crypto.randomUUID()),
   name: text('name').notNull(),
-  userId: text('userId')
-    .notNull()
-    .references(() => users.id, { onDelete: 'cascade' }),
-
-  teamId: text('teamId'),
+  providerId: text('providerId').unique().notNull(),
   accessToken: text('access_token').unique(),
   configurationId: text('configuration_id').unique(),
   installationId: text('installation_id').unique(),
 });
+
+export const userOrganizations = pgTable(
+  'user_organizations',
+  {
+    userId: text('userId')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    orgId: text('org_id')
+      .notNull()
+      .references(() => organizations.id, { onDelete: 'cascade' }),
+  },
+  (t) => [primaryKey({ columns: [t.userId, t.orgId] })],
+);
 
 export const projects = pgTable('projects', {
   id: text('id')

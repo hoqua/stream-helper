@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ZodError } from 'zod';
 import { StreamSubscribeRequestSchema } from '@durablr/shared-utils-schemas';
+import { envWeb as env } from '@durablr/shared-utils-schemas/lib/env-web';
 
 export async function POST(request: NextRequest) {
   try {
@@ -9,7 +10,7 @@ export async function POST(request: NextRequest) {
     // Validate request body using Zod
     const validatedBody = StreamSubscribeRequestSchema.parse(rawBody);
 
-    const response = await fetch(`${process.env.API_URL}/stream/subscribe`, {
+    const response = await fetch(`${env.API_URL}/stream/subscribe`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

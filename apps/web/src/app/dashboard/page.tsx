@@ -5,6 +5,7 @@ import { useEffect } from 'react';
 
 export default function Page() {
   const router = useRouter();
+
   useEffect(() => {
     async function setupUser() {
       try {
