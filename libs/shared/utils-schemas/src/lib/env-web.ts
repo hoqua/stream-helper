@@ -27,7 +27,8 @@ export const envWeb = createEnv({
     // Known issue: VERCEL_GIT_PULL_REQUEST_ID does not increment if a PR is
     // re-created on the same branch. In such cases, Railway will increment
     // the PR number, leading to a mismatched URL.
-    API_URL: process.env.API_URL || 
+    API_URL:
+      process.env.API_URL ||
       `https://durablr-api-stream-helper-${process.env.VERCEL_GIT_PULL_REQUEST_ID!}.up.railway.app`,
   },
 
