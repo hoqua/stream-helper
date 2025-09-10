@@ -2,7 +2,7 @@ import { eq, inArray } from 'drizzle-orm';
 import { db } from '../client';
 import { NewProject, organizations, Project, projects, userOrganizations } from '../schema';
 
-export async function createProject(data: NewProject[]): Promise<Project[]> {
+export async function createProjects(data: NewProject[]): Promise<Project[]> {
   return await db.insert(projects).values(data).returning();
 }
 

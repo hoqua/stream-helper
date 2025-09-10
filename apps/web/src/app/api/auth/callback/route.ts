@@ -3,9 +3,9 @@ import { NextResponse } from 'next/server';
 import {
   createUser,
   findUserById,
-  createProject,
   getUserProjects,
   createOrganizationWithUser,
+  createProjects,
 } from '@durablr/shared-data-access-db';
 import { generateProjectName } from '@durablr/web-feature-dashboard/server';
 
@@ -28,9 +28,8 @@ export async function GET() {
       providerId: user.id,
     });
 
-    const project = await createProject([{ name: generateProjectName(), orgId: org.id }]);
-
-    return NextResponse.json({ redirect: `/dashboard/${project[0].id}` });
+    const projects = await createProjects([{ name: generateProjectName(), orgId: org.id }]);
+    return NextResponse.json({ redirect: `/dashboard/${projects[0].id}` });
   }
 
   const projects = await getUserProjects(existing.id);

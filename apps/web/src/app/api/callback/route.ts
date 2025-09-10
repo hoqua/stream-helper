@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import {
   createOrganizationWithUser,
-  createProject,
+  createProjects,
   createUser,
   findUserById,
 } from '@durablr/shared-data-access-db';
@@ -63,7 +63,7 @@ export async function GET(request: NextRequest) {
   });
 
   await Promise.all([
-    createProject(
+    createProjects(
       projects.map((p) => ({
         id: p.id,
         name: p.name,

@@ -23,7 +23,7 @@ export async function POST(request: NextRequest) {
         const data = body.payload;
         const org = await getOrganizationByConfigurationId(data.configuration.id);
 
-        if (!org.accessToken) {
+        if (!org || !org.accessToken) {
           throw new Error('AccessToken must be provided');
         }
 

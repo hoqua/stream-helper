@@ -6,10 +6,12 @@ const isProtectedRoute = createRouteMatcher(['/dashboard(.*)']);
 export default clerkMiddleware(async (auth, req) => {
   const path = req.nextUrl.pathname;
   if (path.startsWith('/api/callback') || path.startsWith('api/webhook')) {
-    NextResponse.next();
+    return NextResponse.next();
   }
 
   if (isProtectedRoute(req)) await auth.protect();
+
+  return NextResponse.next();
 });
 
 export const config = {

@@ -29,6 +29,10 @@ export async function attachUserToOrganization(userId: string, orgId: string) {
 
 export async function getOrganizationByProviderId(providerId: string) {
   const org = await db.select().from(organizations).where(eq(organizations.providerId, providerId));
+  if (org.length === 0) {
+    return null;
+  }
+
   return org[0];
 }
 
@@ -37,6 +41,10 @@ export async function getOrganizationByConfigurationId(id: string) {
     .select()
     .from(organizations)
     .where(and(eq(organizations.configurationId, id)));
+
+  if (org.length === 0) {
+    return null;
+  }
 
   return org[0];
 }
