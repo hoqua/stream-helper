@@ -119,6 +119,7 @@ jobs:
       - name: 🤖 AI Code Review
         uses: anthropics/claude-code-action@beta
         with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           direct_prompt: |
             Review this PR for bugs and security issues. Focus on:
             • Security vulnerabilities
