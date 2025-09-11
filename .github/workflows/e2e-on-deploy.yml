@@ -3,6 +3,12 @@ name: 🎭 E2E Tests on Deploy
 on:
   deployment_status:
 
+permissions:
+  contents: read
+  deployments: read
+  issues: write
+  pull-requests: write
+
 jobs:
   check-deployments:
     name: 🔍 Check Both Deployments
