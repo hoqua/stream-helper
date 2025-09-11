@@ -7,10 +7,10 @@ test.describe('Stream Subscription E2E', () => {
   let baseUrl: string;
 
   test.beforeEach(async ({ request, baseURL }) => {
-    baseUrl = baseURL || process.env.VERCEL_URL;
-    if (!baseUrl) {
-      throw new Error('No base URL provided. Set VERCEL_URL environment variable or configure baseURL in playwright config.');
+    if (!baseURL) {
+      throw new Error('No base URL provided. Configure baseURL in playwright config.');
     }
+    baseUrl = baseURL;
     apiClient = new StreamApiClient(request, baseUrl);
   });
 
