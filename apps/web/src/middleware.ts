@@ -5,7 +5,7 @@ const isProtectedRoute = createRouteMatcher(['/dashboard(.*)']);
 
 export default clerkMiddleware(async (auth, req) => {
   const path = req.nextUrl.pathname;
-  if (path.startsWith('/api/callback') || path.startsWith('api/webhook')) {
+  if (path.startsWith('/api/callback') || path.startsWith('/api/webhook') || path.startsWith('/api/stream')) {
     return NextResponse.next();
   }
 
