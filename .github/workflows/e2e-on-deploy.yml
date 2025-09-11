@@ -155,18 +155,30 @@ jobs:
           node-version: '20'
 
       - name: 💾 Restore node_modules Cache
+        id: restore-deps
         uses: actions/cache/restore@v4
         with:
           path: node_modules
           key: deps-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
-          fail-on-cache-miss: true
+          restore-keys: |
+            deps-${{ runner.os }}-
+
+      - name: 📦 Fallback Install Dependencies
+        if: steps.restore-deps.outputs.cache-hit != 'true'
+        run: npm ci
 
       - name: 💾 Restore Playwright Cache
+        id: restore-playwright
         uses: actions/cache/restore@v4
         with:
           path: ~/.cache/ms-playwright
           key: playwright-${{ runner.os }}-${{ hashFiles('apps/web-e2e/playwright.config.ts') }}
-          fail-on-cache-miss: true
+          restore-keys: |
+            playwright-${{ runner.os }}-
+
+      - name: 🎭 Fallback Install Playwright
+        if: steps.restore-playwright.outputs.cache-hit != 'true'
+        run: npx playwright install chromium
 
       - name: 🧪 Run E2E Tests
         run: |
