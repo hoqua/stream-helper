@@ -1,0 +1,178 @@
+name: 🎭 E2E Tests on Deploy
+
+on:
+  deployment_status:
+
+jobs:
+  check-and-run-e2e:
+    name: Check Deployments & Run E2E
+    runs-on: ubuntu-latest
+    if: github.event.deployment_status.state == 'success'
+    steps:
+      - name: 📋 Log Current Deployment
+        run: |
+          echo "=========================================="
+          echo "🚀 NEW DEPLOYMENT SUCCESS"
+          echo "=========================================="
+          echo "Environment: ${{ github.event.deployment.environment }}"
+          echo "URL: ${{ github.event.deployment_status.environment_url }}"
+          echo "SHA: ${{ github.event.deployment.sha }}"
+          echo "Creator: ${{ github.event.deployment.creator.login }}"
+          echo "=========================================="
+
+      - name: 🔍 Check All Deployments for SHA
+        id: check-both
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const sha = '${{ github.event.deployment.sha }}';
+            console.log(`\n🔍 Checking all deployments for SHA: ${sha}\n`);
+            
+            // Get all deployments for this SHA
+            const { data: deployments } = await github.rest.repos.listDeployments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              sha: sha
+            });
+            
+            console.log(`Found ${deployments.length} deployments for this SHA`);
+            
+            let vercelDeployment = null;
+            let railwayDeployment = null;
+            
+            // Check each deployment's status
+            for (const dep of deployments) {
+              const { data: statuses } = await github.rest.repos.listDeploymentStatuses({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                deployment_id: dep.id
+              });
+              
+              const latestStatus = statuses[0];
+              if (!latestStatus || latestStatus.state !== 'success') {
+                console.log(`  ❌ Deployment ${dep.id} - not successful yet`);
+                continue;
+              }
+              
+              const url = latestStatus.environment_url || '';
+              const creator = dep.creator.login;
+              
+              console.log(`  📦 Deployment ${dep.id}:`);
+              console.log(`     - Environment: ${dep.environment}`);
+              console.log(`     - URL: ${url}`);
+              console.log(`     - Status: ${latestStatus.state}`);
+              console.log(`     - Creator: ${creator}`);
+              
+              // Detect platform
+              if (url.includes('vercel.app') || creator === 'vercel[bot]') {
+                vercelDeployment = { url, environment: dep.environment };
+                console.log(`     ✅ VERCEL DETECTED`);
+              } else if (url.includes('railway.app') || creator === 'railway-app[bot]') {
+                railwayDeployment = { url, environment: dep.environment };
+                console.log(`     ✅ RAILWAY DETECTED`);
+              }
+            }
+            
+            console.log('\n========================================');
+            console.log('📊 DEPLOYMENT STATUS:');
+            console.log(`Vercel: ${vercelDeployment ? '✅ DEPLOYED' : '❌ NOT DEPLOYED'}`);
+            if (vercelDeployment) console.log(`  URL: ${vercelDeployment.url}`);
+            console.log(`Railway: ${railwayDeployment ? '✅ DEPLOYED' : '❌ NOT DEPLOYED'}`);
+            if (railwayDeployment) console.log(`  URL: ${railwayDeployment.url}`);
+            console.log('========================================\n');
+            
+            if (vercelDeployment && railwayDeployment) {
+              console.log('🎉 BOTH PLATFORMS DEPLOYED - RUNNING E2E TESTS!');
+              core.setOutput('run-e2e', 'true');
+              core.setOutput('vercel-url', vercelDeployment.url);
+              core.setOutput('railway-url', railwayDeployment.url);
+              core.setOutput('sha', sha);
+            } else {
+              console.log('⏳ Waiting for both platforms to deploy...');
+              core.setOutput('run-e2e', 'false');
+            }
+
+      - name: 📥 Checkout Code
+        if: steps.check-both.outputs.run-e2e == 'true'
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.check-both.outputs.sha }}
+
+      - name: 🟢 Setup Node.js
+        if: steps.check-both.outputs.run-e2e == 'true'
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - name: 📦 Install Dependencies
+        if: steps.check-both.outputs.run-e2e == 'true'
+        run: npm ci
+
+      - name: 🎭 Install Playwright
+        if: steps.check-both.outputs.run-e2e == 'true'
+        run: npx playwright install chromium --with-deps
+
+      - name: 🧪 Run E2E Tests
+        if: steps.check-both.outputs.run-e2e == 'true'
+        run: |
+          echo "=========================================="
+          echo "🎯 RUNNING E2E TESTS"
+          echo "=========================================="
+          echo "Vercel URL: ${{ steps.check-both.outputs.vercel-url }}"
+          echo "Railway URL: ${{ steps.check-both.outputs.railway-url }}"
+          echo "=========================================="
+          
+          npx nx e2e web-e2e
+        env:
+          PREVIEW_WEB_URL: ${{ steps.check-both.outputs.vercel-url }}
+          CI: true
+
+      - name: 📊 Upload Test Results
+        if: steps.check-both.outputs.run-e2e == 'true' && always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-results-${{ steps.check-both.outputs.sha }}
+          path: |
+            apps/web-e2e/playwright-report/
+            apps/web-e2e/test-results/
+          retention-days: 30
+
+      - name: 💬 Comment on PR
+        if: steps.check-both.outputs.run-e2e == 'true' && always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            // Find PR for this SHA
+            const sha = '${{ steps.check-both.outputs.sha }}';
+            const { data: prs } = await github.rest.repos.listPullRequests({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open'
+            });
+            
+            const pr = prs.find(p => p.head.sha === sha);
+            if (!pr) {
+              console.log('No PR found for this SHA');
+              return;
+            }
+            
+            const success = '${{ job.status }}' === 'success';
+            const icon = success ? '✅' : '❌';
+            const status = success ? 'PASSED' : 'FAILED';
+            
+            const comment = `## ${icon} E2E Tests ${status}
+            
+            **Vercel:** ${{ steps.check-both.outputs.vercel-url }}
+            **Railway:** Deployed ✅
+            
+            ${success 
+              ? '🎉 All E2E tests passed against the deployed stack!' 
+              : '⚠️ Some tests failed. Check the [workflow run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) for details.'}`;
+            
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: pr.number,
+              body: comment
+            });
