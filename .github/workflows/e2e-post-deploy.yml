@@ -21,44 +21,44 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            // Only process successful deployments
-            if (context.payload.deployment_status.state !== 'success') {
-              console.log('❌ Deployment not successful, skipping');
+            console.log('========================================');
+            console.log('🚀 DEPLOYMENT EVENT RECEIVED');
+            console.log('========================================');
+            
+            // Log the entire event for debugging
+            console.log('📋 Full event context:');
+            console.log(JSON.stringify(context.payload, null, 2));
+            
+            // Check deployment status
+            const status = context.payload.deployment_status.state;
+            console.log(`📊 Deployment status: ${status}`);
+            
+            if (status !== 'success') {
+              console.log('❌ Deployment not successful, skipping E2E tests');
               core.setOutput('should-run-e2e', 'false');
               return;
             }
             
-            // Determine platform based on deployment details
+            // Get deployment info
             const deployment = context.payload.deployment;
-            const deploymentUrl = deployment.payload?.web_url || deployment.url;
+            const deploymentUrl = deployment.payload?.web_url || deployment.url || 'NO_URL';
+            const environment = deployment.environment || 'NO_ENV';
             
-            // Detect platform by URL pattern or other characteristics
+            console.log('🔍 Deployment Details:');
+            console.log(`  - URL: ${deploymentUrl}`);
+            console.log(`  - Environment: ${environment}`);
+            console.log(`  - SHA: ${deployment.sha}`);
+            console.log(`  - Ref: ${deployment.ref}`);
+            
+            // Simple platform detection
             let platform = 'unknown';
-            if (deploymentUrl && deploymentUrl.includes('vercel.app')) {
+            if (deploymentUrl.includes('vercel.app')) {
               platform = 'vercel';
-            } else if (deploymentUrl && (deploymentUrl.includes('railway.app') || deploymentUrl.includes('up.railway.app'))) {
+            } else if (deploymentUrl.includes('railway.app')) {
               platform = 'railway';
-            } else {
-              // Try to detect by environment or other metadata
-              const environment = deployment.environment;
-              if (environment === 'Preview' || environment === 'preview') {
-                platform = 'vercel';
-              } else if (environment === 'production' || deployment.payload?.serviceId) {
-                platform = 'railway';
-              }
             }
             
-            const deploymentInfo = {
-              platform: platform,
-              url: deploymentUrl,
-              sha: deployment.sha,
-              ref: deployment.ref,
-              environment: deployment.environment,
-              creator: deployment.creator?.login,
-              id: deployment.id
-            };
-            
-            console.log(`📦 Processing ${deploymentInfo.platform} deployment:`, deploymentInfo);
+            console.log(`🏷️ Detected platform: ${platform}`);
             
             // Find PR for this deployment
             const prNumber = await (async () => {
