@@ -31,19 +31,39 @@ jobs:
       - name: 📦 Install Playwright browsers
         run: npx playwright install chromium --with-deps
 
-      - name: 🎯 Validate deployment URLs
+      - name: ⏳ Wait for complete stack deployment
         run: |
           VERCEL_URL="${{ github.event.client_payload.url }}"
-          echo "🔍 Vercel deployment URL: $VERCEL_URL"
           
-          # Validate Vercel deployment is accessible
-          if ! curl -f -s -o /dev/null --max-time 10 "$VERCEL_URL/api/hello" 2>/dev/null; then
-            echo "❌ Vercel deployment not accessible at: $VERCEL_URL"
+          echo "🚀 Vercel deployment ready: $VERCEL_URL"
+          echo "⏳ Waiting for Railway backend to be accessible through gateway..."
+          
+          # Wait up to 5 minutes for the full stack to be ready
+          timeout=300
+          interval=10
+          elapsed=0
+          
+          while [ $elapsed -lt $timeout ]; do
+            echo "🔍 Testing full stack connectivity (${elapsed}s elapsed)..."
+            
+            # Test through the gateway - this validates both frontend and backend
+            if curl -f -s -o /dev/null --max-time 10 "$VERCEL_URL/api/hello" 2>/dev/null; then
+              echo "✅ Complete stack is ready! (Vercel ↔ Railway)"
+              break
+            fi
+            
+            echo "⏳ Backend not yet accessible through gateway, waiting ${interval}s..."
+            sleep $interval
+            elapsed=$((elapsed + interval))
+          done
+          
+          if [ $elapsed -ge $timeout ]; then
+            echo "❌ Timeout: Backend not accessible through gateway after ${timeout}s"
+            echo "💡 This might indicate Railway deployment issues or connectivity problems"
             exit 1
           fi
           
-          echo "✅ Vercel deployment is accessible"
-          echo "🎯 Running E2E tests against: $VERCEL_URL"
+          echo "🎯 Full stack validated - running E2E tests"
 
       - name: 🎭 Run E2E tests
         run: npx nx e2e web-e2e --verbose
@@ -67,27 +87,44 @@ jobs:
           path: apps/web-e2e/test-results/
           retention-days: 30
 
-      - name: 📝 Comment PR with results
+      - name: 📝 Comment PR with E2E results
         if: always()
         uses: actions/github-script@v7
         with:
           script: |
-            // Find the PR associated with this deployment
+            const gitSha = '${{ github.event.client_payload.git.sha }}';
+            const gitRef = '${{ github.event.client_payload.git.ref }}';
+            const deploymentUrl = '${{ github.event.client_payload.url }}';
+            const success = '${{ job.status }}' === 'success';
+            
+            // Find the PR
             const { data: prs } = await github.rest.pulls.list({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              head: `${context.repo.owner}:${{ github.event.client_payload.git.ref }}`,
+              head: `${context.repo.owner}:${gitRef}`,
               state: 'open'
             });
 
             if (prs.length > 0) {
               const pr = prs[0];
-              const deploymentUrl = '${{ github.event.client_payload.url }}';
-              const success = '${{ job.status }}' === 'success';
+              const resultIcon = success ? '✅' : '❌';
+              const resultText = success ? 'Passed' : 'Failed';
+              const workflowUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
               
-              const comment = success 
-                ? `✅ **E2E Tests Passed** 🎉\n\nDeployment URL: ${deploymentUrl}\n\nAll end-to-end tests passed successfully against the preview deployment!`
-                : `❌ **E2E Tests Failed** 😞\n\nDeployment URL: ${deploymentUrl}\n\nSome end-to-end tests failed. Please check the [workflow logs](https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}) for details.`;
+              const comment = `## ${resultIcon} E2E Tests ${resultText}
+              
+              **Deployment**: ${deploymentUrl}
+              **Results**: [View workflow logs](${workflowUrl})
+              
+              ${success 
+                ? '🎉 All end-to-end tests passed successfully against the full deployed stack (Vercel + Railway)!' 
+                : '😞 Some E2E tests failed. Check the workflow logs for details.'}
+              
+              **Test Coverage**:
+              - ✅ Stream subscription lifecycle (create → verify → stop → cleanup)
+              - ✅ API validation and error handling  
+              - ✅ Complete Web → API → Database flow
+              `;
 
               await github.rest.issues.createComment({
                 owner: context.repo.owner,
