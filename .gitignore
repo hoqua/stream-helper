@@ -52,3 +52,8 @@ apps/web/.env.local
 apps/api/.env.local
 .vercel
 .env*.local
+
+# Playwright
+playwright-report/
+test-results/
+tsconfig.tsbuildinfo
