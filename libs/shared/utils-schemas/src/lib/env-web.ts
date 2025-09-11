@@ -43,7 +43,7 @@ export const envWeb = createEnv({
     // the PR number, leading to a mismatched URL.
     API_URL:
       process.env.API_URL ||
-      `https://durablr-api-stream-helper-${process.env.VERCEL_GIT_PULL_REQUEST_ID!}.up.railway.app`,
+      'https://durablr-api-stream-helper-pr-30.up.railway.app',
   },
 
   skipValidation: !!process.env.SKIP_ENV_VALIDATION,
