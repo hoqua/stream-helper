@@ -7,9 +7,7 @@ export const TEST_PROJECT_ID = 'prj_test_e2e_streaming';
 export const TEST_FIXTURES = {
   // HTTPBin streaming endpoints - safe for testing
   streamUrls: {
-    short: 'https://httpbin.org/stream/3',    // 3 events - quick test
-    medium: 'https://httpbin.org/stream/5',   // 5 events - standard test
-    long: 'https://httpbin.org/stream/10',    // 10 events - extended test
+    veryLong: 'https://httpbin.org/stream/100', // 100 events - stress test
   },
   
   // Safe webhook endpoints for testing
@@ -27,33 +25,9 @@ export function createTestStreamRequest(
   overrides: Partial<StreamSubscribeRequest> = {}
 ): StreamSubscribeRequest {
   return {
-    streamUrl: TEST_FIXTURES.streamUrls.short,
+    streamUrl: TEST_FIXTURES.streamUrls.veryLong,
     webhookUrl: TEST_FIXTURES.webhookUrls.httpbinPost,
     method: 'GET',
-    projectId: TEST_PROJECT_ID,
-    ...overrides,
-  };
-}
-
-/**
- * Creates an OpenAI-style streaming request for advanced testing
- */
-export function createOpenAIStyleTestRequest(
-  overrides: Partial<StreamSubscribeRequest> = {}
-): StreamSubscribeRequest {
-  return {
-    method: 'POST',
-    streamUrl: 'https://httpbin.org/post', // Safe endpoint that accepts POST
-    webhookUrl: TEST_FIXTURES.webhookUrls.httpbinPost,
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: {
-      model: 'test-model',
-      messages: [{ role: 'user', content: 'Test message for E2E' }],
-      stream: true,
-      max_tokens: 10,
-    },
     projectId: TEST_PROJECT_ID,
     ...overrides,
   };

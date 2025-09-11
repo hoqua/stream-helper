@@ -9,6 +9,9 @@
   "include": ["src/**/*.ts", "src/**/*.js", "playwright.config.ts"],
   "references": [
     {
+      "path": "../../libs/shared/data-access-db"
+    },
+    {
       "path": "../../libs/shared/utils-schemas"
     }
   ]

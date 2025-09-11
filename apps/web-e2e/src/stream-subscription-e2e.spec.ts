@@ -77,4 +77,41 @@ test.describe('Stream Subscription E2E', () => {
     await apiClient.stopStream(streamId);
     await apiClient.waitForStreamToBeRemoved(streamId);
   });
+
+  test('e2e data setup verification', async () => {
+    // Verify that our seeded project ID exists by trying to create a stream
+    const streamRequest = createTestStreamRequest();
+    expect(streamRequest.projectId).toBe('prj_test_e2e_streaming');
+    
+    // This test will fail if the project doesn't exist in the database
+    // due to foreign key constraint, which confirms our seeding worked
+    const { streamId } = await apiClient.subscribeToStream(streamRequest);
+    expect(streamId).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/);
+    
+    // Clean up the test stream
+    await apiClient.stopStream(streamId);
+  });
+
+  test('long stream handling (100 events)', async () => {
+    // Test with 100-event stream to verify handling of longer streams
+    const streamRequest = createTestStreamRequest({
+      streamUrl: 'https://httpbin.org/stream/100'
+    });
+
+    // Create stream
+    const { streamId } = await apiClient.subscribeToStream(streamRequest);
+    expect(streamId).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/);
+
+    // Verify it becomes active quickly (stream start, not completion)
+    await apiClient.waitForStreamToBeActive(streamId);
+    const activeStreams = await apiClient.getActiveStreams();
+    expect(activeStreams.activeStreams).toContain(streamId);
+
+    // Stop stream (don't wait for completion of all 100 events)
+    const stopResponse = await apiClient.stopStream(streamId);
+    expect(stopResponse.streamId).toBe(streamId);
+
+    // Verify removed
+    await apiClient.waitForStreamToBeRemoved(streamId);
+  }, 120000); // 2 minute timeout for this test
 });
