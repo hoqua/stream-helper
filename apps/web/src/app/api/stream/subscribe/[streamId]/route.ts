@@ -10,9 +10,7 @@ export async function DELETE(request: NextRequest, { params }: { params: { strea
 
     const response = await fetch(`${env.API_URL}/stream/subscribe/${validatedParams.streamId}`, {
       method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-      },
+      // Remove Content-Type header for DELETE requests with no body
     });
 
     if (!response.ok) {
