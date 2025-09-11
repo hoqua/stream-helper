@@ -1,22 +1,168 @@
 name: 🎭 E2E Tests (Post-Deploy)
 
 on:
-  repository_dispatch:
-    types:
-      - 'vercel.deployment.success'
+  deployment_status:
 
 env:
   NODE_VERSION: '20'
 
 jobs:
+  track-deployments:
+    name: 📋 Track Deployment Status  
+    runs-on: ubuntu-latest
+    outputs:
+      should-run-e2e: ${{ steps.check-deployments.outputs.should-run-e2e }}
+      vercel-url: ${{ steps.check-deployments.outputs.vercel-url }}
+      git-sha: ${{ steps.check-deployments.outputs.git-sha }}
+      git-ref: ${{ steps.check-deployments.outputs.git-ref }}
+    steps:
+      - name: 🔍 Process deployment event
+        id: check-deployments
+        uses: actions/github-script@v7
+        with:
+          script: |
+            // Only process successful deployments
+            if (context.payload.deployment_status.state !== 'success') {
+              console.log('❌ Deployment not successful, skipping');
+              core.setOutput('should-run-e2e', 'false');
+              return;
+            }
+            
+            // Determine platform based on deployment details
+            const deployment = context.payload.deployment;
+            const deploymentUrl = deployment.payload?.web_url || deployment.url;
+            
+            // Detect platform by URL pattern or other characteristics
+            let platform = 'unknown';
+            if (deploymentUrl && deploymentUrl.includes('vercel.app')) {
+              platform = 'vercel';
+            } else if (deploymentUrl && (deploymentUrl.includes('railway.app') || deploymentUrl.includes('up.railway.app'))) {
+              platform = 'railway';
+            } else {
+              // Try to detect by environment or other metadata
+              const environment = deployment.environment;
+              if (environment === 'Preview' || environment === 'preview') {
+                platform = 'vercel';
+              } else if (environment === 'production' || deployment.payload?.serviceId) {
+                platform = 'railway';
+              }
+            }
+            
+            const deploymentInfo = {
+              platform: platform,
+              url: deploymentUrl,
+              sha: deployment.sha,
+              ref: deployment.ref,
+              environment: deployment.environment,
+              creator: deployment.creator?.login,
+              id: deployment.id
+            };
+            
+            console.log(`📦 Processing ${deploymentInfo.platform} deployment:`, deploymentInfo);
+            
+            // Find PR for this deployment
+            const prNumber = await (async () => {
+              try {
+                const { data: prs } = await github.rest.pulls.list({
+                  owner: context.repo.owner,
+                  repo: context.repo.repo,
+                  head: `${context.repo.owner}:${deploymentInfo.ref}`,
+                  state: 'open'
+                });
+                return prs.length > 0 ? prs[0].number : null;
+              } catch (e) {
+                console.log('Could not find PR:', e.message);
+                return null;
+              }
+            })();
+            
+            if (!prNumber) {
+              console.log('❌ No open PR found for this deployment');
+              core.setOutput('should-run-e2e', 'false');
+              return;
+            }
+            
+            // Track deployment status in PR comment
+            const deploymentComment = `<!-- DEPLOYMENT_TRACKER_${deploymentInfo.sha} -->`;
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber
+            });
+            
+            const trackerComment = comments.find(c => c.body.includes(`DEPLOYMENT_TRACKER_${deploymentInfo.sha}`));
+            let deployments = { vercel: null, railway: null };
+            
+            if (trackerComment) {
+              const match = trackerComment.body.match(/<!-- DEPLOYMENTS: (.+?) -->/);
+              if (match) {
+                deployments = JSON.parse(match[1]);
+              }
+            }
+            
+            // Update deployment status
+            if (deploymentInfo.platform === 'vercel') {
+              deployments.vercel = {
+                url: deploymentInfo.url,
+                timestamp: new Date().toISOString()
+              };
+            } else if (deploymentInfo.platform === 'railway') {
+              deployments.railway = {
+                environment: deploymentInfo.environment,
+                timestamp: new Date().toISOString()
+              };
+            }
+            
+            // Create/update tracking comment
+            const commentBody = `${deploymentComment}
+            🚀 **Deployment Status**
+            
+            ${deployments.vercel ? `✅ **Vercel**: ${deployments.vercel.url}` : '⏳ **Vercel**: Pending...'}
+            ${deployments.railway ? `✅ **Railway**: ${deployments.railway.environment} deployed` : '⏳ **Railway**: Pending...'}
+            
+            ${deployments.vercel && deployments.railway ? '🎭 **E2E Tests**: Running against complete deployed stack!' : '⏳ **E2E Tests**: Waiting for both deployments...'}
+            
+            <!-- DEPLOYMENTS: ${JSON.stringify(deployments)} -->`;
+            
+            if (trackerComment) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: trackerComment.id,
+                body: commentBody
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: prNumber,
+                body: commentBody
+              });
+            }
+            
+            // Set outputs
+            core.setOutput('git-sha', deploymentInfo.sha);
+            core.setOutput('git-ref', deploymentInfo.ref);
+            
+            if (deployments.vercel && deployments.railway) {
+              console.log('🎉 Both deployments complete! Running E2E tests...');
+              core.setOutput('should-run-e2e', 'true');
+              core.setOutput('vercel-url', deployments.vercel.url);
+            } else {
+              console.log('⏳ Waiting for both deployments to complete...');
+              core.setOutput('should-run-e2e', 'false');
+            }
+
   e2e-tests:
     name: 🎭 E2E Tests
     runs-on: ubuntu-latest
+    needs: track-deployments
+    if: needs.track-deployments.outputs.should-run-e2e == 'true'
     steps:
       - name: 📥 Checkout
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.client_payload.git.sha }}
+          ref: ${{ needs.track-deployments.outputs.git-sha }}
           fetch-depth: 0
 
       - name: 🟢 Setup Node.js
@@ -31,51 +177,35 @@ jobs:
       - name: 📦 Install Playwright browsers
         run: npx playwright install chromium --with-deps
 
-      - name: ⏳ Wait for complete stack deployment
+      - name: 🎯 Validate deployed stack
         run: |
-          VERCEL_URL="${{ github.event.client_payload.url }}"
+          VERCEL_URL="${{ needs.track-deployments.outputs.vercel-url }}"
           
-          echo "🚀 Vercel deployment ready: $VERCEL_URL"
-          echo "⏳ Waiting for Railway backend to be accessible through gateway..."
+          echo "✅ Both deployments confirmed complete!"
+          echo "🔍 Vercel Gateway: $VERCEL_URL"
+          echo "🔍 Railway Backend: Deployed and ready"
           
-          # Wait up to 5 minutes for the full stack to be ready
-          timeout=300
-          interval=10
-          elapsed=0
-          
-          while [ $elapsed -lt $timeout ]; do
-            echo "🔍 Testing full stack connectivity (${elapsed}s elapsed)..."
-            
-            # Test through the gateway - this validates both frontend and backend
-            if curl -f -s -o /dev/null --max-time 10 "$VERCEL_URL/api/hello" 2>/dev/null; then
-              echo "✅ Complete stack is ready! (Vercel ↔ Railway)"
-              break
-            fi
-            
-            echo "⏳ Backend not yet accessible through gateway, waiting ${interval}s..."
-            sleep $interval
-            elapsed=$((elapsed + interval))
-          done
-          
-          if [ $elapsed -ge $timeout ]; then
-            echo "❌ Timeout: Backend not accessible through gateway after ${timeout}s"
-            echo "💡 This might indicate Railway deployment issues or connectivity problems"
+          # Quick validation that the stack is accessible
+          echo "🧪 Testing full stack connectivity..."
+          if ! curl -f -s -o /dev/null --max-time 15 "$VERCEL_URL/api/hello" 2>/dev/null; then
+            echo "❌ Stack connectivity test failed"
+            echo "💡 Both deployments completed but connectivity issues detected"
             exit 1
           fi
           
-          echo "🎯 Full stack validated - running E2E tests"
+          echo "✅ Complete stack validated - running E2E tests!"
 
       - name: 🎭 Run E2E tests
         run: npx nx e2e web-e2e --verbose
         env:
-          PREVIEW_WEB_URL: ${{ github.event.client_payload.url }}
+          PREVIEW_WEB_URL: ${{ needs.track-deployments.outputs.vercel-url }}
           CI: true
 
       - name: 📊 Upload E2E test results
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: playwright-report-${{ github.event.client_payload.git.sha }}
+          name: playwright-report-${{ needs.track-deployments.outputs.git-sha }}
           path: apps/web-e2e/playwright-report/
           retention-days: 30
 
@@ -83,18 +213,18 @@ jobs:
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: playwright-results-${{ github.event.client_payload.git.sha }}
+          name: playwright-results-${{ needs.track-deployments.outputs.git-sha }}
           path: apps/web-e2e/test-results/
           retention-days: 30
 
-      - name: 📝 Comment PR with E2E results
+      - name: 📝 Update PR with E2E results
         if: always()
         uses: actions/github-script@v7
         with:
           script: |
-            const gitSha = '${{ github.event.client_payload.git.sha }}';
-            const gitRef = '${{ github.event.client_payload.git.ref }}';
-            const deploymentUrl = '${{ github.event.client_payload.url }}';
+            const gitSha = '${{ needs.track-deployments.outputs.git-sha }}';
+            const gitRef = '${{ needs.track-deployments.outputs.git-ref }}';
+            const deploymentUrl = '${{ needs.track-deployments.outputs.vercel-url }}';
             const success = '${{ job.status }}' === 'success';
             
             // Find the PR
@@ -105,31 +235,33 @@ jobs:
               state: 'open'
             });
 
-            if (prs.length > 0) {
-              const pr = prs[0];
+            if (prs.length === 0) return;
+            const prNumber = prs[0].number;
+            
+            // Update the existing deployment tracker comment with E2E results
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber
+            });
+            
+            const trackerComment = comments.find(c => c.body.includes(`DEPLOYMENT_TRACKER_${gitSha}`));
+            
+            if (trackerComment) {
               const resultIcon = success ? '✅' : '❌';
               const resultText = success ? 'Passed' : 'Failed';
               const workflowUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
               
-              const comment = `## ${resultIcon} E2E Tests ${resultText}
+              // Update the existing comment to show E2E results
+              const updatedBody = trackerComment.body.replace(
+                /🎭 \*\*E2E Tests\*\*:.+/,
+                `${resultIcon} **E2E Tests**: ${resultText} ([View Results](${workflowUrl}))`
+              );
               
-              **Deployment**: ${deploymentUrl}
-              **Results**: [View workflow logs](${workflowUrl})
-              
-              ${success 
-                ? '🎉 All end-to-end tests passed successfully against the full deployed stack (Vercel + Railway)!' 
-                : '😞 Some E2E tests failed. Check the workflow logs for details.'}
-              
-              **Test Coverage**:
-              - ✅ Stream subscription lifecycle (create → verify → stop → cleanup)
-              - ✅ API validation and error handling  
-              - ✅ Complete Web → API → Database flow
-              `;
-
-              await github.rest.issues.createComment({
+              await github.rest.issues.updateComment({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                issue_number: pr.number,
-                body: comment
+                comment_id: trackerComment.id,
+                body: updatedBody
               });
             }
