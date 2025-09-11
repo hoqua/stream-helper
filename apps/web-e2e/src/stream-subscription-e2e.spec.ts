@@ -14,39 +14,27 @@ test.describe('Stream Subscription E2E', () => {
     apiClient = new StreamApiClient(request, baseUrl);
   });
 
-  test.afterEach(async () => {
-    // Global cleanup - stop any remaining streams
-    try {
-      const activeStreams = await apiClient.getActiveStreams();
-      if (activeStreams.count > 0) {
-        console.log(`🧹 Cleaning up ${activeStreams.count} remaining streams...`);
-        await Promise.allSettled(
-          activeStreams.activeStreams.map(id => apiClient.stopStream(id))
-        );
-      }
-    } catch {
-      // Ignore cleanup errors
-    }
-  });
-
   test('basic stream lifecycle', async () => {
     const streamRequest = createTestStreamRequest();
 
     // Create stream
-    const { streamId } = await apiClient.subscribeToStream(streamRequest);
-    expect(streamId).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/);
+    const { response: subResponse, data: subData } = await apiClient.subscribe(streamRequest);
+    expect(subResponse.ok()).toBeTruthy();
+    expect(subData.streamId).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/);
 
-    // Verify active
-    await apiClient.waitForStreamToBeActive(streamId);
-    const activeStreams = await apiClient.getActiveStreams();
-    expect(activeStreams.activeStreams).toContain(streamId);
+    const { response: activeResponse, data: activeData } = await apiClient.getActive();
+    expect(activeResponse.ok()).toBeTruthy();
+    expect(activeData.activeStreams).toContain(subData.streamId);
 
     // Stop stream
-    const stopResponse = await apiClient.stopStream(streamId);
-    expect(stopResponse.streamId).toBe(streamId);
+    const { response: stopResponse, data: stopData } = await apiClient.stop(subData.streamId);
+    expect(stopResponse.ok()).toBeTruthy();
+    expect(stopData.streamId).toBe(subData.streamId);
 
-    // Verify removed
-    await apiClient.waitForStreamToBeRemoved(streamId);
+    // Verify stream is removed
+    const { response: finalResponse, data: finalData } = await apiClient.getActive();
+    expect(finalResponse.ok()).toBeTruthy();
+    expect(finalData.activeStreams).not.toContain(subData.streamId);
   });
 
   test('validation errors', async () => {
@@ -72,10 +60,8 @@ test.describe('Stream Subscription E2E', () => {
       body: { test: 'data' },
     });
 
-    const { streamId } = await apiClient.subscribeToStream(streamRequest);
-    await apiClient.waitForStreamToBeActive(streamId);
-    await apiClient.stopStream(streamId);
-    await apiClient.waitForStreamToBeRemoved(streamId);
+    const { data } = await apiClient.subscribe(streamRequest);
+    await apiClient.stop(data.streamId);
   });
 
   test('e2e data setup verification', async () => {
@@ -85,11 +71,11 @@ test.describe('Stream Subscription E2E', () => {
     
     // This test will fail if the project doesn't exist in the database
     // due to foreign key constraint, which confirms our seeding worked
-    const { streamId } = await apiClient.subscribeToStream(streamRequest);
-    expect(streamId).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/);
+    const { data } = await apiClient.subscribe(streamRequest);
+    expect(data.streamId).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/);
     
     // Clean up the test stream
-    await apiClient.stopStream(streamId);
+    await apiClient.stop(data.streamId);
   });
 
   test('long stream handling (100 events)', async () => {
@@ -99,19 +85,19 @@ test.describe('Stream Subscription E2E', () => {
     });
 
     // Create stream
-    const { streamId } = await apiClient.subscribeToStream(streamRequest);
-    expect(streamId).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/);
+    const { data } = await apiClient.subscribe(streamRequest);
+    expect(data.streamId).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/);
 
-    // Verify it becomes active quickly (stream start, not completion)
-    await apiClient.waitForStreamToBeActive(streamId);
-    const activeStreams = await apiClient.getActiveStreams();
-    expect(activeStreams.activeStreams).toContain(streamId);
+    // Verify it becomes active (stream start, not completion)
+    const { data: activeStreams } = await apiClient.getActive();
+    expect(activeStreams.activeStreams).toContain(data.streamId);
 
     // Stop stream (don't wait for completion of all 100 events)
-    const stopResponse = await apiClient.stopStream(streamId);
-    expect(stopResponse.streamId).toBe(streamId);
+    const { data: stopData } = await apiClient.stop(data.streamId);
+    expect(stopData.streamId).toBe(data.streamId);
 
     // Verify removed
-    await apiClient.waitForStreamToBeRemoved(streamId);
+    const { data: finalStreams } = await apiClient.getActive();
+    expect(finalStreams.activeStreams).not.toContain(data.streamId);
   });
 });

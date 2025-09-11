@@ -7,8 +7,7 @@ export default clerkMiddleware(async (auth, req) => {
   const path = req.nextUrl.pathname;
   if (
     path.startsWith('/api/callback') ||
-    path.startsWith('/api/webhook') ||
-    path.startsWith('/api/stream')
+    path.startsWith('/api/webhook')
   ) {
     return NextResponse.next();
   }
