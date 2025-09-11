@@ -48,3 +48,9 @@ export const envWeb = createEnv({
 
   skipValidation: !!process.env.SKIP_ENV_VALIDATION,
 });
+
+// Print expected API URL during Vercel builds
+if (process.env.VERCEL && process.env.VERCEL_GIT_PULL_REQUEST_ID) {
+  const expectedApiUrl = `https://durablr-api-stream-helper-${process.env.VERCEL_GIT_PULL_REQUEST_ID}.up.railway.app`;
+  console.log(`EXPECT API TO BE ON: ${expectedApiUrl}`);
+}
