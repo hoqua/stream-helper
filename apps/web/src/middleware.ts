@@ -5,7 +5,11 @@ const isProtectedRoute = createRouteMatcher(['/dashboard(.*)']);
 
 export default clerkMiddleware(async (auth, req) => {
   const path = req.nextUrl.pathname;
-  if (path.startsWith('/api/callback') || path.startsWith('/api/webhook') || path.startsWith('/api/stream')) {
+  if (
+    path.startsWith('/api/callback') ||
+    path.startsWith('/api/webhook') ||
+    path.startsWith('/api/stream')
+  ) {
     return NextResponse.next();
   }
 
@@ -17,7 +21,7 @@ export default clerkMiddleware(async (auth, req) => {
 export const config = {
   matcher: [
     // Skip Next.js internals and all static files, unless found in search params
-    '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
+    String.raw`/((?!_next|[^?]*\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)`,
     // Always run for API routes
     '/(api|trpc)(.*)',
   ],

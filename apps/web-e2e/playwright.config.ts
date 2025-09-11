@@ -5,6 +5,8 @@ import { defineConfig, devices } from '@playwright/test';
  */
 export default defineConfig({
   testDir: './src',
+  /* Global setup for e2e data seeding */
+  globalSetup: './src/global-setup.ts',
   /* Maximum time one test can run for. */
   timeout: 60 * 1000,
   /* Test timeout for expect() calls */
