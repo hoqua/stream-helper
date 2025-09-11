@@ -20,13 +20,13 @@ jobs:
           echo "Creator: ${{ github.event.deployment.creator.login }}"
           echo "=========================================="
 
-      - name: 🔍 Check All Deployments for SHA
-        id: check-both
+      - name: 🔍 Check Both Deployments
+        id: check-deployments
         uses: actions/github-script@v7
         with:
           script: |
             const sha = '${{ github.event.deployment.sha }}';
-            console.log(`\n🔍 Checking all deployments for SHA: ${sha}\n`);
+            console.log(`\n🔍 Checking deployments for SHA: ${sha}\n`);
             
             // Get all deployments for this SHA
             const { data: deployments } = await github.rest.repos.listDeployments({
@@ -35,10 +35,8 @@ jobs:
               sha: sha
             });
             
-            console.log(`Found ${deployments.length} deployments for this SHA`);
-            
-            let vercelDeployment = null;
-            let railwayDeployment = null;
+            let vercelUrl = null;
+            let hasRailway = false;
             
             // Check each deployment's status
             for (const dep of deployments) {
@@ -50,101 +48,85 @@ jobs:
               
               const latestStatus = statuses[0];
               if (!latestStatus || latestStatus.state !== 'success') {
-                console.log(`  ❌ Deployment ${dep.id} - not successful yet`);
                 continue;
               }
               
               const url = latestStatus.environment_url || '';
               const creator = dep.creator.login;
               
-              console.log(`  📦 Deployment ${dep.id}:`);
-              console.log(`     - Environment: ${dep.environment}`);
-              console.log(`     - URL: ${url}`);
-              console.log(`     - Status: ${latestStatus.state}`);
-              console.log(`     - Creator: ${creator}`);
-              
-              // Detect platform
+              // Detect platforms
               if (url.includes('vercel.app') || creator === 'vercel[bot]') {
-                vercelDeployment = { url, environment: dep.environment };
-                console.log(`     ✅ VERCEL DETECTED`);
+                vercelUrl = url;
+                console.log(`✅ Vercel deployed: ${url}`);
               } else if (url.includes('railway.app') || creator === 'railway-app[bot]') {
-                railwayDeployment = { url, environment: dep.environment };
-                console.log(`     ✅ RAILWAY DETECTED`);
+                hasRailway = true;
+                console.log(`✅ Railway deployed: ${url}`);
               }
             }
             
-            console.log('\n========================================');
-            console.log('📊 DEPLOYMENT STATUS:');
-            console.log(`Vercel: ${vercelDeployment ? '✅ DEPLOYED' : '❌ NOT DEPLOYED'}`);
-            if (vercelDeployment) console.log(`  URL: ${vercelDeployment.url}`);
-            console.log(`Railway: ${railwayDeployment ? '✅ DEPLOYED' : '❌ NOT DEPLOYED'}`);
-            if (railwayDeployment) console.log(`  URL: ${railwayDeployment.url}`);
-            console.log('========================================\n');
-            
-            if (vercelDeployment && railwayDeployment) {
-              console.log('🎉 BOTH PLATFORMS DEPLOYED - RUNNING E2E TESTS!');
+            if (vercelUrl && hasRailway) {
+              console.log('🎉 BOTH DEPLOYMENTS READY - RUNNING E2E TESTS!');
               core.setOutput('run-e2e', 'true');
-              core.setOutput('vercel-url', vercelDeployment.url);
-              core.setOutput('railway-url', railwayDeployment.url);
-              core.setOutput('sha', sha);
+              core.setOutput('vercel-url', vercelUrl);
             } else {
-              console.log('⏳ Waiting for both platforms to deploy...');
+              console.log('⏳ Waiting for both deployments...');
+              console.log(`Vercel: ${vercelUrl ? '✅' : '❌'}`);
+              console.log(`Railway: ${hasRailway ? '✅' : '❌'}`);
               core.setOutput('run-e2e', 'false');
             }
 
       - name: 📥 Checkout Code
-        if: steps.check-both.outputs.run-e2e == 'true'
+        if: steps.check-deployments.outputs.run-e2e == 'true'
         uses: actions/checkout@v4
         with:
-          ref: ${{ steps.check-both.outputs.sha }}
+          ref: ${{ github.event.deployment.sha }}
 
       - name: 🟢 Setup Node.js
-        if: steps.check-both.outputs.run-e2e == 'true'
+        if: steps.check-deployments.outputs.run-e2e == 'true'
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: npm
 
       - name: 📦 Install Dependencies
-        if: steps.check-both.outputs.run-e2e == 'true'
+        if: steps.check-deployments.outputs.run-e2e == 'true'
         run: npm ci
 
       - name: 🎭 Install Playwright
-        if: steps.check-both.outputs.run-e2e == 'true'
+        if: steps.check-deployments.outputs.run-e2e == 'true'
         run: npx playwright install chromium --with-deps
 
       - name: 🧪 Run E2E Tests
-        if: steps.check-both.outputs.run-e2e == 'true'
+        if: steps.check-deployments.outputs.run-e2e == 'true'
         run: |
           echo "=========================================="
           echo "🎯 RUNNING E2E TESTS"
           echo "=========================================="
-          echo "Vercel URL: ${{ steps.check-both.outputs.vercel-url }}"
-          echo "Railway URL: ${{ steps.check-both.outputs.railway-url }}"
+          echo "Vercel URL: ${{ steps.check-deployments.outputs.vercel-url }}"
           echo "=========================================="
           
           npx nx e2e web-e2e
         env:
-          PREVIEW_WEB_URL: ${{ steps.check-both.outputs.vercel-url }}
+          VERCEL_URL: ${{ steps.check-deployments.outputs.vercel-url }}
           CI: true
 
       - name: 📊 Upload Test Results
-        if: steps.check-both.outputs.run-e2e == 'true' && always()
+        if: steps.check-deployments.outputs.run-e2e == 'true' && always()
         uses: actions/upload-artifact@v4
         with:
-          name: e2e-results-${{ steps.check-both.outputs.sha }}
+          name: e2e-results-${{ github.event.deployment.sha }}
           path: |
             apps/web-e2e/playwright-report/
             apps/web-e2e/test-results/
           retention-days: 30
 
       - name: 💬 Comment on PR
-        if: steps.check-both.outputs.run-e2e == 'true' && always()
+        if: steps.check-deployments.outputs.run-e2e == 'true' && always()
         uses: actions/github-script@v7
         with:
           script: |
             // Find PR for this SHA
-            const sha = '${{ steps.check-both.outputs.sha }}';
+            const sha = '${{ github.event.deployment.sha }}';
             const { data: prs } = await github.rest.repos.listPullRequests({
               owner: context.repo.owner,
               repo: context.repo.repo,
@@ -163,7 +145,7 @@ jobs:
             
             const comment = `## ${icon} E2E Tests ${status}
             
-            **Vercel:** ${{ steps.check-both.outputs.vercel-url }}
+            **Vercel:** ${{ steps.check-deployments.outputs.vercel-url }}
             **Railway:** Deployed ✅
             
             ${success 

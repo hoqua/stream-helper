@@ -27,7 +27,7 @@ export default defineConfig({
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/testing-test-config#use */
   use: {
     /* Base URL for API calls */
-    baseURL: process.env.PREVIEW_WEB_URL || 'http://localhost:3000',
+    baseURL: process.env.VERCEL_URL,
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
     /* Take screenshot on failure */
@@ -53,8 +53,8 @@ export default defineConfig({
     },
   ],
 
-  /* Only start local server if not in CI and no preview URL provided */
-  webServer: process.env.CI || process.env.PREVIEW_WEB_URL
+  /* Only start local server if not in CI and no Vercel URL provided */
+  webServer: process.env.CI || process.env.VERCEL_URL
     ? undefined
     : {
         command: 'nx serve web',
