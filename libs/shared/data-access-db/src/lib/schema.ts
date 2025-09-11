@@ -1,4 +1,4 @@
-import { pgEnum, pgTable, text, timestamp } from 'drizzle-orm/pg-core';
+import { pgEnum, pgTable, primaryKey, text, timestamp } from 'drizzle-orm/pg-core';
 
 export const modeEnum = pgEnum('mode', ['realtime', 'batch', 'daily']);
 export const streamStatusEnum = pgEnum('stream_status', [
@@ -12,20 +12,42 @@ export const users = pgTable('users', {
   id: text('id')
     .primaryKey()
     .$defaultFn(() => crypto.randomUUID()),
-  externalId: text('external_id').unique(),
-  email: text('email').notNull(),
+  email: text('email'),
+  teamId: text('teamId'),
   username: text('username'),
-  teamId: text('team_id').unique(),
-  accessToken: text('access_token').unique().notNull(),
-  configurationId: text('configuration_id').unique().notNull(),
-  installationId: text('installation_id').unique().notNull(),
 });
 
+export const organizations = pgTable('organizations', {
+  id: text('id')
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  name: text('name').notNull(),
+  providerId: text('providerId').unique().notNull(),
+  accessToken: text('access_token').unique(),
+  configurationId: text('configuration_id').unique(),
+  installationId: text('installation_id').unique(),
+});
+
+export const userOrganizations = pgTable(
+  'user_organizations',
+  {
+    userId: text('userId')
+      .notNull()
+      .references(() => users.id, { onDelete: 'cascade' }),
+    orgId: text('org_id')
+      .notNull()
+      .references(() => organizations.id, { onDelete: 'cascade' }),
+  },
+  (t) => [primaryKey({ columns: [t.userId, t.orgId] })],
+);
+
 export const projects = pgTable('projects', {
-  id: text('id').primaryKey(),
-  userId: text('userId')
+  id: text('id')
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  orgId: text('orgId')
     .notNull()
-    .references(() => users.id, { onDelete: 'cascade' }),
+    .references(() => organizations.id, { onDelete: 'cascade' }),
   name: text('name').notNull(),
 });
 
@@ -55,6 +77,8 @@ export const streamLogs = pgTable('stream_logs', {
 
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
+export type Organization = typeof organizations.$inferSelect;
+export type NewOrganization = typeof organizations.$inferInsert;
 export type Project = typeof projects.$inferSelect;
 export type NewProject = typeof projects.$inferInsert;
 export type Stream = typeof streams.$inferSelect;

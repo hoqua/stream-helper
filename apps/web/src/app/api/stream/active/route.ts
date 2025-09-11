@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { envWeb as env } from '@durablr/shared-utils-schemas/lib/env-web';
-
 export async function GET(request: NextRequest) {
   try {
     const response = await fetch(`${env.API_URL}/stream/active`, {

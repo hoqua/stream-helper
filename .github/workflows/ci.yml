@@ -50,6 +50,7 @@ jobs:
     needs: setup
     env:
       DATABASE_URL: ${{ github.event_name == 'pull_request' && secrets.DEV_DATABASE_URL || secrets.PROD_DATABASE_URL }}
+      NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY }}
     steps:
       - name: 📥 Checkout
         uses: actions/checkout@v4
@@ -126,7 +127,7 @@ jobs:
             • Logic errors & edge cases  
             • Resource leaks & performance
             • TypeScript/type safety
-            
+
             Be concise. Report only actual issues found.
             If clean, state: "No security issues or bugs detected."
 
@@ -140,13 +141,13 @@ jobs:
         run: |
           # Required jobs that must pass
           REQUIRED_JOBS=("setup" "build-test" "quality-security")
-          
+
           echo "📋 CI Results Summary:"
           echo "Setup: ${{ needs.setup.result }}"
           echo "Build & Test: ${{ needs.build-test.result }}"
           echo "Quality & Security: ${{ needs.quality-security.result }}"
           echo ""
-          
+
           # Check required jobs
           for job in "${REQUIRED_JOBS[@]}"; do
             case $job in
@@ -170,6 +171,5 @@ jobs:
                 ;;
             esac
           done
-          
-          echo "🎉 All quality gates passed! Ready to merge."
 
+          echo "🎉 All quality gates passed! Ready to merge."

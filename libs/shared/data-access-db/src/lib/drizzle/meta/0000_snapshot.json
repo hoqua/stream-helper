@@ -1,9 +1,197 @@
 {
-  "id": "20a05de2-acf0-4c1d-ac23-ea5e891752c2",
+  "id": "2724289f-f046-498e-9f51-aaac7b302283",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
+    "public.organizations": {
+      "name": "organizations",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "userId": {
+          "name": "userId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "teamId": {
+          "name": "teamId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "access_token": {
+          "name": "access_token",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "configuration_id": {
+          "name": "configuration_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "installation_id": {
+          "name": "installation_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "organizations_userId_users_id_fk": {
+          "name": "organizations_userId_users_id_fk",
+          "tableFrom": "organizations",
+          "tableTo": "users",
+          "columnsFrom": [
+            "userId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {
+        "organizations_access_token_unique": {
+          "name": "organizations_access_token_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "access_token"
+          ]
+        },
+        "organizations_configuration_id_unique": {
+          "name": "organizations_configuration_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "configuration_id"
+          ]
+        },
+        "organizations_installation_id_unique": {
+          "name": "organizations_installation_id_unique",
+          "nullsNotDistinct": false,
+          "columns": [
+            "installation_id"
+          ]
+        }
+      },
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.projects": {
+      "name": "projects",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "orgId": {
+          "name": "orgId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "name": {
+          "name": "name",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "projects_orgId_organizations_id_fk": {
+          "name": "projects_orgId_organizations_id_fk",
+          "tableFrom": "projects",
+          "tableTo": "organizations",
+          "columnsFrom": [
+            "orgId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.stream_logs": {
+      "name": "stream_logs",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "stream_id": {
+          "name": "stream_id",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "content": {
+          "name": "content",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "created_at": {
+          "name": "created_at",
+          "type": "timestamp",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "stream_logs_stream_id_streams_id_fk": {
+          "name": "stream_logs_stream_id_streams_id_fk",
+          "tableFrom": "stream_logs",
+          "tableTo": "streams",
+          "columnsFrom": [
+            "stream_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
     "public.streams": {
       "name": "streams",
       "schema": "",
@@ -12,6 +200,12 @@
           "name": "id",
           "type": "text",
           "primaryKey": true,
+          "notNull": true
+        },
+        "project_id": {
+          "name": "project_id",
+          "type": "text",
+          "primaryKey": false,
           "notNull": true
         },
         "status": {
@@ -56,7 +250,21 @@
         }
       },
       "indexes": {},
-      "foreignKeys": {},
+      "foreignKeys": {
+        "streams_project_id_projects_id_fk": {
+          "name": "streams_project_id_projects_id_fk",
+          "tableFrom": "streams",
+          "tableTo": "projects",
+          "columnsFrom": [
+            "project_id"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
@@ -73,85 +281,23 @@
           "primaryKey": true,
           "notNull": true
         },
-        "team_id": {
-          "name": "team_id",
+        "email": {
+          "name": "email",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "username": {
+          "name": "username",
           "type": "text",
           "primaryKey": false,
           "notNull": false
-        },
-        "access_token": {
-          "name": "access_token",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "configuration_id": {
-          "name": "configuration_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "installation_id": {
-          "name": "installation_id",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "webhook_url": {
-          "name": "webhook_url",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": false
-        },
-        "processing_mode": {
-          "name": "processing_mode",
-          "type": "mode",
-          "typeSchema": "public",
-          "primaryKey": false,
-          "notNull": true,
-          "default": "'realtime'"
-        },
-        "automatic_processing": {
-          "name": "automatic_processing",
-          "type": "boolean",
-          "primaryKey": false,
-          "notNull": true,
-          "default": false
         }
       },
       "indexes": {},
       "foreignKeys": {},
       "compositePrimaryKeys": {},
-      "uniqueConstraints": {
-        "users_team_id_unique": {
-          "name": "users_team_id_unique",
-          "nullsNotDistinct": false,
-          "columns": [
-            "team_id"
-          ]
-        },
-        "users_access_token_unique": {
-          "name": "users_access_token_unique",
-          "nullsNotDistinct": false,
-          "columns": [
-            "access_token"
-          ]
-        },
-        "users_configuration_id_unique": {
-          "name": "users_configuration_id_unique",
-          "nullsNotDistinct": false,
-          "columns": [
-            "configuration_id"
-          ]
-        },
-        "users_installation_id_unique": {
-          "name": "users_installation_id_unique",
-          "nullsNotDistinct": false,
-          "columns": [
-            "installation_id"
-          ]
-        }
-      },
+      "uniqueConstraints": {},
       "policies": {},
       "checkConstraints": {},
       "isRLSEnabled": false

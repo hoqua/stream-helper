@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ZodError } from 'zod';
-import { envWeb as env } from '@durablr/shared-utils-schemas/lib/env-web';
 import { StreamSubscribeRequestSchema } from '@durablr/shared-utils-schemas';
+import { envWeb as env } from '@durablr/shared-utils-schemas/lib/env-web';
 
 export async function POST(request: NextRequest) {
   try {

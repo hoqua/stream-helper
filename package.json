@@ -95,6 +95,7 @@
     "libs/api/feature-stream-helper"
   ],
   "dependencies": {
+    "@clerk/nextjs": "^6.31.9",
     "@fastify/autoload": "~6.0.3",
     "@fastify/cors": "^11.1.0",
     "@fastify/helmet": "^13.0.1",

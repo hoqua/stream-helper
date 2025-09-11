@@ -9,9 +9,15 @@ export const envWeb = createEnv({
     NODE_ENV: z.enum(['development', 'production', 'test']).default('development'),
     SECRET_JWT_KEY: z.string().min(2),
     API_URL: z.url(),
+    CLERK_SECRET_KEY: z.string().min(2),
   },
 
   client: {
+    NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: z.string().min(2),
+    NEXT_PUBLIC_CLERK_SIGN_IN_FORCE_REDIRECT_URL: z.string().min(2),
+    NEXT_PUBLIC_CLERK_SIGN_UP_FORCE_REDIRECT_URL: z.string().min(2),
+    NEXT_PUBLIC_CLERK_SIGN_UP_URL: z.string().min(2),
+    NEXT_PUBLIC_CLERK_SIGN_IN_URL: z.string().min(2),
     NEXT_PUBLIC_VERCEL_URL: z.string().optional(),
   },
 
@@ -22,6 +28,14 @@ export const envWeb = createEnv({
     SECRET_JWT_KEY: process.env.SECRET_JWT_KEY,
     NODE_ENV: process.env.NODE_ENV,
     NEXT_PUBLIC_VERCEL_URL: process.env.NEXT_PUBLIC_VERCEL_URL,
+    CLERK_SECRET_KEY: process.env.CLERK_SECRET_KEY,
+    NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY,
+    NEXT_PUBLIC_CLERK_SIGN_IN_FORCE_REDIRECT_URL:
+      process.env.NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL || '/dashboard',
+    NEXT_PUBLIC_CLERK_SIGN_UP_FORCE_REDIRECT_URL:
+      process.env.NEXT_PUBLIC_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL || '/dashboard',
+    NEXT_PUBLIC_CLERK_SIGN_IN_URL: process.env.NEXT_PUBLIC_CLERK_SIGN_IN_URL,
+    NEXT_PUBLIC_CLERK_SIGN_UP_URL: process.env.NEXT_PUBLIC_CLERK_SIGN_UP_URL,
     // 1. For production, always use the explicitly defined API_URL.
     // 2. For Vercel preview deployments, build the Railway preview URL.
     // Known issue: VERCEL_GIT_PULL_REQUEST_ID does not increment if a PR is

@@ -1,13 +1,20 @@
 import { eq, inArray } from 'drizzle-orm';
 import { db } from '../client';
-import { NewProject, Project, projects } from '../schema';
+import { NewProject, organizations, Project, projects, userOrganizations } from '../schema';
 
-export async function createProject(data: NewProject[]): Promise<Project[]> {
+export async function createProjects(data: NewProject[]): Promise<Project[]> {
   return await db.insert(projects).values(data).returning();
 }
 
 export async function getUserProjects(userId: string): Promise<Project[]> {
-  return await db.select().from(projects).where(eq(projects.userId, userId));
+  const data = await db
+    .select({ project: projects })
+    .from(projects)
+    .innerJoin(organizations, eq(projects.orgId, organizations.id))
+    .innerJoin(userOrganizations, eq(userOrganizations.orgId, organizations.id))
+    .where(eq(userOrganizations.userId, userId));
+
+  return data.map((p) => p.project);
 }
 
 export async function deleteProjects(ids: string[]) {

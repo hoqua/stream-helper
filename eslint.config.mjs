@@ -52,6 +52,7 @@ export default [
       'unicorn/prevent-abbreviations': 'off',
       'unicorn/no-abusive-eslint-disable': 'off',
       'unicorn/no-null': 'off',
+      'unicorn/prefer-string-raw': 'warn',
     },
   },
   {
