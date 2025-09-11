@@ -51,6 +51,6 @@ export const envWeb = createEnv({
 
 // Print expected API URL during Vercel builds
 if (process.env.VERCEL && process.env.VERCEL_GIT_PULL_REQUEST_ID) {
-  const expectedApiUrl = `https://durablr-api-stream-helper-${process.env.VERCEL_GIT_PULL_REQUEST_ID}.up.railway.app`;
+  const expectedApiUrl = `https://durablr-api-stream-helper-pr-${process.env.VERCEL_GIT_PULL_REQUEST_ID}.up.railway.app`;
   console.log(`EXPECT API TO BE ON: ${expectedApiUrl}`);
 }
