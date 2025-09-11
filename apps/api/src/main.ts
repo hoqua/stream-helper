@@ -3,7 +3,7 @@ import helmet from '@fastify/helmet';
 import cors from '@fastify/cors';
 import rateLimit from '@fastify/rate-limit';
 import sensiblePlugin from './app/plugins/sensible';
-import { registerStreamHelperRoute, streamService } from '@durablr/feature-stream-helper';
+import { registerStreamHelperRoute } from '@durablr/feature-stream-helper';
 import { env } from './env';
 
 const host = env.HOST;
