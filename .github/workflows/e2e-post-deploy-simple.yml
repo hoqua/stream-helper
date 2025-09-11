@@ -1,0 +1,101 @@
+name: 🎭 E2E Tests (Simple Debug)
+
+on:
+  deployment_status:
+
+jobs:
+  debug-deployment:
+    name: 🔍 Debug Deployment Event
+    runs-on: ubuntu-latest
+    if: github.event.deployment_status.state == 'success'
+    steps:
+      - name: 📋 Log Full GitHub Event
+        run: |
+          echo "=========================================="
+          echo "🚀 DEPLOYMENT SUCCESS EVENT RECEIVED"
+          echo "=========================================="
+          echo ""
+          echo "📋 FULL EVENT JSON:"
+          echo '${{ toJSON(github.event) }}'
+          echo ""
+          echo "=========================================="
+          echo "🔍 KEY DETAILS:"
+          echo "=========================================="
+          echo "Deployment State: ${{ github.event.deployment_status.state }}"
+          echo "Environment: ${{ github.event.deployment.environment }}"
+          echo "URL: ${{ github.event.deployment.payload.web_url || github.event.deployment.url }}"
+          echo "SHA: ${{ github.event.deployment.sha }}"
+          echo "Ref: ${{ github.event.deployment.ref }}"
+          echo "Creator: ${{ github.event.deployment.creator.login }}"
+          echo "=========================================="
+          
+      - name: 🏷️ Detect Platform
+        run: |
+          URL="${{ github.event.deployment.payload.web_url || github.event.deployment.url || 'none' }}"
+          ENV="${{ github.event.deployment.environment }}"
+          
+          echo "Checking URL: $URL"
+          echo "Environment: $ENV"
+          
+          if [[ "$URL" == *"vercel.app"* ]]; then
+            echo "✅ DETECTED: Vercel deployment"
+          elif [[ "$URL" == *"railway.app"* ]]; then
+            echo "✅ DETECTED: Railway deployment"
+          else
+            echo "❓ UNKNOWN: Could not detect platform from URL"
+            echo "   URL: $URL"
+            echo "   ENV: $ENV"
+          fi
+          
+      - name: 📊 Check All Deployments for this SHA
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const sha = '${{ github.event.deployment.sha }}';
+            console.log(`\n🔍 Checking all deployments for SHA: ${sha}\n`);
+            
+            // Get all deployments for this SHA
+            const { data: deployments } = await github.rest.repos.listDeployments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              sha: sha
+            });
+            
+            console.log(`Found ${deployments.length} deployments for this SHA:`);
+            
+            for (const dep of deployments) {
+              // Get deployment status
+              const { data: statuses } = await github.rest.repos.listDeploymentStatuses({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                deployment_id: dep.id
+              });
+              
+              const latestStatus = statuses[0];
+              const url = dep.payload?.web_url || dep.url || 'NO_URL';
+              
+              console.log(`\n📦 Deployment ${dep.id}:`);
+              console.log(`  - Environment: ${dep.environment}`);
+              console.log(`  - URL: ${url}`);
+              console.log(`  - Latest Status: ${latestStatus?.state || 'NO_STATUS'}`);
+              console.log(`  - Created: ${dep.created_at}`);
+            }
+            
+            // Check if we have both Vercel and Railway deployed
+            const vercelDeployment = deployments.find(d => 
+              (d.payload?.web_url || d.url || '').includes('vercel.app')
+            );
+            const railwayDeployment = deployments.find(d => 
+              (d.payload?.web_url || d.url || '').includes('railway.app')
+            );
+            
+            console.log('\n========================================');
+            console.log('🎯 DEPLOYMENT SUMMARY:');
+            console.log(`Vercel: ${vercelDeployment ? '✅ FOUND' : '❌ NOT FOUND'}`);
+            console.log(`Railway: ${railwayDeployment ? '✅ FOUND' : '❌ NOT FOUND'}`);
+            
+            if (vercelDeployment && railwayDeployment) {
+              console.log('\n🎉 BOTH PLATFORMS DEPLOYED - READY FOR E2E TESTS!');
+            } else {
+              console.log('\n⏳ WAITING FOR BOTH PLATFORMS TO DEPLOY...');
+            }
