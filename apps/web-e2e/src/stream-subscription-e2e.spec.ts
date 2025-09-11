@@ -113,5 +113,5 @@ test.describe('Stream Subscription E2E', () => {
 
     // Verify removed
     await apiClient.waitForStreamToBeRemoved(streamId);
-  }, 120000); // 2 minute timeout for this test
+  });
 });
