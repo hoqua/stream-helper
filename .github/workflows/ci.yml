@@ -173,3 +173,4 @@ jobs:
           done
 
           echo "🎉 All quality gates passed! Ready to merge."
+          echo "📝 Note: E2E tests run separately after successful Vercel deployment."

@@ -26,6 +26,9 @@
     },
     {
       "path": "./libs/api/feature-stream-helper"
+    },
+    {
+      "path": "./apps/web-e2e"
     }
   ]
 }

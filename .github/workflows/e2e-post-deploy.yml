@@ -1,0 +1,98 @@
+name: 🎭 E2E Tests (Post-Deploy)
+
+on:
+  repository_dispatch:
+    types:
+      - 'vercel.deployment.success'
+
+env:
+  NODE_VERSION: '20'
+
+jobs:
+  e2e-tests:
+    name: 🎭 E2E Tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.client_payload.git.sha }}
+          fetch-depth: 0
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+
+      - name: 📦 Install dependencies
+        run: npm ci
+
+      - name: 📦 Install Playwright browsers
+        run: npx playwright install chromium --with-deps
+
+      - name: 🎯 Validate deployment URLs
+        run: |
+          VERCEL_URL="${{ github.event.client_payload.url }}"
+          echo "🔍 Vercel deployment URL: $VERCEL_URL"
+          
+          # Validate Vercel deployment is accessible
+          if ! curl -f -s -o /dev/null --max-time 10 "$VERCEL_URL/api/hello" 2>/dev/null; then
+            echo "❌ Vercel deployment not accessible at: $VERCEL_URL"
+            exit 1
+          fi
+          
+          echo "✅ Vercel deployment is accessible"
+          echo "🎯 Running E2E tests against: $VERCEL_URL"
+
+      - name: 🎭 Run E2E tests
+        run: npx nx e2e web-e2e --verbose
+        env:
+          PREVIEW_WEB_URL: ${{ github.event.client_payload.url }}
+          CI: true
+
+      - name: 📊 Upload E2E test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-report-${{ github.event.client_payload.git.sha }}
+          path: apps/web-e2e/playwright-report/
+          retention-days: 30
+
+      - name: 📊 Upload test results (XML)
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: playwright-results-${{ github.event.client_payload.git.sha }}
+          path: apps/web-e2e/test-results/
+          retention-days: 30
+
+      - name: 📝 Comment PR with results
+        if: always()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            // Find the PR associated with this deployment
+            const { data: prs } = await github.rest.pulls.list({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              head: `${context.repo.owner}:${{ github.event.client_payload.git.ref }}`,
+              state: 'open'
+            });
+
+            if (prs.length > 0) {
+              const pr = prs[0];
+              const deploymentUrl = '${{ github.event.client_payload.url }}';
+              const success = '${{ job.status }}' === 'success';
+              
+              const comment = success 
+                ? `✅ **E2E Tests Passed** 🎉\n\nDeployment URL: ${deploymentUrl}\n\nAll end-to-end tests passed successfully against the preview deployment!`
+                : `❌ **E2E Tests Failed** 😞\n\nDeployment URL: ${deploymentUrl}\n\nSome end-to-end tests failed. Please check the [workflow logs](https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}) for details.`;
+
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: pr.number,
+                body: comment
+              });
+            }
