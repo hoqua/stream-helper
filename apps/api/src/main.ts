@@ -83,21 +83,12 @@ server.get('/health', async () => {
   return { status: 'ok', timestamp: new Date().toISOString() };
 });
 
-// Graceful shutdown
+// Ignore shutdown signals - application will keep running
 const signals = ['SIGINT', 'SIGTERM'];
 for (const signal of signals) {
-  process.on(signal, async () => {
-    server.log.info(`Received ${signal}, shutting down gracefully...`);
-    try {
-      // Clean up active streams on shutdown
-      await streamService.destroy();
-
-      await server.close();
-      process.exit(0);
-    } catch (error) {
-      server.log.error(`Error during shutdown: ${error}`);
-      process.exit(1);
-    }
+  process.on(signal, () => {
+    server.log.info(`Received ${signal}, but ignoring - application will continue running`);
+    // Do nothing - just log and continue
   });
 }
 
