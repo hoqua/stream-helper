@@ -218,24 +218,6 @@ export class StreamHelperService {
   getActiveStreams(): string[] {
     return [...this.processors.keys()];
   }
-
-  public async destroy(): Promise<void> {
-    // Clear metrics interval
-    if (this.metricsInterval) {
-      clearInterval(this.metricsInterval);
-      this.metricsInterval = null;
-    }
-
-    const streamIds = [...this.processors.keys()];
-
-    await Promise.all(
-      streamIds.map((streamId) =>
-        this.stopStream(streamId).catch((error) =>
-          this.logger.error({ streamId, error }, 'Failed to stop stream during shutdown'),
-        ),
-      ),
-    );
-  }
 }
 
 export const streamService = new StreamHelperService();
