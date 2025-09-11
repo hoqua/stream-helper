@@ -108,6 +108,8 @@ jobs:
           npx nx e2e web-e2e
         env:
           VERCEL_URL: ${{ steps.check-deployments.outputs.vercel-url }}
+          DATABASE_URL: ${{ secrets.DEV_DATABASE_URL }}
+
           CI: true
 
       - name: 📊 Upload Test Results
