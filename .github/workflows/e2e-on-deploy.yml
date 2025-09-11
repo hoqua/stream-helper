@@ -216,7 +216,7 @@ jobs:
           script: |
             // Find PR for this SHA
             const sha = '${{ github.event.deployment.sha }}';
-            const { data: prs } = await github.rest.repos.listPullRequests({
+            const { data: prs } = await github.rest.pulls.list({
               owner: context.repo.owner,
               repo: context.repo.repo,
               state: 'open'
