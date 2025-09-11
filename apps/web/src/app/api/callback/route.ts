@@ -37,8 +37,6 @@ export async function GET(request: NextRequest) {
     vercelClient.getProjects(data.team_id ?? undefined),
   ]);
 
-  console.log('UserData', userData);
-
   if (!userData || !projects) {
     return NextResponse.redirect(new URL(`/error?message=Unauthorized`, request.url));
   }
