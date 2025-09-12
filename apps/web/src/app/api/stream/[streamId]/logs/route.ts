@@ -1,14 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { ZodError } from 'zod';
 import { envWeb as env } from '@durablr/shared-utils-schemas/lib/env-web';
-import { StreamIdParamSchema } from '@durablr/shared-utils-schemas';
 import { authService } from '@durablr/utils-auth';
 import jwt from 'jsonwebtoken';
 
-export async function DELETE(request: NextRequest, { params }: { params: { streamId: string } }) {
+export async function GET(request: NextRequest, { params }: { params: { streamId: string } }) {
   try {
-    // Validate streamId parameter using Zod
-    const validatedParams = StreamIdParamSchema.parse(params);
+    const { streamId } = params;
 
     const authHeader = request.headers.get('Authorization');
 
@@ -29,9 +26,10 @@ export async function DELETE(request: NextRequest, { params }: { params: { strea
       });
     }
 
-    const response = await fetch(`${env.API_URL}/stream/subscribe/${validatedParams.streamId}`, {
-      method: 'DELETE',
+    const response = await fetch(`${env.API_URL}/stream/${streamId}/logs`, {
+      method: 'GET',
       headers: {
+        'Content-Type': 'application/json',
         authorization: `Bearer ${jwt.sign({ valid: true }, env.SECRET_JWT_KEY)}`,
       },
     });
@@ -39,7 +37,7 @@ export async function DELETE(request: NextRequest, { params }: { params: { strea
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
       return NextResponse.json(
-        { error: 'Failed to stop stream', details: errorData },
+        { error: 'Failed to get stream logs', details: errorData },
         { status: response.status },
       );
     }
@@ -47,11 +45,7 @@ export async function DELETE(request: NextRequest, { params }: { params: { strea
     const data = await response.json();
     return NextResponse.json(data);
   } catch (error) {
-    if (error instanceof ZodError) {
-      return NextResponse.json(error, { status: 400 });
-    }
-
-    console.error('Error stopping stream:', error);
+    console.error('Error getting stream logs:', error);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }

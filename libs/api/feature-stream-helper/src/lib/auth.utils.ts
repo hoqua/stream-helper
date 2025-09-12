@@ -1,4 +1,4 @@
-import * as jwt from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 import { envApi } from '@durablr/shared-utils-schemas/lib/env-api';
 
 export function validateAccessToken(accessToken: string) {

@@ -1,4 +1,4 @@
-import { createStream, updateStreamStatus } from '@durablr/shared-data-access-db';
+import { createStream, createStreamLog, updateStreamStatus } from '@durablr/shared-data-access-db';
 import { retry } from 'radash';
 
 export interface StreamConfig {
@@ -8,6 +8,7 @@ export interface StreamConfig {
   headers?: Record<string, string>;
   body?: unknown;
   method?: string;
+  saveStreamData?: boolean; // Optional flag to enable saving stream data to database
 }
 
 interface WebhookPayload {
@@ -113,7 +114,6 @@ export class StreamHelperService {
   private async processStream(processor: StreamProcessor): Promise<void> {
     const { config, streamId, abortController } = processor;
 
-    // Make HTTP request to stream URL
     const fetchOptions: RequestInit = {
       method: config.method,
       headers: {
@@ -123,11 +123,11 @@ export class StreamHelperService {
       signal: abortController.signal,
       body: config.body ? JSON.stringify(config.body) : undefined,
     };
-
+    // Make HTTP request to Users provided stream URL
     const response = await fetch(config.streamUrl, fetchOptions);
 
     if (!response.ok) {
-      const errorMessage = `Stream failed with status ${response.status}`;
+      const errorMessage = `Stream failed with status ${response.status}, ${await response.text()}`;
       await updateStreamStatus(streamId, 'error', errorMessage);
       throw new Error(errorMessage);
     }
@@ -135,19 +135,30 @@ export class StreamHelperService {
     if (!response.body) return;
 
     // Process the stream
-    const reader = response.body.getReader();
-    const decoder = new TextDecoder();
+    const [reader, decoder] = [response.body.getReader(), new TextDecoder()];
 
     try {
-      // Read chunks and send to webhook
       while (!abortController.signal.aborted) {
         const { done, value } = await reader.read();
         if (done) break;
 
+        const decodedChunk = decoder.decode(value);
+
+        // Only save stream data if explicitly enabled
+        // Fire and forget - log to database without blocking stream processing
+        if (config.saveStreamData) {
+          createStreamLog({ streamId, content: decodedChunk }).catch((logError) => {
+            this.logger.error(
+              { streamId, error: logError },
+              'Failed to log stream message to database',
+            );
+          });
+        }
+
         await this.sendWebhookWithRetry(config.webhookUrl, {
           streamId,
           type: 'chunk',
-          data: decoder.decode(value),
+          data: decodedChunk,
           timestamp: new Date().toISOString(),
         });
       }
@@ -161,8 +172,11 @@ export class StreamHelperService {
 
       await updateStreamStatus(streamId, 'completed');
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
-      await updateStreamStatus(streamId, 'error', errorMessage);
+      await updateStreamStatus(
+        streamId,
+        'error',
+        error instanceof Error ? error.message : 'Unknown error',
+      );
       throw error;
     } finally {
       reader.releaseLock();
