@@ -29,6 +29,7 @@ export function createTestStreamRequest(
     webhookUrl: TEST_FIXTURES.webhookUrls.httpbinPost,
     method: 'GET',
     projectId: TEST_PROJECT_ID,
+    saveStreamData: false,
     ...overrides,
   };
 }
