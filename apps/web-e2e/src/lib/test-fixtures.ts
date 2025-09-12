@@ -1,4 +1,6 @@
 import type { StreamSubscribeRequest } from '@durablr/shared-utils-schemas';
+import { retry } from 'radash';
+import type { StreamApiClient } from './api-client';
 
 // Test project ID (safe for testing)
 export const TEST_PROJECT_ID = 'prj_test_e2e_streaming';
@@ -32,4 +34,26 @@ export function createTestStreamRequest(
     saveStreamData: false,
     ...overrides,
   };
+}
+
+/**
+ * Waits for a stream to become active with retry logic
+ */
+export async function waitForStreamActive(
+  apiClient: StreamApiClient,
+  streamId: string,
+  options: { times?: number; delay?: number } = {}
+): Promise<boolean> {
+  const { times = 5, delay = 200 } = options;
+  
+  return await retry(
+    { times, delay },
+    async () => {
+      const { data: activeData } = await apiClient.getActive();
+      if (activeData.activeStreams.includes(streamId)) {
+        return true;
+      }
+      throw new Error(`Stream ${streamId} not yet active`);
+    }
+  );
 }

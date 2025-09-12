@@ -124,6 +124,7 @@ jobs:
           path: |
             apps/web-e2e/playwright-report/
             apps/web-e2e/test-results/
+            test-results.json
           retention-days: 30
 
   comment-pr:
@@ -132,10 +133,22 @@ jobs:
     needs: [check-deployments, run-e2e-tests]
     if: always() && needs.check-deployments.outputs.run-e2e == 'true'
     steps:
+      - name: 📥 Checkout Code (for test results)
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.deployment.sha }}
+
+      - name: 📥 Download Test Results
+        uses: actions/download-artifact@v4
+        with:
+          name: e2e-results-${{ github.event.deployment.sha }}
+          path: ./test-artifacts
+
       - name: 💬 Comment on PR
         uses: actions/github-script@v7
         with:
           script: |
+            const fs = require('fs');
             const sha = '${{ github.event.deployment.sha }}';
             const { data: prs } = await github.rest.pulls.list({
               owner: context.repo.owner,
@@ -153,6 +166,36 @@ jobs:
             const icon = success ? '✅' : '❌';
             const status = success ? 'PASSED' : 'FAILED';
             
+            // Try to read stress test results
+            let stressTestResults = '';
+            try {
+              if (fs.existsSync('./test-results.json')) {
+                const results = JSON.parse(fs.readFileSync('./test-results.json', 'utf8'));
+                stressTestResults = `
+            
+            ### 🚀 Stress Test Results
+            - **Streams Created:** ${results.successfulStreams}/${results.totalStreams}
+            - **Currently Active:** ${results.activeStreams} streams
+            - **Test Duration:** ${results.totalTestTimeMin} minutes
+            - **Avg Activation Time:** ${results.avgActivationTimeMs}ms
+            - **Throughput:** ${results.streamsPerSecond} streams/sec
+            - **Performance:** Min ${results.minActivationTimeMs}ms, Max ${results.maxActivationTimeMs}ms, P95 ${results.p95ActivationTimeMs}ms`;
+              } else if (fs.existsSync('./test-artifacts/test-results.json')) {
+                const results = JSON.parse(fs.readFileSync('./test-artifacts/test-results.json', 'utf8'));
+                stressTestResults = `
+            
+            ### 🚀 Stress Test Results
+            - **Streams Created:** ${results.successfulStreams}/${results.totalStreams}
+            - **Currently Active:** ${results.activeStreams} streams
+            - **Test Duration:** ${results.totalTestTimeMin} minutes
+            - **Avg Activation Time:** ${results.avgActivationTimeMs}ms
+            - **Throughput:** ${results.streamsPerSecond} streams/sec
+            - **Performance:** Min ${results.minActivationTimeMs}ms, Max ${results.maxActivationTimeMs}ms, P95 ${results.p95ActivationTimeMs}ms`;
+              }
+            } catch (error) {
+              console.log('Could not read stress test results:', error.message);
+            }
+            
             const comment = `## ${icon} E2E Tests ${status}
             
             **Vercel:** ${{ needs.check-deployments.outputs.vercel-url }}
@@ -160,7 +203,10 @@ jobs:
             
             ${success 
               ? '🎉 All E2E tests passed against the deployed stack!' 
-              : '⚠️ Some tests failed. Check the [workflow run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) for details.'}`;
+              : '⚠️ Some tests failed. Check the [workflow run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) for details.'}${stressTestResults}
+            
+            ---
+            *📊 [View full test report](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})*`;
             
             await github.rest.issues.createComment({
               owner: context.repo.owner,

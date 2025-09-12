@@ -1,8 +1,8 @@
 import { test, expect } from '@playwright/test';
 import { StreamApiClient } from './lib/api-client';
-import { createTestStreamRequest } from './lib/test-fixtures';
-import { retry } from 'radash';
+import { createTestStreamRequest, waitForStreamActive } from './lib/test-fixtures';
 import { z } from 'zod';
+import * as fs from 'fs';
 
 test.describe('Stream Subscription E2E', () => {
   let apiClient: StreamApiClient;
@@ -24,9 +24,9 @@ test.describe('Stream Subscription E2E', () => {
     expect(subResponse.ok()).toBeTruthy();
     expect(z.uuid().safeParse(subData.streamId).success).toBeTruthy();
 
-    const { response: activeResponse, data: activeData } = await apiClient.getActive();
-    expect(activeResponse.ok()).toBeTruthy();
-    expect(activeData.activeStreams).toContain(subData.streamId);
+    // Wait for stream to become active
+    const streamActivated = await waitForStreamActive(apiClient, subData.streamId);
+    expect(streamActivated).toBeTruthy();
 
     // Stop stream
     const { response: stopResponse, data: stopData } = await apiClient.stop(subData.streamId);
@@ -63,6 +63,10 @@ test.describe('Stream Subscription E2E', () => {
     });
 
     const { data } = await apiClient.subscribe(streamRequest);
+    
+    // Wait for stream to become active
+    await waitForStreamActive(apiClient, data.streamId);
+    
     await apiClient.stop(data.streamId);
   });
 
@@ -75,6 +79,9 @@ test.describe('Stream Subscription E2E', () => {
     // due to foreign key constraint, which confirms our seeding worked
     const { data } = await apiClient.subscribe(streamRequest);
     expect(z.uuid().safeParse(data.streamId).success).toBeTruthy();
+    
+    // Wait for stream to become active
+    await waitForStreamActive(apiClient, data.streamId);
     
     // Clean up the test stream
     await apiClient.stop(data.streamId);
@@ -90,6 +97,9 @@ test.describe('Stream Subscription E2E', () => {
     const { response, data } = await apiClient.subscribe(streamRequest);
     expect(response.ok()).toBeTruthy();
     expect(z.uuid().safeParse(data.streamId).success).toBeTruthy();
+
+    // Wait for stream to become active
+    await waitForStreamActive(apiClient, data.streamId);
 
     // Wait for stream to process some data
     await new Promise(resolve => setTimeout(resolve, 5000));
@@ -124,6 +134,9 @@ test.describe('Stream Subscription E2E', () => {
     expect(response.ok()).toBeTruthy();
     expect(z.uuid().safeParse(data.streamId).success).toBeTruthy();
 
+    // Wait for stream to become active
+    await waitForStreamActive(apiClient, data.streamId);
+
     // Wait for stream to process
     await new Promise(resolve => setTimeout(resolve, 5000));
 
@@ -144,18 +157,24 @@ test.describe('Stream Subscription E2E', () => {
     const streamIds: string[] = [];
     const totalStreams = 1000;
     const delayMs = 50;
+    const activationTimes: number[] = [];
 
     // Helper function to add delay
     const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
     console.log(`Starting stress test: creating ${totalStreams} streams with ${delayMs}ms delay`);
+    console.log('Each stream will save log data and be verified for activation');
 
-    // Create streams with delay
+    const testStartTime = Date.now();
+
+    // Create streams with delay and individual verification
     for (let i = 0; i < totalStreams; i++) {
       const streamRequest = createTestStreamRequest({
         webhookUrl: `https://httpbin.org/post?stream=${i}`,
+        saveStreamData: true, // Enable data saving for stress test
       });
 
+      const streamStartTime = Date.now();
       const { response, data } = await apiClient.subscribe(streamRequest);
 
       // Verify each stream is created successfully
@@ -164,37 +183,78 @@ test.describe('Stream Subscription E2E', () => {
 
       streamIds.push(data.streamId);
 
-      // Log progress every 20 streams
+      // Wait for this specific stream to become active
+      const streamActivated = await waitForStreamActive(apiClient, data.streamId);
+
+      const streamActivationTime = Date.now();
+      const timeTaken = streamActivationTime - streamStartTime;
+      activationTimes.push(timeTaken);
+
+      expect(streamActivated).toBeTruthy();
+
+      // Log progress every 20 streams with timing info
       if ((i + 1) % 20 === 0) {
-        console.log(`Created ${i + 1}/${totalStreams} streams`);
+        const avgActivationTime = activationTimes.slice(-20).reduce((a, b) => a + b, 0) / Math.min(20, activationTimes.length);
+        console.log(`Created ${i + 1}/${totalStreams} streams (last 20 avg activation: ${avgActivationTime.toFixed(0)}ms)`);
       }
 
       // Add delay between stream creations
       await delay(delayMs);
     }
 
-    console.log(`Successfully created ${totalStreams} streams`);
+    const testEndTime = Date.now();
+    const totalTestTime = testEndTime - testStartTime;
 
-    // Verify streams exist with retry logic (3 attempts)
-    console.log('Verifying streams exist in the system...');
+    // Calculate statistics
+    const avgActivationTime = activationTimes.reduce((a, b) => a + b, 0) / activationTimes.length;
+    const minActivationTime = Math.min(...activationTimes);
+    const maxActivationTime = Math.max(...activationTimes);
+    const p95ActivationTime = activationTimes.sort((a, b) => a - b)[Math.floor(activationTimes.length * 0.95)];
 
-    const activeStreams = await retry(
-      { times: 3, delay: 1000 },
-      async () => {
-        const { data: activeData } = await apiClient.getActive();
-        console.log(`Found ${activeData.activeStreams.length} active streams`);
-        return activeData.activeStreams as string[];
-      }
-    );
+    // Final verification
+    const { data: finalActiveData } = await apiClient.getActive();
+    const ourActiveStreams = finalActiveData.activeStreams.filter((id: string) => streamIds.includes(id));
 
-    // Just verify we can query the endpoint and get a valid response
-    expect(activeStreams).toBeDefined();
-    expect(Array.isArray(activeStreams)).toBeTruthy();
+    const results = {
+      totalStreams,
+      successfulStreams: streamIds.length,
+      activeStreams: ourActiveStreams.length,
+      totalTestTimeMs: totalTestTime,
+      totalTestTimeMin: (totalTestTime / 1000 / 60).toFixed(2),
+      avgActivationTimeMs: avgActivationTime.toFixed(2),
+      minActivationTimeMs: minActivationTime,
+      maxActivationTimeMs: maxActivationTime,
+      p95ActivationTimeMs: p95ActivationTime,
+      streamsPerSecond: ((totalStreams / (totalTestTime / 1000)).toFixed(2)),
+    };
 
-    // Count how many of our created streams are still active
-    const ourActiveStreams = activeStreams.filter((id: string) => streamIds.includes(id));
-    console.log(`${ourActiveStreams.length} of our ${totalStreams} created streams are still active`);
+    console.log('🚀 STRESS TEST RESULTS:');
+    console.log(`✅ Created ${results.successfulStreams}/${results.totalStreams} streams successfully`);
+    console.log(`📊 ${results.activeStreams} streams currently active`);
+    console.log(`⏱️  Total test time: ${results.totalTestTimeMin} minutes`);
+    console.log(`⚡ Average stream activation time: ${results.avgActivationTimeMs}ms`);
+    console.log(`🏃 Streams per second: ${results.streamsPerSecond}`);
+    console.log(`📈 Activation times - Min: ${results.minActivationTimeMs}ms, Max: ${results.maxActivationTimeMs}ms, P95: ${results.p95ActivationTimeMs}ms`);
+
+    // Store results in testInfo for potential PR commenting
+    testInfo.annotations.push({
+      type: 'info',
+      description: `Stress Test Results: ${results.successfulStreams}/${results.totalStreams} streams, ${results.avgActivationTimeMs}ms avg activation, ${results.streamsPerSecond} streams/sec`
+    });
+
+    // Save results to file for PR comment script
+    try {
+      fs.writeFileSync('./test-results.json', JSON.stringify(results, null, 2));
+      console.log('📁 Test results saved to test-results.json');
+    } catch (error) {
+      console.warn('⚠️ Failed to save test results file:', error);
+    }
 
     console.log('Stress test completed successfully - no cleanup performed');
+
+    // Assertions
+    expect(results.successfulStreams).toBe(totalStreams);
+    expect(results.activeStreams).toBeGreaterThan(0);
+    expect(parseFloat(results.avgActivationTimeMs)).toBeLessThan(5000); // Should activate within 5 seconds on average
   });
 });
