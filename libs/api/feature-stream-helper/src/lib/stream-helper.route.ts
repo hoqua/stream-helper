@@ -1,6 +1,7 @@
 import { FastifyInstance } from 'fastify';
 import { streamService, StreamConfig } from './stream-helper.service';
 import { StreamSubscribeRequestSchema, StreamIdParamSchema } from '@durablr/shared-utils-schemas';
+import { validateAccessToken } from './auth.utils';
 import { getStreamLogs } from '@durablr/shared-data-access-db';
 
 export function registerStreamHelperRoute(fastify: FastifyInstance) {
@@ -9,6 +10,20 @@ export function registerStreamHelperRoute(fastify: FastifyInstance) {
 
   // Generic stream subscription - works with any SSE endpoint
   fastify.post('/stream/subscribe', async (request, reply) => {
+    const accessToken = request.headers.authorization;
+
+    if (!accessToken) {
+      reply.code(401);
+      return { error: 'Authorization failed' };
+    }
+
+    const valid = validateAccessToken(accessToken);
+
+    if (!valid) {
+      reply.code(401);
+      return { error: 'Invalid Token' };
+    }
+
     // Validate request body using Zod
     const validatedBody = StreamSubscribeRequestSchema.parse(request.body);
 
@@ -28,6 +43,19 @@ export function registerStreamHelperRoute(fastify: FastifyInstance) {
 
   // Stop stream subscription
   fastify.delete('/stream/subscribe/:streamId', async (request, reply) => {
+    const accessToken = request.headers.authorization;
+
+    if (!accessToken) {
+      reply.code(401);
+      return { error: 'Authorization failed' };
+    }
+
+    const valid = validateAccessToken(accessToken);
+
+    if (!valid) {
+      reply.code(401);
+      return { error: 'Invalid Token' };
+    }
     // Validate streamId parameter using Zod
     const validatedParams = StreamIdParamSchema.parse(request.params);
 
@@ -42,7 +70,21 @@ export function registerStreamHelperRoute(fastify: FastifyInstance) {
   });
 
   // Get active streams
-  fastify.get('/stream/active', async () => {
+  fastify.get('/stream/active', async (request, reply) => {
+    const accessToken = request.headers.authorization;
+
+    if (!accessToken) {
+      reply.code(401);
+      return { error: 'Authorization failed' };
+    }
+
+    const valid = validateAccessToken(accessToken);
+
+    if (!valid) {
+      reply.code(401);
+      return { error: 'Invalid Token' };
+    }
+
     const activeStreams = streamService.getActiveStreams();
     return { activeStreams, count: activeStreams.length };
   });

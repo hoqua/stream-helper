@@ -50,13 +50,19 @@
   ],
   "references": [
     {
+      "path": "../../libs/web/feature-settings"
+    },
+    {
       "path": "../../libs/shared/utils-schemas"
     },
     {
-      "path": "../../libs/web/feature-dashboard"
+      "path": "../../libs/web/utils-auth"
     },
     {
       "path": "../../libs/web/feature-vercel"
+    },
+    {
+      "path": "../../libs/web/feature-dashboard"
     },
     {
       "path": "../../libs/shared/data-access-db"

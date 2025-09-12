@@ -1,4 +1,4 @@
-import { DashboardLayout } from '@durablr/web-feature-dashboard/server';
+import { ProjectLayout } from '@durablr/web-feature-dashboard/server';
 import { ReactNode } from 'react';
 
 export default async function Layout({
@@ -9,5 +9,5 @@ export default async function Layout({
   children: ReactNode;
 }) {
   const { projectId } = await params;
-  return <DashboardLayout projectId={projectId}>{children}</DashboardLayout>;
+  return <ProjectLayout projectId={projectId}>{children}</ProjectLayout>;
 }

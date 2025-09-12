@@ -1,4 +1,5 @@
 import { APIRequestContext } from '@playwright/test';
+import { rawKey } from './seed-e2e-data';
 
 export class StreamApiClient {
   constructor(public request: APIRequestContext, private baseUrl: string) {}

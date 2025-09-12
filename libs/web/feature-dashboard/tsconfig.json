@@ -3,6 +3,9 @@
   "include": [],
   "references": [
     {
+      "path": "../utils-auth"
+    },
+    {
       "path": "../../shared/data-access-db"
     },
     {

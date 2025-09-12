@@ -1,7 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { ZodError } from 'zod';
 import { StreamSubscribeRequestSchema } from '@durablr/shared-utils-schemas';
+import { authService } from '@durablr/utils-auth';
 import { envWeb as env } from '@durablr/shared-utils-schemas/lib/env-web';
+import * as jwt from 'jsonwebtoken';
 
 export async function POST(request: NextRequest) {
   try {
@@ -10,10 +12,30 @@ export async function POST(request: NextRequest) {
     // Validate request body using Zod
     const validatedBody = StreamSubscribeRequestSchema.parse(rawBody);
 
+    const authHeader = request.headers.get('Authorization');
+
+    if (!authHeader?.startsWith('Bearer ')) {
+      return NextResponse.json(
+        { error: 'Missing or invalid Authorization header' },
+        { status: 401 },
+      );
+    }
+    const token = authHeader.split(' ')[1];
+
+    const { valid, message } = await authService.validateUserToken(token);
+
+    if (!valid) {
+      return NextResponse.json({
+        error: message,
+        status: 401,
+      });
+    }
+
     const response = await fetch(`${env.API_URL}/stream/subscribe`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        authorization: `Bearer ${jwt.sign({ valid: true }, env.SECRET_JWT_KEY)}`,
       },
       body: JSON.stringify(validatedBody),
     });

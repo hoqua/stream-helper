@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import {
+  addKey,
   createOrganizationWithUser,
   createProjects,
   createUser,
@@ -7,6 +8,7 @@ import {
 } from '@durablr/shared-data-access-db';
 import { exchangeExternalCodeForToken, VercelService } from '@durablr/feature-vercel';
 import { env } from '../../../env';
+import { authService } from '@durablr/utils-auth';
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -52,13 +54,22 @@ export async function GET(request: NextRequest) {
     });
   }
 
-  const org = await createOrganizationWithUser(data.user_id, {
-    name: 'Vercel',
-    accessToken: data.access_token,
-    providerId: data.team_id || data.user_id,
-    configurationId,
-    installationId: data.installation_id,
-  });
+  const { rawKey, hash } = authService.generateKey();
+
+  const [org] = await Promise.all([
+    createOrganizationWithUser(data.user_id, {
+      name: 'Vercel',
+      accessToken: data.access_token,
+      providerId: data.team_id || data.user_id,
+      configurationId,
+      installationId: data.installation_id,
+    }),
+    addKey({
+      key: hash,
+      userId: data.user_id,
+      name: 'Vercel',
+    }),
+  ]);
 
   await Promise.all([
     createProjects(
@@ -72,6 +83,7 @@ export async function GET(request: NextRequest) {
       projects.map((p) => p.id),
       {
         DURABLR_URL: env.API_URL,
+        DURABLR_ACCESS_TOKEN: rawKey,
       },
       data.team_id ?? undefined,
     ),
