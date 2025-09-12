@@ -3,7 +3,7 @@ import { ZodError } from 'zod';
 import { envWeb as env } from '@durablr/shared-utils-schemas/lib/env-web';
 import { StreamIdParamSchema } from '@durablr/shared-utils-schemas';
 import { authService } from '@durablr/utils-auth';
-import * as jwt from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 
 export async function DELETE(request: NextRequest, { params }: { params: { streamId: string } }) {
   try {

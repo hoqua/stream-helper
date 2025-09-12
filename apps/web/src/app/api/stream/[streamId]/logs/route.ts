@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { envWeb as env } from '@durablr/shared-utils-schemas/lib/env-web';
 import { authService } from '@durablr/utils-auth';
-import * as jwt from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 
 export async function GET(request: NextRequest, { params }: { params: { streamId: string } }) {
   try {

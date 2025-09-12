@@ -3,7 +3,7 @@ import { ZodError } from 'zod';
 import { StreamSubscribeRequestSchema } from '@durablr/shared-utils-schemas';
 import { authService } from '@durablr/utils-auth';
 import { envWeb as env } from '@durablr/shared-utils-schemas/lib/env-web';
-import * as jwt from 'jsonwebtoken';
+import jwt from 'jsonwebtoken';
 
 export async function POST(request: NextRequest) {
   console.log('=== POST /api/stream/subscribe called ===');

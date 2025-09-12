@@ -127,7 +127,7 @@ export class StreamHelperService {
     const response = await fetch(config.streamUrl, fetchOptions);
 
     if (!response.ok) {
-      const errorMessage = `Stream failed with status ${response.status}`;
+      const errorMessage = `Stream failed with status ${response.status}, ${await response.text()}`;
       await updateStreamStatus(streamId, 'error', errorMessage);
       throw new Error(errorMessage);
     }
