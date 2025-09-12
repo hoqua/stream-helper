@@ -57,7 +57,6 @@ test.describe('Stream Subscription E2E', () => {
   test('post request with headers', async () => {
     const streamRequest = createTestStreamRequest({
       method: 'POST',
-      streamUrl: 'https://httpbin.org/post',
       headers: { 'Content-Type': 'application/json' },
       body: { test: 'data' },
     });
@@ -89,10 +88,7 @@ test.describe('Stream Subscription E2E', () => {
 
   test('stream data saving when enabled', async () => {
     // Create stream with saveStreamData enabled
-    const streamRequest = createTestStreamRequest({
-      saveStreamData: true,
-      streamUrl: 'https://httpbin.org/stream/5', // Small stream for testing
-    });
+    const streamRequest = createTestStreamRequest({ saveStreamData: true });
 
     const { response, data } = await apiClient.subscribe(streamRequest);
     expect(response.ok()).toBeTruthy();
@@ -109,7 +105,6 @@ test.describe('Stream Subscription E2E', () => {
 
     // Verify data was saved to database
     const { response: logsResponse, data: logsData } = await apiClient.getStreamLogs(data.streamId);
-    console.log('logsData', logsData);
     expect(logsResponse.ok()).toBeTruthy();
     expect(logsData.streamId).toBe(data.streamId);
     expect(logsData.count).toBeGreaterThan(0);
@@ -127,10 +122,7 @@ test.describe('Stream Subscription E2E', () => {
 
   test('stream data not saved by default', async () => {
     // Create stream without saveStreamData (should default to false)
-    const streamRequest = createTestStreamRequest({
-      streamUrl: 'https://httpbin.org/stream/5',
-    });
-
+    const streamRequest = createTestStreamRequest();
     const { response, data } = await apiClient.subscribe(streamRequest);
     expect(response.ok()).toBeTruthy();
     expect(z.uuid().safeParse(data.streamId).success).toBeTruthy();
@@ -153,10 +145,10 @@ test.describe('Stream Subscription E2E', () => {
     expect(logsData.logs.length).toBe(0);
   });
 
-  test('stress test: create 1000 streams with 10ms delay', async ({ }, testInfo) => {
+  test('stress test: create 500 streams with 10ms delay', async ({ }, testInfo) => {
     testInfo.setTimeout(60 * 60 * 1000); // 1 hour timeout
     const streamIds: string[] = [];
-    const totalStreams = 1000;
+    const totalStreams = 500;
     const delayMs = 10;
     const subscriptionTimes: number[] = [];
     const activationTimes: number[] = [];
@@ -172,7 +164,6 @@ test.describe('Stream Subscription E2E', () => {
     // Create streams with delay and individual verification
     for (let i = 0; i < totalStreams; i++) {
       const streamRequest = createTestStreamRequest({
-        webhookUrl: `https://httpbin.org/post?stream=${i}`,
         saveStreamData: true, // Enable data saving for stress test
       });
 

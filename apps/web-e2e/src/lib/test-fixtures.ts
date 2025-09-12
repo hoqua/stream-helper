@@ -2,17 +2,12 @@ import type { StreamSubscribeRequest } from '@durablr/shared-utils-schemas';
 import { retry } from 'radash';
 import type { StreamApiClient } from './api-client';
 
-// Test project ID (safe for testing)
 export const TEST_PROJECT_ID = 'prj_test_e2e_streaming';
 
-// Safe test endpoints that return predictable responses
 export const TEST_FIXTURES = {
-  // HTTPBin streaming endpoints - safe for testing
   streamUrls: {
-    veryLong: 'https://httpbin.org/stream/100', // 100 events - stress test
+    veryLong: 'https://httpbin.org/stream/100', // 100 events - more reliable timing than stream/100
   },
-  
-  // Safe webhook endpoints for testing
   webhookUrls: {
     webhookSite: 'https://webhook.site/test-e2e',
     httpbinPost: 'https://httpbin.org/post',
