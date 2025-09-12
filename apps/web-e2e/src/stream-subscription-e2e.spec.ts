@@ -3,7 +3,6 @@ import { StreamApiClient } from './lib/api-client';
 import { createTestStreamRequest, waitForStreamActive } from './lib/test-fixtures';
 import { z } from 'zod';
 import { retry } from 'radash';
-import * as fs from 'fs';
 
 test.describe('Stream Subscription E2E', () => {
   let apiClient: StreamApiClient;
