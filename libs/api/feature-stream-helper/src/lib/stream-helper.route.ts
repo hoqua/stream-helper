@@ -97,7 +97,7 @@ export function registerStreamHelperRoute(fastify: FastifyInstance) {
     try {
       const logs = await getStreamLogs(validatedParams.streamId);
       return { streamId: validatedParams.streamId, logs, count: logs.length };
-    } catch (error) {
+    } catch {
       reply.code(500);
       return { error: 'Failed to retrieve stream logs' };
     }

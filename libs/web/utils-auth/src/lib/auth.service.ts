@@ -1,10 +1,10 @@
 import { createClerkClient } from '@clerk/nextjs/server';
 import crypto from 'node:crypto';
-import { getKey } from '@durablr/shared-data-access-db';
-
-const clerkClient = createClerkClient({
-  secretKey: process.env.CLERK_SECRET_KEY,
-});
+// import { getKey } from '@durablr/shared-data-access-db';
+//
+// const clerkClient = createClerkClient({
+//   secretKey: process.env.CLERK_SECRET_KEY,
+// });
 
 class AuthService {
   generateKey() {
@@ -49,8 +49,8 @@ class AuthService {
   async validateUserToken(token: string) {
     return {
       valid: true,
-      message: 'ok'
-    }
+      message: 'ok',
+    };
   }
 }
 
