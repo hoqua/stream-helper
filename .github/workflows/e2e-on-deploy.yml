@@ -169,28 +169,32 @@ jobs:
             // Try to read stress test results
             let stressTestResults = '';
             try {
+              let results = null;
               if (fs.existsSync('./test-results.json')) {
-                const results = JSON.parse(fs.readFileSync('./test-results.json', 'utf8'));
-                stressTestResults = `
-            
-            ### 🚀 Stress Test Results
-            - **Streams Created:** ${results.successfulStreams}/${results.totalStreams}
-            - **Currently Active:** ${results.activeStreams} streams
-            - **Test Duration:** ${results.totalTestTimeMin} minutes
-            - **Avg Activation Time:** ${results.avgActivationTimeMs}ms
-            - **Throughput:** ${results.streamsPerSecond} streams/sec
-            - **Performance:** Min ${results.minActivationTimeMs}ms, Max ${results.maxActivationTimeMs}ms, P95 ${results.p95ActivationTimeMs}ms`;
+                results = JSON.parse(fs.readFileSync('./test-results.json', 'utf8'));
               } else if (fs.existsSync('./test-artifacts/test-results.json')) {
-                const results = JSON.parse(fs.readFileSync('./test-artifacts/test-results.json', 'utf8'));
+                results = JSON.parse(fs.readFileSync('./test-artifacts/test-results.json', 'utf8'));
+              }
+              
+              if (results) {
                 stressTestResults = `
             
             ### 🚀 Stress Test Results
             - **Streams Created:** ${results.successfulStreams}/${results.totalStreams}
             - **Currently Active:** ${results.activeStreams} streams
             - **Test Duration:** ${results.totalTestTimeMin} minutes
-            - **Avg Activation Time:** ${results.avgActivationTimeMs}ms
-            - **Throughput:** ${results.streamsPerSecond} streams/sec
-            - **Performance:** Min ${results.minActivationTimeMs}ms, Max ${results.maxActivationTimeMs}ms, P95 ${results.p95ActivationTimeMs}ms`;
+            
+            #### 🔌 API Performance
+            - **Avg Subscription Time:** ${results.avgSubscriptionTimeMs}ms
+            - **API Throughput:** ${results.subscriptionCallsPerSecond} calls/sec
+            - **Subscription P95:** ${results.p95SubscriptionTimeMs}ms (${results.minSubscriptionTimeMs}-${results.maxSubscriptionTimeMs}ms range)
+            
+            #### ⚡ Stream Activation
+            - **Avg Activation Time:** ${results.avgActivationTimeMs}ms  
+            - **Activation P95:** ${results.p95ActivationTimeMs}ms (${results.minActivationTimeMs}-${results.maxActivationTimeMs}ms range)
+            
+            #### 📊 Overall Throughput
+            - **End-to-End:** ${results.streamsPerSecond} streams/sec`;
               }
             } catch (error) {
               console.log('Could not read stress test results:', error.message);

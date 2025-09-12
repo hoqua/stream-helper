@@ -152,11 +152,12 @@ test.describe('Stream Subscription E2E', () => {
     expect(logsData.logs.length).toBe(0);
   });
 
-  test('stress test: create 1000 streams with 50ms delay', async ({ }, testInfo) => {
+  test('stress test: create 1000 streams with 10ms delay', async ({ }, testInfo) => {
     testInfo.setTimeout(60 * 60 * 1000); // 1 hour timeout
     const streamIds: string[] = [];
     const totalStreams = 1000;
-    const delayMs = 50;
+    const delayMs = 10;
+    const subscriptionTimes: number[] = [];
     const activationTimes: number[] = [];
 
     // Helper function to add delay
@@ -174,28 +175,33 @@ test.describe('Stream Subscription E2E', () => {
         saveStreamData: true, // Enable data saving for stress test
       });
 
-      const streamStartTime = Date.now();
+      // Measure subscription API call time
+      const subscriptionStartTime = Date.now();
       const { response, data } = await apiClient.subscribe(streamRequest);
+      const subscriptionEndTime = Date.now();
+      const subscriptionTime = subscriptionEndTime - subscriptionStartTime;
 
       // Verify each stream is created successfully
       expect(response.ok(), `Stream ${i + 1} creation should succeed`).toBeTruthy();
       expect(z.uuid().safeParse(data.streamId).success, `Stream ${i + 1} should have valid UUID`).toBeTruthy();
 
       streamIds.push(data.streamId);
+      subscriptionTimes.push(subscriptionTime);
 
-      // Wait for this specific stream to become active
+      // Measure activation time
+      const activationStartTime = Date.now();
       const streamActivated = await waitForStreamActive(apiClient, data.streamId);
-
-      const streamActivationTime = Date.now();
-      const timeTaken = streamActivationTime - streamStartTime;
-      activationTimes.push(timeTaken);
+      const activationEndTime = Date.now();
+      const activationTime = activationEndTime - activationStartTime;
 
       expect(streamActivated).toBeTruthy();
+      activationTimes.push(activationTime);
 
       // Log progress every 20 streams with timing info
       if ((i + 1) % 20 === 0) {
+        const avgSubscriptionTime = subscriptionTimes.slice(-20).reduce((a, b) => a + b, 0) / Math.min(20, subscriptionTimes.length);
         const avgActivationTime = activationTimes.slice(-20).reduce((a, b) => a + b, 0) / Math.min(20, activationTimes.length);
-        console.log(`Created ${i + 1}/${totalStreams} streams (last 20 avg activation: ${avgActivationTime.toFixed(0)}ms)`);
+        console.log(`Created ${i + 1}/${totalStreams} streams (last 20 avg - subscription: ${avgSubscriptionTime.toFixed(0)}ms, activation: ${avgActivationTime.toFixed(0)}ms)`);
       }
 
       // Add delay between stream creations
@@ -205,11 +211,17 @@ test.describe('Stream Subscription E2E', () => {
     const testEndTime = Date.now();
     const totalTestTime = testEndTime - testStartTime;
 
-    // Calculate statistics
+    // Calculate subscription statistics
+    const avgSubscriptionTime = subscriptionTimes.reduce((a, b) => a + b, 0) / subscriptionTimes.length;
+    const minSubscriptionTime = Math.min(...subscriptionTimes);
+    const maxSubscriptionTime = Math.max(...subscriptionTimes);
+    const p95SubscriptionTime = [...subscriptionTimes].sort((a, b) => a - b)[Math.floor(subscriptionTimes.length * 0.95)];
+
+    // Calculate activation statistics
     const avgActivationTime = activationTimes.reduce((a, b) => a + b, 0) / activationTimes.length;
     const minActivationTime = Math.min(...activationTimes);
     const maxActivationTime = Math.max(...activationTimes);
-    const p95ActivationTime = activationTimes.sort((a, b) => a - b)[Math.floor(activationTimes.length * 0.95)];
+    const p95ActivationTime = [...activationTimes].sort((a, b) => a - b)[Math.floor(activationTimes.length * 0.95)];
 
     // Final verification
     const { data: finalActiveData } = await apiClient.getActive();
@@ -221,10 +233,18 @@ test.describe('Stream Subscription E2E', () => {
       activeStreams: ourActiveStreams.length,
       totalTestTimeMs: totalTestTime,
       totalTestTimeMin: (totalTestTime / 1000 / 60).toFixed(2),
+      // Subscription metrics
+      avgSubscriptionTimeMs: avgSubscriptionTime.toFixed(2),
+      minSubscriptionTimeMs: minSubscriptionTime,
+      maxSubscriptionTimeMs: maxSubscriptionTime,
+      p95SubscriptionTimeMs: p95SubscriptionTime,
+      subscriptionCallsPerSecond: ((totalStreams / (totalTestTime / 1000)).toFixed(2)),
+      // Activation metrics
       avgActivationTimeMs: avgActivationTime.toFixed(2),
       minActivationTimeMs: minActivationTime,
       maxActivationTimeMs: maxActivationTime,
       p95ActivationTimeMs: p95ActivationTime,
+      // Overall throughput
       streamsPerSecond: ((totalStreams / (totalTestTime / 1000)).toFixed(2)),
     };
 
@@ -232,14 +252,17 @@ test.describe('Stream Subscription E2E', () => {
     console.log(`✅ Created ${results.successfulStreams}/${results.totalStreams} streams successfully`);
     console.log(`📊 ${results.activeStreams} streams currently active`);
     console.log(`⏱️  Total test time: ${results.totalTestTimeMin} minutes`);
-    console.log(`⚡ Average stream activation time: ${results.avgActivationTimeMs}ms`);
-    console.log(`🏃 Streams per second: ${results.streamsPerSecond}`);
+    console.log(`🔌 Average subscription time: ${results.avgSubscriptionTimeMs}ms`);
+    console.log(`⚡ Average activation time: ${results.avgActivationTimeMs}ms`);
+    console.log(`🏃 Overall throughput: ${results.streamsPerSecond} streams/sec`);
+    console.log(`📞 API throughput: ${results.subscriptionCallsPerSecond} calls/sec`);
+    console.log(`📈 Subscription times - Min: ${results.minSubscriptionTimeMs}ms, Max: ${results.maxSubscriptionTimeMs}ms, P95: ${results.p95SubscriptionTimeMs}ms`);
     console.log(`📈 Activation times - Min: ${results.minActivationTimeMs}ms, Max: ${results.maxActivationTimeMs}ms, P95: ${results.p95ActivationTimeMs}ms`);
 
     // Store results in testInfo for potential PR commenting
     testInfo.annotations.push({
       type: 'info',
-      description: `Stress Test Results: ${results.successfulStreams}/${results.totalStreams} streams, ${results.avgActivationTimeMs}ms avg activation, ${results.streamsPerSecond} streams/sec`
+      description: `Stress Test Results: ${results.successfulStreams}/${results.totalStreams} streams, ${results.avgSubscriptionTimeMs}ms avg subscription, ${results.avgActivationTimeMs}ms avg activation, ${results.streamsPerSecond} streams/sec`
     });
 
     // Save results to file for PR comment script
@@ -256,5 +279,6 @@ test.describe('Stream Subscription E2E', () => {
     expect(results.successfulStreams).toBe(totalStreams);
     expect(results.activeStreams).toBeGreaterThan(0);
     expect(parseFloat(results.avgActivationTimeMs)).toBeLessThan(5000); // Should activate within 5 seconds on average
+    expect(parseFloat(results.avgSubscriptionTimeMs)).toBeLessThan(1000); // API calls should be fast
   });
 });
