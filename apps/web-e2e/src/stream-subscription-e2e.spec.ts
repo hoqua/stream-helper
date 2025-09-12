@@ -78,26 +78,63 @@ test.describe('Stream Subscription E2E', () => {
     await apiClient.stop(data.streamId);
   });
 
-  test('long stream handling (100 events)', async () => {
-    // Test with 100-event stream to verify handling of longer streams
-    const streamRequest = createTestStreamRequest({
-      streamUrl: 'https://httpbin.org/stream/100'
-    });
-
-    // Create stream
-    const { data } = await apiClient.subscribe(streamRequest);
-    expect(data.streamId).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/);
-
-    // Verify it becomes active (stream start, not completion)
-    const { data: activeStreams } = await apiClient.getActive();
-    expect(activeStreams.activeStreams).toContain(data.streamId);
-
-    // Stop stream (don't wait for completion of all 100 events)
-    const { data: stopData } = await apiClient.stop(data.streamId);
-    expect(stopData.streamId).toBe(data.streamId);
-
-    // Verify removed
-    const { data: finalStreams } = await apiClient.getActive();
-    expect(finalStreams.activeStreams).not.toContain(data.streamId);
+  test('stress test: create 100 streams with 50ms delay', async ({ }, testInfo) => {
+    testInfo.setTimeout(60 * 60 * 1000); // 1 hour timeout
+    const streamIds: string[] = [];
+    const totalStreams = 100;
+    const delayMs = 50;
+    
+    // Helper function to add delay
+    const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+    
+    console.log(`Starting stress test: creating ${totalStreams} streams with ${delayMs}ms delay`);
+    
+    // Create streams with delay
+    for (let i = 0; i < totalStreams; i++) {
+      const streamRequest = createTestStreamRequest({
+        webhookUrl: `https://httpbin.org/post?stream=${i}`,
+      });
+      
+      const { response, data } = await apiClient.subscribe(streamRequest);
+      
+      // Verify each stream is created successfully
+      expect(response.ok(), `Stream ${i + 1} creation should succeed`).toBeTruthy();
+      expect(data.streamId, `Stream ${i + 1} should have valid ID`).toMatch(
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/
+      );
+      
+      streamIds.push(data.streamId);
+      
+      // Log progress every 100 streams
+      if ((i + 1) % 100 === 0) {
+        console.log(`Created ${i + 1}/${totalStreams} streams`);
+      }
+      
+      // Add delay between stream creations
+      await delay(delayMs);
+    }
+    
+    console.log(`Successfully created ${totalStreams} streams`);
+    
+    // Verify all streams are active
+    const { data: activeData } = await apiClient.getActive();
+    for (const streamId of streamIds) {
+      expect(activeData.activeStreams).toContain(streamId);
+    }
+    
+    console.log('All streams verified as active');
+    
+    // Clean up: stop all created streams
+    console.log('Cleaning up: stopping all streams');
+    for (let i = 0; i < streamIds.length; i++) {
+      await apiClient.stop(streamIds[i]);
+      
+      // Log cleanup progress every 100 streams
+      if ((i + 1) % 100 === 0) {
+        console.log(`Stopped ${i + 1}/${totalStreams} streams`);
+      }
+    }
+    
+    console.log('Stress test completed successfully');
   });
 });
