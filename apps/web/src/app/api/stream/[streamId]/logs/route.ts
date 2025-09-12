@@ -6,7 +6,7 @@ import * as jwt from 'jsonwebtoken';
 export async function GET(request: NextRequest, { params }: { params: { streamId: string } }) {
   try {
     const { streamId } = params;
-    
+
     const authHeader = request.headers.get('Authorization');
 
     if (!authHeader?.startsWith('Bearer ')) {
