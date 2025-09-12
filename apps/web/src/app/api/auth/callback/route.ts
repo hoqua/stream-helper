@@ -14,6 +14,14 @@ export async function GET() {
 
   if (!session.userId || !user) return NextResponse.json({ redirect: '/sign-in' });
 
+  const hasPremiumAccess = session.has({ feature: 'premium_access' });
+
+  if (!hasPremiumAccess) {
+    return NextResponse.json({
+      redirect: '/pricing',
+    });
+  }
+
   const existing = await findUserById(user.id);
 
   if (!existing) {

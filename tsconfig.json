@@ -26,6 +26,12 @@
     },
     {
       "path": "./libs/api/feature-stream-helper"
+    },
+    {
+      "path": "./libs/web/utils-auth"
+    },
+    {
+      "path": "./libs/web/feature-settings"
     }
   ]
 }

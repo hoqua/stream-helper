@@ -1,4 +1,4 @@
-import { pgEnum, pgTable, primaryKey, text, timestamp } from 'drizzle-orm/pg-core';
+import { boolean, pgEnum, pgTable, primaryKey, text, timestamp } from 'drizzle-orm/pg-core';
 
 export const modeEnum = pgEnum('mode', ['realtime', 'batch', 'daily']);
 export const streamStatusEnum = pgEnum('stream_status', [
@@ -40,6 +40,17 @@ export const userOrganizations = pgTable(
   },
   (t) => [primaryKey({ columns: [t.userId, t.orgId] })],
 );
+
+export const apiKeys = pgTable('api_keys', {
+  id: text('id')
+    .primaryKey()
+    .$defaultFn(() => crypto.randomUUID()),
+  key: text('key').notNull().unique(),
+  userId: text('user_id').references(() => users.id, { onDelete: 'cascade' }),
+  name: text('name').notNull().default('Api Key'),
+  createdAt: timestamp('created_at').defaultNow().notNull(),
+  revoked: boolean('revoked').default(false).notNull(),
+});
 
 export const projects = pgTable('projects', {
   id: text('id')
@@ -85,3 +96,5 @@ export type Stream = typeof streams.$inferSelect;
 export type NewStream = typeof streams.$inferInsert;
 export type StreamLog = typeof streamLogs.$inferSelect;
 export type NewStreamLog = typeof streamLogs.$inferInsert;
+export type ApiKey = typeof apiKeys.$inferSelect;
+export type NewApiKey = typeof apiKeys.$inferInsert;
