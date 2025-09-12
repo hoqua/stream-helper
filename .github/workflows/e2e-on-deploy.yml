@@ -17,6 +17,7 @@ jobs:
     outputs:
       run-e2e: ${{ steps.check-deployments.outputs.run-e2e }}
       vercel-url: ${{ steps.check-deployments.outputs.vercel-url }}
+      railway-url: ${{ steps.check-deployments.outputs.railway-url }}
     steps:
       - name: 📋 Log Current Deployment
         run: |
@@ -44,7 +45,7 @@ jobs:
             });
             
             let vercelUrl = null;
-            let hasRailway = false;
+            let railwayUrl = null;
             
             for (const dep of deployments) {
               const { data: statuses } = await github.rest.repos.listDeploymentStatuses({
@@ -63,19 +64,20 @@ jobs:
                 vercelUrl = url;
                 console.log(`✅ Vercel deployed: ${url}`);
               } else if (url.includes('railway.app') || creator === 'railway-app[bot]') {
-                hasRailway = true;
+                railwayUrl = url;
                 console.log(`✅ Railway deployed: ${url}`);
               }
             }
             
-            if (vercelUrl && hasRailway) {
+            if (vercelUrl && railwayUrl) {
               console.log('🎉 BOTH DEPLOYMENTS READY - RUNNING E2E TESTS!');
               core.setOutput('run-e2e', 'true');
               core.setOutput('vercel-url', vercelUrl);
+              core.setOutput('railway-url', railwayUrl);
             } else {
               console.log('⏳ Waiting for both deployments...');
               console.log(`Vercel: ${vercelUrl ? '✅' : '❌'}`);
-              console.log(`Railway: ${hasRailway ? '✅' : '❌'}`);
+              console.log(`Railway: ${railwayUrl ? '✅' : '❌'}`);
               core.setOutput('run-e2e', 'false');
             }
 
@@ -108,11 +110,13 @@ jobs:
           echo "🎯 RUNNING E2E TESTS"
           echo "=========================================="
           echo "Vercel URL: ${{ needs.check-deployments.outputs.vercel-url }}"
+          echo "Railway URL: ${{ needs.check-deployments.outputs.railway-url }}"
           echo "=========================================="
           
           npx nx e2e web-e2e
         env:
           VERCEL_URL: ${{ needs.check-deployments.outputs.vercel-url }}
+          API_URL: ${{ needs.check-deployments.outputs.railway-url }}
           DATABASE_URL: ${{ secrets.DEV_DATABASE_URL }}
           CI: true
 
@@ -203,7 +207,7 @@ jobs:
             const comment = `## ${icon} E2E Tests ${status}
             
             **Vercel:** ${{ needs.check-deployments.outputs.vercel-url }}
-            **Railway:** Deployed ✅
+            **Railway:** ${{ needs.check-deployments.outputs.railway-url }}
             
             ${success 
               ? '🎉 All E2E tests passed against the deployed stack!' 
