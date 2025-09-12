@@ -1,0 +1,20 @@
+import { APIRequestContext } from '@playwright/test';
+
+export class StreamApiClient {
+  constructor(public request: APIRequestContext, private baseUrl: string) {}
+
+  async subscribe(payload: any) {
+    const response = await this.request.post(`${this.baseUrl}/api/stream/subscribe`, { data: payload });
+    return { response, data: await response.json() };
+  }
+
+  async getActive() {
+    const response = await this.request.get(`${this.baseUrl}/api/stream/active`);
+    return { response, data: await response.json() };
+  }
+
+  async stop(streamId: string) {
+    const response = await this.request.delete(`${this.baseUrl}/api/stream/subscribe/${streamId}`);
+    return { response, data: await response.json() };
+  }
+}

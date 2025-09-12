@@ -32,6 +32,9 @@
     },
     {
       "path": "./libs/web/feature-settings"
+    },
+    {
+      "path": "./apps/web-e2e"
     }
   ]
 }

@@ -32,7 +32,6 @@ export async function DELETE(request: NextRequest, { params }: { params: { strea
     const response = await fetch(`${env.API_URL}/stream/subscribe/${validatedParams.streamId}`, {
       method: 'DELETE',
       headers: {
-        'Content-Type': 'application/json',
         authorization: `Bearer ${jwt.sign({ valid: true }, env.SECRET_JWT_KEY)}`,
       },
     });

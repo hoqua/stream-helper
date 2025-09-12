@@ -1,0 +1,170 @@
+name: 🎭 E2E Tests on Deploy
+
+on:
+  deployment_status:
+
+permissions:
+  contents: read
+  deployments: read
+  issues: write
+  pull-requests: write
+
+jobs:
+  check-deployments:
+    name: 🔍 Check Both Deployments
+    runs-on: ubuntu-latest
+    if: github.event.deployment_status.state == 'success'
+    outputs:
+      run-e2e: ${{ steps.check-deployments.outputs.run-e2e }}
+      vercel-url: ${{ steps.check-deployments.outputs.vercel-url }}
+    steps:
+      - name: 📋 Log Current Deployment
+        run: |
+          echo "=========================================="
+          echo "🚀 NEW DEPLOYMENT SUCCESS"
+          echo "=========================================="
+          echo "Environment: ${{ github.event.deployment.environment }}"
+          echo "URL: ${{ github.event.deployment_status.environment_url }}"
+          echo "SHA: ${{ github.event.deployment.sha }}"
+          echo "Creator: ${{ github.event.deployment.creator.login }}"
+          echo "=========================================="
+
+      - name: 🔍 Check Both Deployments
+        id: check-deployments
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const sha = '${{ github.event.deployment.sha }}';
+            console.log(`\n🔍 Checking deployments for SHA: ${sha}\n`);
+            
+            const { data: deployments } = await github.rest.repos.listDeployments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              sha: sha
+            });
+            
+            let vercelUrl = null;
+            let hasRailway = false;
+            
+            for (const dep of deployments) {
+              const { data: statuses } = await github.rest.repos.listDeploymentStatuses({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                deployment_id: dep.id
+              });
+              
+              const latestStatus = statuses[0];
+              if (!latestStatus || latestStatus.state !== 'success') continue;
+              
+              const url = latestStatus.environment_url || '';
+              const creator = dep.creator.login;
+              
+              if (url.includes('vercel.app') || creator === 'vercel[bot]') {
+                vercelUrl = url;
+                console.log(`✅ Vercel deployed: ${url}`);
+              } else if (url.includes('railway.app') || creator === 'railway-app[bot]') {
+                hasRailway = true;
+                console.log(`✅ Railway deployed: ${url}`);
+              }
+            }
+            
+            if (vercelUrl && hasRailway) {
+              console.log('🎉 BOTH DEPLOYMENTS READY - RUNNING E2E TESTS!');
+              core.setOutput('run-e2e', 'true');
+              core.setOutput('vercel-url', vercelUrl);
+            } else {
+              console.log('⏳ Waiting for both deployments...');
+              console.log(`Vercel: ${vercelUrl ? '✅' : '❌'}`);
+              console.log(`Railway: ${hasRailway ? '✅' : '❌'}`);
+              core.setOutput('run-e2e', 'false');
+            }
+
+  run-e2e-tests:
+    name: 🧪 Setup & Run E2E Tests
+    runs-on: ubuntu-latest
+    needs: check-deployments
+    if: needs.check-deployments.outputs.run-e2e == 'true'
+    steps:
+      - name: 📥 Checkout Code
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.deployment.sha }}
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+
+      - name: 📦 Install Dependencies
+        run: npm ci
+
+      - name: 🎭 Install Playwright
+        run: npx playwright install chromium
+
+      - name: 🧪 Run E2E Tests
+        run: |
+          echo "=========================================="
+          echo "🎯 RUNNING E2E TESTS"
+          echo "=========================================="
+          echo "Vercel URL: ${{ needs.check-deployments.outputs.vercel-url }}"
+          echo "=========================================="
+          
+          npx nx e2e web-e2e
+        env:
+          VERCEL_URL: ${{ needs.check-deployments.outputs.vercel-url }}
+          DATABASE_URL: ${{ secrets.DEV_DATABASE_URL }}
+          CI: true
+
+      - name: 📊 Upload Test Results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-results-${{ github.event.deployment.sha }}
+          path: |
+            apps/web-e2e/playwright-report/
+            apps/web-e2e/test-results/
+          retention-days: 30
+
+  comment-pr:
+    name: 💬 Comment on PR
+    runs-on: ubuntu-latest
+    needs: [check-deployments, run-e2e-tests]
+    if: always() && needs.check-deployments.outputs.run-e2e == 'true'
+    steps:
+      - name: 💬 Comment on PR
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const sha = '${{ github.event.deployment.sha }}';
+            const { data: prs } = await github.rest.pulls.list({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open'
+            });
+            
+            const pr = prs.find(p => p.head.sha === sha);
+            if (!pr) {
+              console.log('No PR found for this SHA');
+              return;
+            }
+            
+            const success = '${{ needs.run-e2e-tests.result }}' === 'success';
+            const icon = success ? '✅' : '❌';
+            const status = success ? 'PASSED' : 'FAILED';
+            
+            const comment = `## ${icon} E2E Tests ${status}
+            
+            **Vercel:** ${{ needs.check-deployments.outputs.vercel-url }}
+            **Railway:** Deployed ✅
+            
+            ${success 
+              ? '🎉 All E2E tests passed against the deployed stack!' 
+              : '⚠️ Some tests failed. Check the [workflow run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) for details.'}`;
+            
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: pr.number,
+              body: comment
+            });

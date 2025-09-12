@@ -1,6 +1,12 @@
 import { createEnv } from '@t3-oss/env-nextjs';
 import { z } from 'zod';
 
+const expectedPrApiUrl = `https://durablr-api-stream-helper-pr-${process.env.VERCEL_GIT_PULL_REQUEST_ID}.up.railway.app`;
+
+// Print expected API URL during Vercel builds
+if (process.env.VERCEL && process.env.VERCEL_GIT_PULL_REQUEST_ID) {
+  console.log(`EXPECT API TO BE ON: ${expectedPrApiUrl}`);
+}
 export const envWeb = createEnv({
   server: {
     DATABASE_URL: z.url(),
@@ -41,9 +47,7 @@ export const envWeb = createEnv({
     // Known issue: VERCEL_GIT_PULL_REQUEST_ID does not increment if a PR is
     // re-created on the same branch. In such cases, Railway will increment
     // the PR number, leading to a mismatched URL.
-    API_URL:
-      process.env.API_URL ||
-      `https://durablr-api-stream-helper-${process.env.VERCEL_GIT_PULL_REQUEST_ID!}.up.railway.app`,
+    API_URL: process.env.API_URL || expectedPrApiUrl,
   },
 
   skipValidation: !!process.env.SKIP_ENV_VALIDATION,

@@ -106,30 +106,30 @@ jobs:
       - name: 🛡️ Security audit
         run: npm audit --audit-level=high
 
-  ai-review:
-    name: 🤖 Claude Review (Advisory)
-    runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request'
-    continue-on-error: true
-    steps:
-      - name: 📥 Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+  # ai-review:
+  #   name: 🤖 Claude Review (Advisory)
+  #   runs-on: ubuntu-latest
+  #   if: github.event_name == 'pull_request'
+  #   continue-on-error: true
+  #   steps:
+  #     - name: 📥 Checkout
+  #       uses: actions/checkout@v4
+  #       with:
+  #         fetch-depth: 0
 
-      - name: 🤖 AI Code Review
-        uses: anthropics/claude-code-action@beta
-        with:
-          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
-          direct_prompt: |
-            Review this PR for bugs and security issues. Focus on:
-            • Security vulnerabilities
-            • Logic errors & edge cases  
-            • Resource leaks & performance
-            • TypeScript/type safety
+  #     - name: 🤖 AI Code Review
+  #       uses: anthropics/claude-code-action@beta
+  #       with:
+  #         anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+  #         direct_prompt: |
+  #           Review this PR for bugs and security issues. Focus on:
+  #           • Security vulnerabilities
+  #           • Logic errors & edge cases  
+  #           • Resource leaks & performance
+  #           • TypeScript/type safety
 
-            Be concise. Report only actual issues found.
-            If clean, state: "No security issues or bugs detected."
+  #           Be concise. Report only actual issues found.
+  #           If clean, state: "No security issues or bugs detected."
 
   status:
     name: ✅ CI Status
