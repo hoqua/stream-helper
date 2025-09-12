@@ -1,6 +1,7 @@
 import { FastifyInstance } from 'fastify';
 import { streamService, StreamConfig } from './stream-helper.service';
 import { StreamSubscribeRequestSchema, StreamIdParamSchema } from '@durablr/shared-utils-schemas';
+import { getStreamLogs } from '@durablr/shared-data-access-db';
 
 export function registerStreamHelperRoute(fastify: FastifyInstance) {
   // Pass Fastify logger to stream service
@@ -18,6 +19,7 @@ export function registerStreamHelperRoute(fastify: FastifyInstance) {
       headers: validatedBody.headers,
       body: validatedBody.body,
       method: validatedBody.method,
+      saveStreamData: validatedBody.saveStreamData,
     };
 
     const streamId = await streamService.subscribeToStream(streamConfig);
@@ -43,5 +45,19 @@ export function registerStreamHelperRoute(fastify: FastifyInstance) {
   fastify.get('/stream/active', async () => {
     const activeStreams = streamService.getActiveStreams();
     return { activeStreams, count: activeStreams.length };
+  });
+
+  // Get stream logs for a specific stream
+  fastify.get('/stream/:streamId/logs', async (request, reply) => {
+    // Validate streamId parameter using Zod
+    const validatedParams = StreamIdParamSchema.parse(request.params);
+
+    try {
+      const logs = await getStreamLogs(validatedParams.streamId);
+      return { streamId: validatedParams.streamId, logs, count: logs.length };
+    } catch (error) {
+      reply.code(500);
+      return { error: 'Failed to retrieve stream logs' };
+    }
   });
 }

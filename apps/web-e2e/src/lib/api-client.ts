@@ -17,4 +17,9 @@ export class StreamApiClient {
     const response = await this.request.delete(`${this.baseUrl}/api/stream/subscribe/${streamId}`);
     return { response, data: await response.json() };
   }
+
+  async getStreamLogs(streamId: string) {
+    const response = await this.request.get(`${this.baseUrl}/api/stream/${streamId}/logs`);
+    return { response, data: await response.json() };
+  }
 }

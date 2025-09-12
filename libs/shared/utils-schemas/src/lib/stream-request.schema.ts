@@ -17,6 +17,7 @@ export const StreamSubscribeRequestSchema = z.object({
   headers: HeadersSchema,
   body: RequestBodySchema,
   projectId: z.string().min(1, 'projectId is required'),
+  saveStreamData: z.boolean().optional().default(false),
 });
 
 // Stream subscription response validation
