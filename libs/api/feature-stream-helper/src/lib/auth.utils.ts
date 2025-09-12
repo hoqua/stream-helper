@@ -1,4 +1,4 @@
-import { verify } from 'jsonwebtoken';
+import * as jwt from 'jsonwebtoken';
 import { envApi } from '@durablr/shared-utils-schemas/lib/env-api';
 
 export function validateAccessToken(accessToken: string) {
@@ -7,7 +7,7 @@ export function validateAccessToken(accessToken: string) {
   }
 
   const value = accessToken.split(' ')[1];
-  const decodedToken = verify(value, envApi.SECRET_JWT_KEY) as { valid: boolean };
+  const decodedToken = jwt.verify(value, envApi.SECRET_JWT_KEY) as { valid: boolean };
 
   return decodedToken.valid;
 }

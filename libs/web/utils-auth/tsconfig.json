@@ -4,9 +4,6 @@
   "include": [],
   "references": [
     {
-      "path": "../../shared/data-access-db"
-    },
-    {
       "path": "./tsconfig.lib.json"
     },
     {
