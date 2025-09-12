@@ -1,6 +1,7 @@
 import type { StreamSubscribeRequest } from '@durablr/shared-utils-schemas';
 import { retry } from 'radash';
 import type { StreamApiClient } from './api-client';
+import { envWeb as env } from '@durablr/shared-utils-schemas/lib/env-web';
 
 export const TEST_PROJECT_ID = 'prj_test_e2e_streaming';
 
@@ -9,7 +10,7 @@ export const TEST_FIXTURES = {
     veryLong: 'https://httpbin.org/stream/100', // 100 events - more reliable timing than stream/100
   },
   webhookUrls: {
-    apiTest: `${process.env.API_URL || 'http://localhost:3001'}/test`,
+    apiTest: `${env.API_URL || 'http://localhost:3001'}/test`,
   },
 } as const;
 
