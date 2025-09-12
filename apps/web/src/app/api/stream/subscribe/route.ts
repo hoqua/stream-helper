@@ -49,6 +49,7 @@ export async function POST(request: NextRequest) {
     }
 
     const data = await response.json();
+    console.log('subscribe response', data);
     return NextResponse.json(data);
   } catch (error) {
     if (error instanceof ZodError) {
