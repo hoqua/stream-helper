@@ -4,8 +4,6 @@ import { getUserKeys } from './loader';
 
 export async function SettingsPage() {
   const data = await getUserKeys();
-
-  console.log(data);
   return (
     <div className="max-w-4xl mx-auto space-y-8">
       <div className="space-y-2">

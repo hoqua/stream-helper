@@ -66,6 +66,7 @@ export async function GET(request: NextRequest) {
     }),
     addKey({
       key: hash,
+      userId: data.user_id,
       name: 'Vercel',
     }),
   ]);
