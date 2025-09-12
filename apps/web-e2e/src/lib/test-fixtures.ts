@@ -9,9 +9,7 @@ export const TEST_FIXTURES = {
     veryLong: 'https://httpbin.org/stream/100', // 100 events - more reliable timing than stream/100
   },
   webhookUrls: {
-    webhookSite: 'https://webhook.site/test-e2e',
-    httpbinPost: 'https://httpbin.org/post',
-    requestCatcher: 'https://requestcatcher.com/test-e2e',
+    apiTest: `${process.env.API_URL || 'http://localhost:3001'}/test`,
   },
 } as const;
 
@@ -23,7 +21,7 @@ export function createTestStreamRequest(
 ): StreamSubscribeRequest {
   return {
     streamUrl: TEST_FIXTURES.streamUrls.veryLong,
-    webhookUrl: TEST_FIXTURES.webhookUrls.httpbinPost,
+    webhookUrl: TEST_FIXTURES.webhookUrls.apiTest,
     method: 'GET',
     projectId: TEST_PROJECT_ID,
     saveStreamData: false,

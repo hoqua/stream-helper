@@ -83,6 +83,11 @@ server.get('/health', async () => {
   return { status: 'ok', timestamp: new Date().toISOString() };
 });
 
+// Test route
+server.post('/test', async (request) => {
+  return { status: 'ok', received: true };
+});
+
 // Ignore shutdown signals - application will keep running
 const signals = ['SIGINT', 'SIGTERM'];
 for (const signal of signals) {
