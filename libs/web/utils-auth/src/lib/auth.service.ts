@@ -1,17 +1,12 @@
 import { createClerkClient } from '@clerk/nextjs/server';
 import crypto from 'node:crypto';
 import { getKey } from '@durablr/shared-data-access-db';
-import * as jwt from 'jsonwebtoken';
 
 class AuthService {
   generateKey() {
     const rawKey = crypto.randomBytes(32).toString('hex');
     const hash = crypto.createHash('sha256').update(rawKey).digest('hex');
     return { rawKey, hash };
-  }
-
-  generateJwt(payload: string, secret: string) {
-    return jwt.sign(payload, secret);
   }
 
   async validateUserToken(token: string) {

@@ -3,6 +3,7 @@ import { ZodError } from 'zod';
 import { envWeb as env } from '@durablr/shared-utils-schemas/lib/env-web';
 import { StreamIdParamSchema } from '@durablr/shared-utils-schemas';
 import { authService } from '@durablr/utils-auth';
+import * as jwt from 'jsonwebtoken';
 
 export async function DELETE(request: NextRequest, { params }: { params: { streamId: string } }) {
   try {
@@ -32,7 +33,7 @@ export async function DELETE(request: NextRequest, { params }: { params: { strea
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
-        authorization: `Bearer ${authService.generateJwt(JSON.stringify({ valid: true }), env.SECRET_JWT_KEY)}`,
+        authorization: `Bearer ${jwt.sign({ valid: true }, env.SECRET_JWT_KEY)}`,
       },
     });
 

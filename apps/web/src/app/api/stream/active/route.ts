@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { envWeb as env } from '@durablr/shared-utils-schemas/lib/env-web';
 import { authService } from '@durablr/utils-auth';
+import * as jwt from 'jsonwebtoken';
 
 export async function GET(request: NextRequest) {
   try {
@@ -26,7 +27,7 @@ export async function GET(request: NextRequest) {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        authorization: `Bearer ${authService.generateJwt(JSON.stringify({ valid: true }), env.SECRET_JWT_KEY)}`,
+        authorization: `Bearer ${jwt.sign({ valid: true }, env.SECRET_JWT_KEY)}`,
       },
     });
 

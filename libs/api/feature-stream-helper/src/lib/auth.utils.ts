@@ -7,8 +7,7 @@ export function validateAccessToken(accessToken: string) {
   }
 
   const value = accessToken.split(' ')[1];
-  const decodedToken = jwt.verify(value, envApi.SECRET_JWT_KEY) as string;
-  const parsed = JSON.parse(decodedToken) as { valid: string };
+  const decodedToken = jwt.verify(value, envApi.SECRET_JWT_KEY) as { valid: boolean };
 
-  return parsed.valid;
+  return decodedToken.valid;
 }

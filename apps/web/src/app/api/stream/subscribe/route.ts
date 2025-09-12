@@ -3,6 +3,7 @@ import { ZodError } from 'zod';
 import { StreamSubscribeRequestSchema } from '@durablr/shared-utils-schemas';
 import { authService } from '@durablr/utils-auth';
 import { envWeb as env } from '@durablr/shared-utils-schemas/lib/env-web';
+import * as jwt from 'jsonwebtoken';
 
 export async function POST(request: NextRequest) {
   try {
@@ -34,7 +35,7 @@ export async function POST(request: NextRequest) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        authorization: `Bearer ${authService.generateJwt(JSON.stringify({ valid: true }), env.SECRET_JWT_KEY)}`,
+        authorization: `Bearer ${jwt.sign({ valid: true }, env.SECRET_JWT_KEY)}`,
       },
       body: JSON.stringify(validatedBody),
     });
