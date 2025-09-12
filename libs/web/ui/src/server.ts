@@ -7,3 +7,5 @@ export * from './lib/utils';
 export * from './lib/ui/badge';
 export * from './lib/ui/data-table';
 export * from './lib/ui/dropdown-menu';
+export * from './lib/ui/label';
+export * from './lib/ui/dialog';

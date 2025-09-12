@@ -2,15 +2,38 @@ import { NextRequest, NextResponse } from 'next/server';
 import { ZodError } from 'zod';
 import { envWeb as env } from '@durablr/shared-utils-schemas/lib/env-web';
 import { StreamIdParamSchema } from '@durablr/shared-utils-schemas';
+import { authService } from '@durablr/utils-auth';
+import * as jwt from 'jsonwebtoken';
 
 export async function DELETE(request: NextRequest, { params }: { params: { streamId: string } }) {
   try {
     // Validate streamId parameter using Zod
     const validatedParams = StreamIdParamSchema.parse(params);
 
+    const authHeader = request.headers.get('Authorization');
+
+    if (!authHeader?.startsWith('Bearer ')) {
+      return NextResponse.json(
+        { error: 'Missing or invalid Authorization header' },
+        { status: 401 },
+      );
+    }
+    const token = authHeader.split(' ')[1];
+
+    const { valid, message } = await authService.validateUserToken(token);
+
+    if (!valid) {
+      return NextResponse.json({
+        error: message,
+        status: 401,
+      });
+    }
+
     const response = await fetch(`${env.API_URL}/stream/subscribe/${validatedParams.streamId}`, {
       method: 'DELETE',
-      // Remove Content-Type header for DELETE requests with no body
+      headers: {
+        authorization: `Bearer ${jwt.sign({ valid: true }, env.SECRET_JWT_KEY)}`,
+      },
     });
 
     if (!response.ok) {

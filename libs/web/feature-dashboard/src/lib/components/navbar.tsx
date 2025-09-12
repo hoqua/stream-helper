@@ -6,10 +6,11 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '@durablr/web-ui/server';
-import { ChevronDown, ChevronUp } from 'lucide-react';
+import { ChevronDown, ChevronUp, Sliders } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
 import { UserButton } from '@clerk/nextjs';
+import { useParams } from 'next/navigation';
 
 export default function Navbar({
   projects,
@@ -18,6 +19,7 @@ export default function Navbar({
   projects: Project[];
   selectedProjectId: string;
 }) {
+  const params = useParams();
   const [open, setIsOpen] = useState(false);
 
   const selectedProject = projects.find((p) => p.id === selectedProjectId);
@@ -27,7 +29,7 @@ export default function Navbar({
       <div className="max-w-7xl mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           <div className="w-full flex items-center gap-8">
-            <div className="flex items-center gap-3">
+            <Link href={`/dashboard/${params.projectId}`} className="block flex items-center gap-3">
               <div className="inline-flex items-center justify-center w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg">
                 <svg
                   className="w-4 h-4 text-white"
@@ -44,7 +46,7 @@ export default function Navbar({
                 </svg>
               </div>
               <span className="text-white font-semibold">Stream Consumer</span>
-            </div>
+            </Link>
 
             <div className="max-w-[300px] w-full flex items-center gap-2">
               <span className="text-gray-400 text-sm">Project:</span>
@@ -69,7 +71,16 @@ export default function Navbar({
               </DropdownMenu>
             </div>
           </div>
-          <UserButton />
+          <UserButton>
+            <UserButton.MenuItems>
+              <UserButton.Action label="manageAccount" />
+              <UserButton.Link
+                label="Preferences"
+                labelIcon={<Sliders className="w-4 h-4" />}
+                href={`/dashboard/${params.projectId}/settings`}
+              />
+            </UserButton.MenuItems>
+          </UserButton>
         </div>
       </div>
     </nav>

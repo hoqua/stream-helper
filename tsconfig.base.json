@@ -23,6 +23,12 @@
       "development"
     ],
     "paths": {
+      "@durablr/feature-settings": [
+        "./libs/web/feature-settings/src/index.ts"
+      ],
+      "@durablr/feature-settings/server": [
+        "./libs/web/feature-settings/src/server.ts"
+      ],
       "@durablr/feature-stream-helper": [
         "./libs/api/feature-stream-helper/src/index.ts"
       ],
@@ -34,6 +40,9 @@
       ],
       "@durablr/shared-utils-schemas": [
         "./libs/shared/utils-schemas/src/index.ts"
+      ],
+      "@durablr/utils-auth": [
+        "./libs/web/utils-auth/src/index.ts"
       ],
       "@durablr/web-feature-dashboard": [
         "./libs/web/feature-dashboard/src/index.ts"
