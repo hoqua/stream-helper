@@ -109,6 +109,7 @@ test.describe('Stream Subscription E2E', () => {
 
     // Verify data was saved to database
     const { response: logsResponse, data: logsData } = await apiClient.getStreamLogs(data.streamId);
+    console.log('logsData', logsData);
     expect(logsResponse.ok()).toBeTruthy();
     expect(logsData.streamId).toBe(data.streamId);
     expect(logsData.count).toBeGreaterThan(0);
