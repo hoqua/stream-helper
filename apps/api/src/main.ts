@@ -52,7 +52,7 @@ server.register(cors, {
 
 // Rate limiting: 100 requests per minute per IP
 server.register(rateLimit, {
-  max: 100,
+  max: 1500,
   timeWindow: '1 minute',
   allowList: [], // IPs to exclude from rate limiting
   redis: undefined, // Can add Redis for distributed rate limiting
