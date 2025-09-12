@@ -149,7 +149,7 @@ test.describe('Stream Subscription E2E', () => {
     testInfo.setTimeout(60 * 60 * 1000); // 1 hour timeout
     const streamIds: string[] = [];
     const totalStreams = 500;
-    const delayMs = 20;
+    const delayMs = 50;
     const subscriptionTimes: number[] = [];
     const activationTimes: number[] = [];
 
