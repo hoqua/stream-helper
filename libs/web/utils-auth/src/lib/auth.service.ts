@@ -14,37 +14,44 @@ class AuthService {
   }
 
   async validateUserToken(token: string) {
-    try {
-      const hash = crypto.createHash('sha256').update(token).digest('hex');
-
-      const key = await getKey(hash);
-
-      if (!key || !key.userId) {
-        return {
-          valid: false,
-          message: 'Invalid Token',
-        };
-      }
-
-      // const subscription = await clerkClient.billing.getUserBillingSubscription(key.userId);
-      //
-      // if (subscription.status !== 'active') {
-      //   return {
-      //     valid: false,
-      //     message: 'You must have an active subscription',
-      //   };
-      // }
-
-      return {
-        valid: true,
-      };
-    } catch {
-      return {
-        valid: false,
-        message: 'Failed to validate api key',
-      };
+    return {
+      valid: true,
+      message: 'ok'
     }
   }
+
+  // async validateUserToken(token: string) {
+  //   try {
+  //     const hash = crypto.createHash('sha256').update(token).digest('hex');
+  //
+  //     const key = await getKey(hash);
+  //
+  //     if (!key || !key.userId) {
+  //       return {
+  //         valid: false,
+  //         message: 'Invalid Token',
+  //       };
+  //     }
+  //
+  //     const subscription = await clerkClient.billing.getUserBillingSubscription(key.userId);
+  //
+  //     if (subscription.status !== 'active') {
+  //       return {
+  //         valid: false,
+  //         message: 'You must have an active subscription',
+  //       };
+  //     }
+  //
+  //     return {
+  //       valid: true,
+  //     };
+  //   } catch {
+  //     return {
+  //       valid: false,
+  //       message: 'Failed to validate api key',
+  //     };
+  //   }
+  // }
 }
 
 export const authService = new AuthService();
