@@ -2,11 +2,12 @@
 import { ApiKeyForm } from './schema';
 import { addKey, deleteKey } from '@durablr/shared-data-access-db';
 import { revalidatePath } from 'next/cache';
-import { getAuthUserIdOrThrow, authService } from '@durablr/utils-auth';
+import { getAuthUserIdOrThrow } from '@durablr/utils-auth';
+import { accessService } from '@durablr/feature-access-control';
 
 export async function addApiKey(data: ApiKeyForm, path: string) {
   const userId = await getAuthUserIdOrThrow();
-  const { rawKey, hash } = authService.generateKey();
+  const { rawKey, hash } = accessService.generateKey();
   await addKey({
     name: data.name,
     key: hash,

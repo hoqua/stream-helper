@@ -7,23 +7,27 @@ import {
   db,
   apiKeys,
 } from '@durablr/shared-data-access-db';
-import { authService } from '@durablr/utils-auth';
+import { accessService } from '@durablr/feature-access-control';
 import { eq } from 'drizzle-orm';
 
-const E2E_USER_ID = 'user_test_e2e';
+//const E2E_USER_ID = 'user_test_e2e';
 const E2E_ORG_ID = 'org_test_e2e';
 const E2E_PROJECT_ID = 'prj_test_e2e_streaming';
 const E2E_ORG_NAME = 'E2E Test Organization';
 const E2E_PROJECT_NAME = 'E2E Test Project';
-export const { rawKey, hash } = authService.generateKey();
 
-export async function seedE2EData() {
+export async function deleteDbUser(userId: string) {
+  return await db.delete(users).where(eq(users.id, userId)).returning();
+}
+
+export async function seedE2EData(userId: string) {
   try {
+    const { rawKey, hash } = accessService.generateKey();
     // Upsert user
     await db
       .insert(users)
       .values({
-        id: E2E_USER_ID,
+        id: userId,
         email: 'test-e2e@example.com',
         username: 'e2e-tester',
         teamId: null,
@@ -36,7 +40,7 @@ export async function seedE2EData() {
       .values({
         id: E2E_ORG_ID,
         name: E2E_ORG_NAME,
-        providerId: E2E_ORG_ID, // Use org ID as providerId to ensure uniqueness
+        providerId: userId, // Use org ID as providerId to ensure uniqueness
         accessToken: null,
         configurationId: null,
         installationId: null,
@@ -47,7 +51,7 @@ export async function seedE2EData() {
     await db
       .insert(userOrganizations)
       .values({
-        userId: E2E_USER_ID,
+        userId: userId,
         orgId: E2E_ORG_ID,
       })
       .onConflictDoNothing();
@@ -55,7 +59,7 @@ export async function seedE2EData() {
     //Upsert User Api-Key
     await db.insert(apiKeys).values({
       key: hash,
-      userId: E2E_USER_ID,
+      userId: userId,
     });
 
     // Upsert project
@@ -72,9 +76,13 @@ export async function seedE2EData() {
     await db.delete(streams).where(eq(streams.projectId, E2E_PROJECT_ID));
 
     console.log(`E2E data ready: ${E2E_PROJECT_ID}`);
+    return {
+      rawKey,
+      hash,
+      userId,
+    };
   } catch (error) {
     console.error('E2E seed failed:', error);
     throw error;
   }
 }
-

@@ -37,16 +37,16 @@ jobs:
           script: |
             const sha = '${{ github.event.deployment.sha }}';
             console.log(`\n🔍 Checking deployments for SHA: ${sha}\n`);
-            
+
             const { data: deployments } = await github.rest.repos.listDeployments({
               owner: context.repo.owner,
               repo: context.repo.repo,
               sha: sha
             });
-            
+
             let vercelUrl = null;
             let railwayUrl = null;
-            
+
             for (const dep of deployments) {
               const { data: statuses } = await github.rest.repos.listDeploymentStatuses({
                 owner: context.repo.owner,
@@ -68,7 +68,7 @@ jobs:
                 console.log(`✅ Railway deployed: ${url}`);
               }
             }
-            
+
             if (vercelUrl && railwayUrl) {
               console.log('🎉 BOTH DEPLOYMENTS READY - RUNNING E2E TESTS!');
               core.setOutput('run-e2e', 'true');
@@ -112,12 +112,13 @@ jobs:
           echo "Vercel URL: ${{ needs.check-deployments.outputs.vercel-url }}"
           echo "Railway URL: ${{ needs.check-deployments.outputs.railway-url }}"
           echo "=========================================="
-          
+
           npx nx e2e web-e2e
         env:
           VERCEL_URL: ${{ needs.check-deployments.outputs.vercel-url }}
           API_URL: ${{ needs.check-deployments.outputs.railway-url }}
           DATABASE_URL: ${{ secrets.DEV_DATABASE_URL }}
+          CLERK_SECRET_KEY: ${{secrets.CLERK_SECRET_KEY }}
           CI: true
 
       - name: 📊 Upload Test Results
@@ -159,17 +160,17 @@ jobs:
               repo: context.repo.repo,
               state: 'open'
             });
-            
+
             const pr = prs.find(p => p.head.sha === sha);
             if (!pr) {
               console.log('No PR found for this SHA');
               return;
             }
-            
+
             const success = '${{ needs.run-e2e-tests.result }}' === 'success';
             const icon = success ? '✅' : '❌';
             const status = success ? 'PASSED' : 'FAILED';
-            
+
             // Try to read stress test results
             let stressTestResults = '';
             try {
@@ -182,43 +183,44 @@ jobs:
               
               if (results) {
                 stressTestResults = `
-            
+
             ### 🚀 Stress Test Results
             - **Streams Created:** ${results.successfulStreams}/${results.totalStreams}
             - **Currently Active:** ${results.activeStreams} streams
             - **Test Duration:** ${results.totalTestTimeMin} minutes
-            
+
             #### 🔌 API Performance
             - **Avg Subscription Time:** ${results.avgSubscriptionTimeMs}ms
             - **API Throughput:** ${results.subscriptionCallsPerSecond} calls/sec
             - **Subscription P95:** ${results.p95SubscriptionTimeMs}ms (${results.minSubscriptionTimeMs}-${results.maxSubscriptionTimeMs}ms range)
-            
+
             #### ⚡ Stream Activation
             - **Avg Activation Time:** ${results.avgActivationTimeMs}ms  
             - **Activation P95:** ${results.p95ActivationTimeMs}ms (${results.minActivationTimeMs}-${results.maxActivationTimeMs}ms range)
-            
+
             #### 📊 Overall Throughput
             - **End-to-End:** ${results.streamsPerSecond} streams/sec`;
               }
             } catch (error) {
               console.log('Could not read stress test results:', error.message);
             }
-            
+
             const comment = `## ${icon} E2E Tests ${status}
-            
+
             **Vercel:** ${{ needs.check-deployments.outputs.vercel-url }}
             **Railway:** ${{ needs.check-deployments.outputs.railway-url }}
-            
+
             ${success 
               ? '🎉 All E2E tests passed against the deployed stack!' 
               : '⚠️ Some tests failed. Check the [workflow run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) for details.'}${stressTestResults}
-            
+
             ---
             *📊 [View full test report](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})*`;
-            
+
             await github.rest.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: pr.number,
               body: comment
             });
+
