@@ -3,7 +3,10 @@ import { envWeb as env } from '@durablr/shared-utils-schemas/lib/env-web';
 import { accessService } from '@durablr/feature-access-control';
 import jwt from 'jsonwebtoken';
 
-export async function GET(request: NextRequest, { params }: { params: Promise<{ streamId: string }> }) {
+export async function GET(
+  request: NextRequest,
+  { params }: { params: Promise<{ streamId: string }> },
+) {
   try {
     const { streamId } = await params;
 

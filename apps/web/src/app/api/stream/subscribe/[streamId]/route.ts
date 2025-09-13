@@ -5,7 +5,10 @@ import { StreamIdParamSchema } from '@durablr/shared-utils-schemas';
 import { accessService } from '@durablr/feature-access-control';
 import jwt from 'jsonwebtoken';
 
-export async function DELETE(request: NextRequest, { params }: { params: Promise<{ streamId: string }> }) {
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: Promise<{ streamId: string }> },
+) {
   try {
     // Validate streamId parameter using Zod
     const validatedParams = StreamIdParamSchema.parse(await params);
@@ -23,10 +26,7 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
     const { valid, message } = await accessService.validateUserToken(token);
 
     if (!valid) {
-      return NextResponse.json({
-        error: message,
-        status: 401,
-      });
+      return NextResponse.json({ error: message }, { status: 401 });
     }
 
     const response = await fetch(`${env.API_URL}/stream/subscribe/${validatedParams.streamId}`, {

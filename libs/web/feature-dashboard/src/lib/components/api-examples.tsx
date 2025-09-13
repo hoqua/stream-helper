@@ -11,7 +11,7 @@ export function ApiExamples({ projectId }: ApiExamplesProps) {
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
   const [isExpanded, setIsExpanded] = useState(false);
 
-  const baseUrl = process.env.NEXT_PUBLIC_VERCEL_URL 
+  const baseUrl = process.env.NEXT_PUBLIC_VERCEL_URL
     ? `https://${process.env.NEXT_PUBLIC_VERCEL_URL}`
     : 'http://localhost:3000';
 
@@ -37,8 +37,8 @@ export function ApiExamples({ projectId }: ApiExamplesProps) {
       await navigator.clipboard.writeText(text);
       setCopiedIndex(index);
       setTimeout(() => setCopiedIndex(null), 2000);
-    } catch (err) {
-      console.error('Failed to copy text: ', err);
+    } catch (error) {
+      console.error('Failed to copy text:', error);
     }
   };
 
@@ -66,8 +66,8 @@ export function ApiExamples({ projectId }: ApiExamplesProps) {
         </div>
         <p className="text-gray-400">
           Copy-paste ready curl commands for your project. Replace{' '}
-          <code className="bg-gray-800 px-2 py-1 rounded text-orange-400">YOUR_API_KEY</code>{' '}
-          with your actual API key.
+          <code className="bg-gray-800 px-2 py-1 rounded text-orange-400">YOUR_API_KEY</code> with
+          your actual API key.
         </p>
       </div>
 
@@ -111,9 +111,18 @@ export function ApiExamples({ projectId }: ApiExamplesProps) {
           <div className="bg-blue-900/20 border border-blue-800/50 rounded-lg p-4">
             <h3 className="text-lg font-semibold text-blue-300 mb-2">💡 Getting Started</h3>
             <ul className="text-sm text-blue-200 space-y-1">
-              <li>• Replace <code className="bg-blue-900/50 px-1 rounded">YOUR_API_KEY</code> with your actual API key</li>
-              <li>• Replace <code className="bg-blue-900/50 px-1 rounded">{'{streamId}'}</code> with actual stream IDs from responses</li>
-              <li>• Your project ID is already configured: <code className="bg-blue-900/50 px-1 rounded">{projectId}</code></li>
+              <li>
+                • Replace <code className="bg-blue-900/50 px-1 rounded">YOUR_API_KEY</code> with
+                your actual API key
+              </li>
+              <li>
+                • Replace <code className="bg-blue-900/50 px-1 rounded">{'{streamId}'}</code> with
+                actual stream IDs from responses
+              </li>
+              <li>
+                • Your project ID is already configured:{' '}
+                <code className="bg-blue-900/50 px-1 rounded">{projectId}</code>
+              </li>
             </ul>
           </div>
         </>
