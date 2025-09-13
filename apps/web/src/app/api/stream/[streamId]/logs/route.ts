@@ -3,9 +3,9 @@ import { envWeb as env } from '@durablr/shared-utils-schemas/lib/env-web';
 import { authService } from '@durablr/utils-auth';
 import jwt from 'jsonwebtoken';
 
-export async function GET(request: NextRequest, { params }: { params: { streamId: string } }) {
+export async function GET(request: NextRequest, { params }: { params: Promise<{ streamId: string }> }) {
   try {
-    const { streamId } = params;
+    const { streamId } = await params;
 
     const authHeader = request.headers.get('Authorization');
 

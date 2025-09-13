@@ -5,10 +5,10 @@ import { StreamIdParamSchema } from '@durablr/shared-utils-schemas';
 import { authService } from '@durablr/utils-auth';
 import jwt from 'jsonwebtoken';
 
-export async function DELETE(request: NextRequest, { params }: { params: { streamId: string } }) {
+export async function DELETE(request: NextRequest, { params }: { params: Promise<{ streamId: string }> }) {
   try {
     // Validate streamId parameter using Zod
-    const validatedParams = StreamIdParamSchema.parse(params);
+    const validatedParams = StreamIdParamSchema.parse(await params);
 
     const authHeader = request.headers.get('Authorization');
 
