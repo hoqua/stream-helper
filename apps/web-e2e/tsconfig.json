@@ -4,25 +4,15 @@
     "sourceMap": false,
     "outDir": "../../dist/out-tsc",
     "allowJs": true,
-    "types": [
-      "node",
-      "@playwright/test"
-    ]
+    "types": ["node", "@playwright/test"]
   },
-  "include": [
-    "src/**/*.ts",
-    "src/**/*.js",
-    "playwright.config.ts"
-  ],
+  "include": ["src/**/*.ts", "src/**/*.js", "playwright.config.ts"],
   "references": [
     {
       "path": "../../libs/shared/data-access-db"
     },
     {
       "path": "../../libs/shared/utils-schemas"
-    },
-    {
-      "path": "../../libs/web/utils-auth"
     }
   ]
 }

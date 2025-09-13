@@ -1,4 +1,5 @@
 {
+  "extends": "../../../tsconfig.base.json",
   "files": [],
   "include": [],
   "references": [
@@ -6,17 +7,10 @@
       "path": "../../shared/data-access-db"
     },
     {
-      "path": "../ui"
-    },
-    {
-      "path": "../../shared/utils-schemas"
-    },
-    {
       "path": "./tsconfig.lib.json"
     },
     {
       "path": "./tsconfig.spec.json"
     }
-  ],
-  "extends": "../../../tsconfig.base.json"
+  ]
 }

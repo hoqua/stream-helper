@@ -1,0 +1,12 @@
+version: '3.9'
+services:
+  playwright:
+    image: mcr.microsoft.com/playwright:v1.55.0-jammy
+    working_dir: /workspace
+    env_file:
+      - ../../apps/web/.env.local
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+    volumes:
+      - ../../:/workspace
+    command: npx nx run web-e2e:e2e

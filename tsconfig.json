@@ -35,6 +35,9 @@
     },
     {
       "path": "./apps/web-e2e"
+    },
+    {
+      "path": "./libs/web/feature-access-control"
     }
   ]
 }

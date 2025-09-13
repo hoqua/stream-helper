@@ -8,23 +8,27 @@ import { format } from 'date-fns';
 export const columns: ColumnDef<Stream>[] = [
   {
     accessorKey: 'id',
-    header: 'Event ID',
+    header: 'Stream ID',
     cell: ({ row }) => (
       <span className="font-mono text-sm text-gray-300">{row.getValue('id')}</span>
     ),
   },
   {
-    accessorKey: 'timestamp',
-    header: 'Timestamp',
+    accessorKey: 'streamUrl',
+    header: 'Stream Url',
     cell: ({ row }) => (
-      <span className="text-sm text-gray-300 truncate">{row.getValue('streamUrl')}</span>
+      <span className="block w-[200px] text-sm text-gray-300 truncate">
+        {row.getValue('streamUrl')}
+      </span>
     ),
   },
   {
-    accessorKey: 'eventType',
-    header: 'Event Type',
+    accessorKey: 'webhookUrl',
+    header: 'Webhook Url',
     cell: ({ row }) => (
-      <span className="font-mono text-sm text-white truncate">{row.getValue('webhookUrl')}</span>
+      <span className="block w-[200px] font-mono text-sm text-white truncate">
+        {row.getValue('webhookUrl')}
+      </span>
     ),
   },
   {

@@ -12,6 +12,7 @@ test.describe('Stream Subscription E2E', () => {
     if (!baseURL) {
       throw new Error('No base URL provided. Configure baseURL in playwright config.');
     }
+
     baseUrl = baseURL;
     apiClient = new StreamApiClient(request, baseUrl);
   });
@@ -21,6 +22,7 @@ test.describe('Stream Subscription E2E', () => {
 
     // Create stream
     const { response: subResponse, data: subData } = await apiClient.subscribe(streamRequest);
+    console.log('sub', subData);
     expect(subResponse.ok()).toBeTruthy();
     expect(z.uuid().safeParse(subData.streamId).success).toBeTruthy();
 
@@ -62,10 +64,10 @@ test.describe('Stream Subscription E2E', () => {
     });
 
     const { data } = await apiClient.subscribe(streamRequest);
-    
+
     // Wait for stream to become active
     await waitForStreamActive(apiClient, data.streamId);
-    
+
     await apiClient.stop(data.streamId);
   });
 
@@ -73,15 +75,15 @@ test.describe('Stream Subscription E2E', () => {
     // Verify that our seeded project ID exists by trying to create a stream
     const streamRequest = createTestStreamRequest();
     expect(streamRequest.projectId).toBe('prj_test_e2e_streaming');
-    
+
     // This test will fail if the project doesn't exist in the database
     // due to foreign key constraint, which confirms our seeding worked
     const { data } = await apiClient.subscribe(streamRequest);
     expect(z.uuid().safeParse(data.streamId).success).toBeTruthy();
-    
+
     // Wait for stream to become active
     await waitForStreamActive(apiClient, data.streamId);
-    
+
     // Clean up the test stream
     await apiClient.stop(data.streamId);
   });
@@ -98,7 +100,7 @@ test.describe('Stream Subscription E2E', () => {
     await waitForStreamActive(apiClient, data.streamId);
 
     // Wait for stream to process some data
-    await new Promise(resolve => setTimeout(resolve, 5000));
+    await new Promise((resolve) => setTimeout(resolve, 5000));
 
     // Verify data was saved to database (with retry)
     const { response: logsResponse, data: logsData } = await retry(
@@ -106,16 +108,18 @@ test.describe('Stream Subscription E2E', () => {
       async () => {
         const result = await apiClient.getStreamLogs(data.streamId);
         if (!result.response.ok() || result.data.count === 0) {
-          throw new Error(`Logs not ready: ${result.response.status()}, count: ${result.data.count || 0}`);
+          throw new Error(
+            `Logs not ready: ${result.response.status()}, count: ${result.data.count || 0}`,
+          );
         }
         return result;
-      }
+      },
     );
     expect(logsResponse.ok()).toBeTruthy();
     expect(logsData.streamId).toBe(data.streamId);
     expect(logsData.count).toBeGreaterThan(0);
     expect(Array.isArray(logsData.logs)).toBeTruthy();
-    
+
     // Verify each log entry has the expected structure
     if (logsData.logs.length > 0) {
       const firstLog = logsData.logs[0];
@@ -137,7 +141,7 @@ test.describe('Stream Subscription E2E', () => {
     await waitForStreamActive(apiClient, data.streamId);
 
     // Wait for stream to process
-    await new Promise(resolve => setTimeout(resolve, 5000));
+    await new Promise((resolve) => setTimeout(resolve, 5000));
 
     // Stop the stream
     await apiClient.stop(data.streamId);
@@ -280,3 +284,4 @@ test.describe('Stream Subscription E2E', () => {
   //   expect(parseFloat(results.avgSubscriptionTimeMs)).toBeLessThan(1000); // API calls should be fast
   // });
 });
+
