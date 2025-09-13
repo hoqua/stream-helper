@@ -1,8 +1,7 @@
 import { createClerkClient } from '@clerk/nextjs/server';
-import { envWeb as env } from '@durablr/shared-utils-schemas/lib/env-web';
 
 const clerkClient = createClerkClient({
-  secretKey: env.CLERK_SECRET_KEY,
+  secretKey: process.env.CLERK_SECRET_KEY,
 });
 
 export async function getOrCreateTestUser(email: string) {
