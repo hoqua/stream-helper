@@ -7,7 +7,7 @@ import {
   db,
   apiKeys,
 } from '@durablr/shared-data-access-db';
-import { authService } from '@durablr/utils-auth';
+import { accessService } from '@durablr/feature-access-control';
 import { eq } from 'drizzle-orm';
 
 //const E2E_USER_ID = 'user_test_e2e';
@@ -22,7 +22,7 @@ export async function deleteDbUser(userId: string) {
 
 export async function seedE2EData(userId: string) {
   try {
-    const { rawKey, hash } = authService.generateKey();
+    const { rawKey, hash } = accessService.generateKey();
     // Upsert user
     await db
       .insert(users)
