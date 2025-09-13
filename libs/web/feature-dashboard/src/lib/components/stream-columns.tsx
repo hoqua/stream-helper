@@ -17,7 +17,7 @@ export const columns: ColumnDef<Stream>[] = [
     accessorKey: 'streamUrl',
     header: 'Stream Url',
     cell: ({ row }) => (
-      <span className="block w-[200px] text-sm text-gray-300 truncate">
+      <span className="block w-[200px] text-sm text-gray-300 truncate max-w-48">
         {row.getValue('streamUrl')}
       </span>
     ),
@@ -39,6 +39,18 @@ export const columns: ColumnDef<Stream>[] = [
         {row.getValue('status')}
       </Badge>
     ),
+  },
+  {
+    accessorKey: 'errorMessage',
+    header: 'Error Message',
+    cell: ({ row }) => {
+      const errorMessage = row.getValue('errorMessage') as string;
+      return errorMessage ? (
+        <span className="text-sm text-red-300 truncate max-w-48">{errorMessage}</span>
+      ) : (
+        <span className="text-sm text-gray-500">-</span>
+      );
+    },
   },
   {
     accessorKey: 'createdAt',

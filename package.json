@@ -8,9 +8,13 @@
     "dev:api": "env-cmd -f apps/api/.env.local nx serve @durablr/api --watch",
     "-----TOOLS-------": "-----TOOLS-------",
     "stream": "tsx scripts/register-stream.ts",
+    "test:key": "env-cmd -f apps/web/.env.local tsx scripts/generate-test-key.ts",
     "-----QUALITY-------": "-----QUALITY-------",
     "lint": "nx run-many --target=lint --all",
     "lint:fix": "nx run-many --target=lint --all -- --fix",
+    "-----E2E-TESTING-------": "-----E2E-TESTING-------",
+    "e2e": "env-cmd -f apps/web/.env.local nx e2e web-e2e --skipInstall",
+    "e2e:with-servers": "concurrently -k -s first -n \"WEB,API,E2E\" -c \"cyan,magenta,green\" \"npm run dev:web\" \"npm run dev:api\" \"wait-on tcp:3000 tcp:3001 && npm run e2e\"",
     "-------DATABASE-------": "-------DATABASE-------",
     "db:generate": "env-cmd -f apps/web/.env.local drizzle-kit generate",
     "db:migrate": "env-cmd -f apps/web/.env.local drizzle-kit migrate",
@@ -56,6 +60,7 @@
     "@types/react-dom": "19.0.0",
     "autoprefixer": "10.4.13",
     "babel-jest": "^30.0.2",
+    "concurrently": "^9.2.1",
     "drizzle-kit": "^0.31.4",
     "env-cmd": "^11.0.0",
     "esbuild": "^0.19.2",
@@ -83,7 +88,8 @@
     "tslib": "^2.3.0",
     "tsx": "^4.20.5",
     "typescript": "~5.8.2",
-    "typescript-eslint": "^8.29.0"
+    "typescript-eslint": "^8.29.0",
+    "wait-on": "^8.0.4"
   },
   "workspaces": [
     "web",

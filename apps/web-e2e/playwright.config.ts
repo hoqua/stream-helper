@@ -30,7 +30,7 @@ export default defineConfig({
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/testing-test-config#use */
   use: {
     /* Base URL for API calls */
-    baseURL: process.env.VERCEL_URL,
+    baseURL: process.env.VERCEL_URL || 'http://localhost:3000',
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
     /* Take screenshot on failure */
@@ -61,7 +61,7 @@ export default defineConfig({
     process.env.CI || process.env.VERCEL_URL
       ? undefined
       : {
-          command: 'nx serve web',
+          command: 'nx dev web',
           url: 'http://localhost:3000',
           reuseExistingServer: true,
           timeout: 120 * 1000,
