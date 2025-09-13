@@ -45,7 +45,7 @@ export default function Navbar({
                   />
                 </svg>
               </div>
-              <span className="text-white font-semibold">Stream Consumer</span>
+              <span className="text-white font-semibold">Durablr</span>
             </Link>
 
             <div className="max-w-[300px] w-full flex items-center gap-2">

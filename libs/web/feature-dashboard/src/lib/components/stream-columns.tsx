@@ -8,23 +8,23 @@ import { format } from 'date-fns';
 export const columns: ColumnDef<Stream>[] = [
   {
     accessorKey: 'id',
-    header: 'Event ID',
+    header: 'Stream ID',
     cell: ({ row }) => (
       <span className="font-mono text-sm text-gray-300">{row.getValue('id')}</span>
     ),
   },
   {
-    accessorKey: 'timestamp',
-    header: 'Timestamp',
+    accessorKey: 'streamUrl',
+    header: 'Stream URL',
     cell: ({ row }) => (
-      <span className="text-sm text-gray-300 truncate">{row.getValue('streamUrl')}</span>
+      <span className="text-sm text-gray-300 truncate max-w-48">{row.getValue('streamUrl')}</span>
     ),
   },
   {
-    accessorKey: 'eventType',
-    header: 'Event Type',
+    accessorKey: 'webhookUrl',
+    header: 'Webhook URL',
     cell: ({ row }) => (
-      <span className="font-mono text-sm text-white truncate">{row.getValue('webhookUrl')}</span>
+      <span className="text-sm text-gray-300 truncate max-w-48">{row.getValue('webhookUrl')}</span>
     ),
   },
   {
@@ -35,6 +35,18 @@ export const columns: ColumnDef<Stream>[] = [
         {row.getValue('status')}
       </Badge>
     ),
+  },
+  {
+    accessorKey: 'errorMessage',
+    header: 'Error Message',
+    cell: ({ row }) => {
+      const errorMessage = row.getValue('errorMessage') as string;
+      return errorMessage ? (
+        <span className="text-sm text-red-300 truncate max-w-48">{errorMessage}</span>
+      ) : (
+        <span className="text-sm text-gray-500">-</span>
+      );
+    },
   },
   {
     accessorKey: 'createdAt',

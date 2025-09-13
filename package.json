@@ -8,6 +8,7 @@
     "dev:api": "env-cmd -f apps/api/.env.local nx serve @durablr/api --watch",
     "-----TOOLS-------": "-----TOOLS-------",
     "stream": "tsx scripts/register-stream.ts",
+    "test:key": "env-cmd -f apps/web/.env.local tsx scripts/generate-test-key.ts",
     "-----QUALITY-------": "-----QUALITY-------",
     "lint": "nx run-many --target=lint --all",
     "lint:fix": "nx run-many --target=lint --all -- --fix",
