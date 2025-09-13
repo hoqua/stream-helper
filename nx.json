@@ -32,7 +32,8 @@
         "libs/web/feature-vercel/*",
         "libs/shared/data-access-db/*",
         "libs/shared/utils-schemas/*",
-        "libs/web/utils-auth/*"
+        "libs/web/utils-auth/*",
+        "libs/web/feature-access-control/*"
       ]
     },
     {
@@ -70,7 +71,8 @@
         "libs/web/feature-vercel/*",
         "libs/shared/data-access-db/*",
         "libs/shared/utils-schemas/*",
-        "libs/web/utils-auth/*"
+        "libs/web/utils-auth/*",
+        "libs/web/feature-access-control/*"
       ],
       "options": {
         "typecheck": {

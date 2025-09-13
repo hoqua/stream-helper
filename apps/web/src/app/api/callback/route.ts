@@ -8,7 +8,8 @@ import {
 } from '@durablr/shared-data-access-db';
 import { exchangeExternalCodeForToken, VercelService } from '@durablr/feature-vercel';
 import { env } from '../../../env';
-import { authService } from '@durablr/utils-auth';
+
+import { accessService } from '@durablr/feature-access-control';
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -54,7 +55,7 @@ export async function GET(request: NextRequest) {
     });
   }
 
-  const { rawKey, hash } = authService.generateKey();
+  const { rawKey, hash } = accessService.generateKey();
 
   const [org] = await Promise.all([
     createOrganizationWithUser(data.user_id, {

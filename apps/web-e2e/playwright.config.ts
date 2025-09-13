@@ -7,6 +7,7 @@ export default defineConfig({
   testDir: './src',
   /* Global setup for e2e data seeding */
   globalSetup: './src/global-setup.ts',
+  globalTeardown: './src/global-teardown.ts',
   /* Maximum time one test can run for. */
   timeout: 60 * 1000,
   /* Test timeout for expect() calls */
@@ -23,7 +24,7 @@ export default defineConfig({
   /* Opt out of parallel tests on CI. */
   workers: process.env.CI ? 1 : 1, // Always use 1 worker for E2E
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: process.env.CI 
+  reporter: process.env.CI
     ? [['html'], ['junit', { outputFile: 'test-results/results.xml' }]]
     : 'html',
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/testing-test-config#use */
@@ -46,7 +47,7 @@ export default defineConfig({
   projects: [
     {
       name: 'api-tests',
-      use: { 
+      use: {
         ...devices['Desktop Chrome'],
         // Since we're doing API-only tests, we don't need a browser UI
         headless: true,
@@ -56,14 +57,16 @@ export default defineConfig({
   ],
 
   /* Only start local server if not in CI and no Vercel URL provided */
-  webServer: process.env.CI || process.env.VERCEL_URL
-    ? undefined
-    : {
-        command: 'nx dev web',
-        url: 'http://localhost:3000',
-        reuseExistingServer: true,
-        timeout: 120 * 1000,
-        stdout: 'pipe',
-        stderr: 'pipe',
-      },
+  webServer:
+    process.env.CI || process.env.VERCEL_URL
+      ? undefined
+      : {
+          command: 'nx dev web',
+          url: 'http://localhost:3000',
+          reuseExistingServer: true,
+          timeout: 120 * 1000,
+          stdout: 'pipe',
+          stderr: 'pipe',
+        },
 });
+

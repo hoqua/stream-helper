@@ -22,7 +22,7 @@
       "path": "../../libs/shared/utils-schemas"
     },
     {
-      "path": "../../libs/web/utils-auth"
+      "path": "../../libs/web/feature-access-control"
     }
   ]
 }

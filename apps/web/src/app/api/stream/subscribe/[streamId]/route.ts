@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { ZodError } from 'zod';
 import { envWeb as env } from '@durablr/shared-utils-schemas/lib/env-web';
 import { StreamIdParamSchema } from '@durablr/shared-utils-schemas';
-import { authService } from '@durablr/utils-auth';
+import { accessService } from '@durablr/feature-access-control';
 import jwt from 'jsonwebtoken';
 
 export async function DELETE(request: NextRequest, { params }: { params: Promise<{ streamId: string }> }) {
@@ -20,7 +20,7 @@ export async function DELETE(request: NextRequest, { params }: { params: Promise
     }
     const token = authHeader.split(' ')[1];
 
-    const { valid, message } = await authService.validateUserToken(token);
+    const { valid, message } = await accessService.validateUserToken(token);
 
     if (!valid) {
       return NextResponse.json({

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { envWeb as env } from '@durablr/shared-utils-schemas/lib/env-web';
-import { authService } from '@durablr/utils-auth';
+
+import { accessService } from '@durablr/feature-access-control';
 import jwt from 'jsonwebtoken';
 
 export async function GET(request: NextRequest) {
@@ -15,7 +16,7 @@ export async function GET(request: NextRequest) {
     }
     const token = authHeader.split(' ')[1];
 
-    const { valid, message } = await authService.validateUserToken(token);
+    const { valid, message } = await accessService.validateUserToken(token);
 
     if (!valid) {
       return NextResponse.json({

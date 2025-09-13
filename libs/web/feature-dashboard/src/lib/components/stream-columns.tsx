@@ -15,16 +15,20 @@ export const columns: ColumnDef<Stream>[] = [
   },
   {
     accessorKey: 'streamUrl',
-    header: 'Stream URL',
+    header: 'Stream Url',
     cell: ({ row }) => (
-      <span className="text-sm text-gray-300 truncate max-w-48">{row.getValue('streamUrl')}</span>
+      <span className="block w-[200px] text-sm text-gray-300 truncate max-w-48">
+        {row.getValue('streamUrl')}
+      </span>
     ),
   },
   {
     accessorKey: 'webhookUrl',
-    header: 'Webhook URL',
+    header: 'Webhook Url',
     cell: ({ row }) => (
-      <span className="text-sm text-gray-300 truncate max-w-48">{row.getValue('webhookUrl')}</span>
+      <span className="block w-[200px] font-mono text-sm text-white truncate">
+        {row.getValue('webhookUrl')}
+      </span>
     ),
   },
   {
